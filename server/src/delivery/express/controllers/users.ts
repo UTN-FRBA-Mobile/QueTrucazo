@@ -15,9 +15,9 @@ export const getUsersController: Controller = async (req, res) => {
 }
 
 export const registerUserController: Controller = async (req, res) => {
-    const { email, password } = req.body;
+    const { username, password } = req.body;
 
-    const user: SafeUser = await createUser.invoke({ email, password });
+    const user: SafeUser = await createUser.invoke({ username, password });
     const token = getUserToken.invoke(user);
 
     res.status(201).json({
@@ -27,9 +27,9 @@ export const registerUserController: Controller = async (req, res) => {
 };
 
 export const loginUserController: Controller = async (req, res) => {
-    const { email, password } = req.body;
+    const { username, password } = req.body;
 
-    const user: SafeUser = await loginUser.invoke(email, password);
+    const user: SafeUser = await loginUser.invoke(username, password);
     const token = getUserToken.invoke(user);
 
     res.status(201).json({

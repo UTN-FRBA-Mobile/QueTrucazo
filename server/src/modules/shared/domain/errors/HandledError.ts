@@ -17,9 +17,8 @@ export type HandledErrorParams = {
 };
 
 export enum Resource {
-  ORDER = 'order',
+  GAME = 'game',
   USER = 'user',
-  ITEM = 'item'
 }
 
 export class HandledError extends Error {

@@ -3,21 +3,21 @@ export type SafeUser = Omit<UserProps, 'password'> & { password: undefined };
 
 export type UserProps = {
     id: UserId;
-    email: string;
+    username: string;
     password: string;
     isAdmin: boolean;
 };
 
 export class User {
     readonly id: UserId;
-    readonly email: string;
+    readonly username: string;
     readonly password: string;
     readonly isAdmin: boolean;
 
     constructor(props?: UserProps) {
         if (props) {
             this.id = props.id;
-            this.email = props.email;
+            this.username = props.username;
             this.password = props.password;
             this.isAdmin = props.isAdmin;
         }
@@ -40,7 +40,7 @@ export class User {
         });
     }
 
-    withoutPassword(): SafeUser {
+    toSafeUser(): SafeUser {
         return { ...this, password: undefined };
     }
 }

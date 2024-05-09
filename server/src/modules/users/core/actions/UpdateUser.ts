@@ -13,7 +13,7 @@ export class UpdateUser {
             throw new UserNotFound(id);
 
         const updatedUser = user.copy(removeUndefined(params));
-        return (await this.userService.update(updatedUser)).withoutPassword();
+        return (await this.userService.update(updatedUser)).toSafeUser();
     }
 }
 

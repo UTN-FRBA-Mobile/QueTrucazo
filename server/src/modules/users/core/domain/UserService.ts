@@ -8,9 +8,9 @@ export class UserService {
     constructor(private hashService: HashService, private userRepository: UserRepository) { }
 
     async create(user: User) {
-        const existingUser = await this.userRepository.getByEmail(user.email);
+        const existingUser = await this.userRepository.getByUsername(user.username);
         if (existingUser) {
-            throw new UserAlreadyExists(user.email);
+            throw new UserAlreadyExists(user.username);
         }
         const hashedPassword = await this.hashService.hash(user.password);
         const hashedUser = user.copy({ password: hashedPassword });
@@ -18,15 +18,15 @@ export class UserService {
     }
 
     async update(user: User) {
-        const existingUser = await this.userRepository.getByEmail(user.email);
+        const existingUser = await this.userRepository.getByUsername(user.username);
         if (existingUser && existingUser.id !== user.id) {
-            throw new UserAlreadyExists(user.email);
+            throw new UserAlreadyExists(user.username);
         }
         return this.userRepository.save(user);
     }
 
-    async login(email: string, password: string) {
-        const user = await this.userRepository.getByEmail(email);
+    async login(username: string, password: string) {
+        const user = await this.userRepository.getByUsername(username);
 
         if (!user)
             throw new LoginError();

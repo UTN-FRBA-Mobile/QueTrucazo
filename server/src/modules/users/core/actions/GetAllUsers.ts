@@ -10,7 +10,7 @@ export class GetAllUsers {
 
     return {
       ...result,
-      entries: result.entries.map((user) => user.withoutPassword()),
+      entries: result.entries.map((user) => user.toSafeUser()),
     };
   }
 }

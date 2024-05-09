@@ -5,7 +5,7 @@ export class DeleteUser {
   constructor(private userRepository: UserRepository) { }
 
   async invoke(id: UserId): Promise<SafeUser> {
-    return (await this.userRepository.delete(id)).withoutPassword();
+    return (await this.userRepository.delete(id)).toSafeUser();
   }
 }
 

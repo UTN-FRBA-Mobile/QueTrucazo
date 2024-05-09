@@ -6,7 +6,7 @@ export class CreateUser {
 
   async invoke(params: Omit<UserProps, 'id' | 'isAdmin'>): Promise<SafeUser> {
     const user = User.new(params);
-    return (await this.userService.create(user)).withoutPassword();
+    return (await this.userService.create(user)).toSafeUser();
   }
 }
 

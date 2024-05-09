@@ -5,7 +5,7 @@ export type PartialSession = Omit<Session, "issued" | "expires">;
 
 export interface Session {
   id: UserId;
-  email: string;
+  username: string;
   issued: number;
   expires: number;
 }

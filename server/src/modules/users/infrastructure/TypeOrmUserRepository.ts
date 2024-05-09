@@ -1,6 +1,6 @@
 import { Repository } from 'typeorm';
 import { EntriesResult } from '../../shared/domain/EntriesResult';
-import { User } from '../core/domain/User';
+import { SafeUser, User } from '../core/domain/User';
 import { UserRepository } from '../core/domain/UserRepository';
 import { TypeormUser } from './TypeormUser';
 import { ResourceNotFound } from '../../shared/domain/errors/ResourceNotFound';
@@ -16,13 +16,13 @@ export class TypeormUserRepository implements UserRepository {
         return createdUser.toDomain();
     }
 
-    async getById(id: number): Promise<User | undefined> {
+    async getById(id: number): Promise<SafeUser | undefined> {
         const user = await this.repository.findOne({ where: { id } });
-        return user ? user.toDomain() : undefined;
+        return user ? user.toDomain().toSafeUser() : undefined;
     }
 
-    async getByEmail(email: string): Promise<User | undefined> {
-        const user = await this.repository.findOne({ where: { email } });
+    async getByUsername(username: string): Promise<User | undefined> {
+        const user = await this.repository.findOne({ where: { username } });
         return user ? user.toDomain() : undefined;
     }
 
