@@ -8,16 +8,16 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.ui.window.Dialog
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
+import com.utnmobile.quetrucazo.music.MusicModel
 
 @Composable
-fun VolumeControlDialog(onDismissRequest: () -> Unit) {
-    // State for music and effects volume
+fun VolumeControlDialog(musicModel: MusicModel, onDismissRequest: () -> Unit) {
     var musicVolume by remember { mutableStateOf(0.5f) }
     var effectsVolume by remember { mutableStateOf(0.5f) }
 
     Dialog(onDismissRequest = onDismissRequest) {
         Surface(
-            shape = MaterialTheme.shapes.medium, // Adjust the shape as necessary
+            shape = MaterialTheme.shapes.medium,
             modifier = Modifier.fillMaxWidth()
         ) {
             Column(modifier = Modifier.padding(16.dp)) {
@@ -32,9 +32,11 @@ fun VolumeControlDialog(onDismissRequest: () -> Unit) {
                 Text("Música", style = MaterialTheme.typography.titleLarge)
                 Slider(
                     value = musicVolume,
-                    onValueChange = { musicVolume = it },
-                    valueRange = 0f..1f,
-                    modifier = Modifier.fillMaxWidth()
+                    onValueChange = { newVolume ->
+                        musicVolume = newVolume
+                        musicModel.setVolume(newVolume)
+                    },
+                    valueRange = 0f..1f
                 )
                 Text("Efectos", style = MaterialTheme.typography.titleLarge)
                 Slider(

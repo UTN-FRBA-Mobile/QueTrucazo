@@ -3,28 +3,21 @@ package com.utnmobile.quetrucazo
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.runtime.*
-import androidx.compose.ui.Modifier
 import com.utnmobile.quetrucazo.ui.presentation.AppNavigation
 import com.utnmobile.quetrucazo.ui.theme.QueTrucazoTheme
-import androidx.compose.material3.Text
+import com.utnmobile.quetrucazo.music.MusicModel
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.utnmobile.quetrucazo.music.MusicModelFactory
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
             QueTrucazoTheme {
-                AppNavigation()
+                // Use ViewModel with factory
+                val musicModel: MusicModel = viewModel(factory = MusicModelFactory(applicationContext))
+                AppNavigation(musicModel)
             }
         }
     }
-}
-
-
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
 }
