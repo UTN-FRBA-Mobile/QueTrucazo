@@ -20,7 +20,7 @@ export class GameService {
             throw new Error('User cannot join game');
         }
 
-        const updatedGame = game.join(user);
+        const updatedGame = game.join(user).start();
 
         return this.gameRepository.save(updatedGame);
     }
