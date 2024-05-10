@@ -8,11 +8,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Settings
+import com.utnmobile.quetrucazo.music.MusicModel
 
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MainScreen() {
+fun MainScreen(musicModel: MusicModel) {
     var showDialog by remember { mutableStateOf(false) }
 
     Scaffold(
@@ -46,7 +47,7 @@ fun MainScreen() {
             }
 
             if (showDialog) {
-                VolumeControlDialog { showDialog = false }
+                VolumeControlDialog(musicModel = musicModel, onDismissRequest = { showDialog = false })
             }
         }
     }
