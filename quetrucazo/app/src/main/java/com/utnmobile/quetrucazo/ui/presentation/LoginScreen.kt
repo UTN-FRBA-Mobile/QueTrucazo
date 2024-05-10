@@ -46,9 +46,11 @@ fun LoginScreen(onLogin: (String, String) -> Unit, onNavigateToRegister: () -> U
             Text("Login")
         }
 
-        Spacer(modifier = Modifier.height(8.dp))
+        Spacer(modifier = Modifier.height(16.dp))
 
-        Text("¿No tienes cuenta aún?")
+        Text("¿No tienes cuenta?")
+
+        Spacer(modifier = Modifier.height(4.dp))
 
         Button(onClick = onNavigateToRegister) {
             Text("Register")
