@@ -46,9 +46,11 @@ fun RegisterScreen(onRegister: (String, String) -> Unit, onNavigateToLogin: () -
             Text("Register")
         }
 
-        Spacer(modifier = Modifier.height(8.dp))
+        Spacer(modifier = Modifier.height(16.dp))
 
         Text("¿Ya tienes cuenta?")
+
+        Spacer(modifier = Modifier.height(4.dp))
 
         Button(onClick = onNavigateToLogin) {
             Text("Back to Login")
