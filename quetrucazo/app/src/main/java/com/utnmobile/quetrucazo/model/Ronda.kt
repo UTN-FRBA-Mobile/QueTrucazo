@@ -16,4 +16,13 @@ class Ronda {
         this.cartasJugadasJugador2 = cartasJugadasJugador2
     }
 
+    fun cartaGanadora(carta1: Carta, carta2: Carta){
+        if (carta1.valorCarta() < carta2.valorCarta()){
+            println(carta1.toString())
+        } else if (carta1.valorCarta() > carta2.valorCarta()){
+            println(carta2.toString())
+        }   else{
+            println("EMPATE")
+        }
+    }
 }

@@ -9,6 +9,29 @@ class Carta(var palo: CartaPalo, var numero: CartaNumero) {
         return "$numero de $palo"
     }
 
+    fun valorCarta(): Int {
+        var valor = 1
+        when(this.cartaNumero){
+            CartaNumero.UNO -> valor += if (this.cartaPalo == CartaPalo.BASTO){ 1 } else 0
+            CartaNumero.DOS -> valor += 5
+            CartaNumero.TRES -> valor += 4
+            CartaNumero.CUATRO -> valor += 13
+            CartaNumero.CINCO -> valor += 12
+            CartaNumero.SEIS -> valor += 11
+            CartaNumero.SIETE -> valor += when(this.cartaPalo){
+                                            CartaPalo.BASTO -> 10
+                                            CartaPalo.ESPADA -> 2
+                                            CartaPalo.ORO -> 3
+                                            CartaPalo.COPA -> 10
+                                            }
+            CartaNumero.DIEZ -> valor += 9
+            CartaNumero.ONCE -> valor += 8
+            CartaNumero.DOCE -> valor += 7
+        }
+        return valor
+
+    }
+
 
 
 }
