@@ -13,7 +13,7 @@ import androidx.compose.ui.unit.dp
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
-fun LoginScreen(onLogin: (String, String) -> Unit, onNavigateToRegister: () -> Unit) {
+fun LoginScreen(onLogin: (String, String) -> Unit, onNavigateTo: OnNavigateTo) {
     val keyboardController = LocalSoftwareKeyboardController.current
     var username by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
@@ -56,7 +56,7 @@ fun LoginScreen(onLogin: (String, String) -> Unit, onNavigateToRegister: () -> U
         Text(
             "Registrarse",
             modifier = Modifier.clickable {
-                onNavigateToRegister()
+                onNavigateTo(Screen.Register)
             },
             style = MaterialTheme.typography.bodyLarge.copy(
                 color = MaterialTheme.colorScheme.primary,

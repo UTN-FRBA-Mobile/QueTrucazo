@@ -3,9 +3,15 @@ package com.utnmobile.quetrucazo.ui.presentation
 import androidx.compose.runtime.*
 import com.utnmobile.quetrucazo.ui.music.MusicViewModel
 
+typealias OnNavigateTo = (Screen) -> Unit
+
 @Composable
 fun AppNavigation(musicViewModel: MusicViewModel) {
-    var currentScreen by remember { mutableStateOf<Screen>(Screen.Login) }
+    var currentScreen by remember { mutableStateOf(Screen.Login) }
+
+    val onNavigateTo: OnNavigateTo = { screen ->
+        currentScreen = screen
+    }
 
     when (currentScreen) {
         Screen.Login -> LoginScreen(
@@ -13,14 +19,14 @@ fun AppNavigation(musicViewModel: MusicViewModel) {
                 currentScreen = Screen.Main
                 musicViewModel.playMusic()
             },
-            onNavigateToRegister = { currentScreen = Screen.Register }
+            onNavigateTo = onNavigateTo,
         )
         Screen.Register -> RegisterScreen(
             onRegister = { username, password ->
                 currentScreen = Screen.Main
                 musicViewModel.playMusic()
             },
-            onNavigateToLogin = { currentScreen = Screen.Login }
+            onNavigateTo = onNavigateTo,
         )
         Screen.Main -> MainScreen(musicViewModel)
     }
