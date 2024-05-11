@@ -5,9 +5,9 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import com.utnmobile.quetrucazo.ui.presentation.AppNavigation
 import com.utnmobile.quetrucazo.ui.theme.QueTrucazoTheme
-import com.utnmobile.quetrucazo.music.MusicModel
+import com.utnmobile.quetrucazo.ui.music.MusicViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.utnmobile.quetrucazo.music.MusicModelFactory
+import com.utnmobile.quetrucazo.ui.music.MusicViewModelFactory
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -15,8 +15,8 @@ class MainActivity : ComponentActivity() {
         setContent {
             QueTrucazoTheme {
                 // Use ViewModel with factory
-                val musicModel: MusicModel = viewModel(factory = MusicModelFactory(applicationContext))
-                AppNavigation(musicModel)
+                val musicViewModel: MusicViewModel = viewModel(factory = MusicViewModelFactory(applicationContext))
+                AppNavigation(musicViewModel)
             }
         }
     }

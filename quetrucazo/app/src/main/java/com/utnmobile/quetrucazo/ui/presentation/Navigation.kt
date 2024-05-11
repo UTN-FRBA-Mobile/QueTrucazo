@@ -1,10 +1,10 @@
 package com.utnmobile.quetrucazo.ui.presentation
 
 import androidx.compose.runtime.*
-import com.utnmobile.quetrucazo.music.MusicModel
+import com.utnmobile.quetrucazo.ui.music.MusicViewModel
 
 @Composable
-fun AppNavigation(musicViewModel: MusicModel) {
+fun AppNavigation(musicViewModel: MusicViewModel) {
     var currentScreen by remember { mutableStateOf<Screen>(Screen.Login) }
 
     when (currentScreen) {

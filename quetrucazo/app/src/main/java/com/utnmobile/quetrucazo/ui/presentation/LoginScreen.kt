@@ -1,5 +1,6 @@
 package com.utnmobile.quetrucazo.ui.presentation
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.material3.*
@@ -43,7 +44,7 @@ fun LoginScreen(onLogin: (String, String) -> Unit, onNavigateToRegister: () -> U
         Spacer(modifier = Modifier.height(16.dp))
 
         Button(onClick = { onLogin(username, password) }) {
-            Text("Login")
+            Text("Iniciar sesión")
         }
 
         Spacer(modifier = Modifier.height(16.dp))
@@ -52,8 +53,14 @@ fun LoginScreen(onLogin: (String, String) -> Unit, onNavigateToRegister: () -> U
 
         Spacer(modifier = Modifier.height(4.dp))
 
-        Button(onClick = onNavigateToRegister) {
-            Text("Register")
-        }
+        Text(
+            "Registrarse",
+            modifier = Modifier.clickable {
+                onNavigateToRegister()
+            },
+            style = MaterialTheme.typography.bodyLarge.copy(
+                color = MaterialTheme.colorScheme.primary,
+            )
+        )
     }
 }
