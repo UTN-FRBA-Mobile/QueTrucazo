@@ -2,7 +2,10 @@ package com.utnmobile.quetrucazo
 
 import com.utnmobile.quetrucazo.model.Baraja
 import com.utnmobile.quetrucazo.model.Carta
+import com.utnmobile.quetrucazo.model.CartaNumero
+import com.utnmobile.quetrucazo.model.CartaPalo
 import com.utnmobile.quetrucazo.model.Jugador
+import com.utnmobile.quetrucazo.model.Ronda
 import org.junit.Test
 
 import org.junit.Assert.*
@@ -41,5 +44,13 @@ class ExampleUnitTest {
         for (i in 1..1000){
             baraja()
         }
+    }
+
+    @Test
+    fun ganadoraEntreDosCartas(){
+        var ronda = Ronda(1,true,true, emptyList(), emptyList())
+
+        ronda.cartaGanadora(Carta(CartaPalo.COPA,CartaNumero.UNO), Carta(CartaPalo.ORO,CartaNumero.UNO))
+
     }
 }
