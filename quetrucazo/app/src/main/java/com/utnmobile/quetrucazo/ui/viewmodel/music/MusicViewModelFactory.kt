@@ -1,4 +1,4 @@
-package com.utnmobile.quetrucazo.ui.music
+package com.utnmobile.quetrucazo.ui.viewmodel.music
 
 import android.content.Context
 import androidx.lifecycle.ViewModel

@@ -8,12 +8,14 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.ui.window.Dialog
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
-import com.utnmobile.quetrucazo.ui.music.MusicViewModel
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.utnmobile.quetrucazo.ui.viewmodel.music.MusicViewModel
 
 @Composable
-fun VolumeControlDialog(musicViewModel: MusicViewModel, onDismissRequest: () -> Unit) {
+fun VolumeControlDialog(onDismissRequest: () -> Unit) {
     var musicVolume by remember { mutableStateOf(0.5f) }
     var effectsVolume by remember { mutableStateOf(0.5f) }
+    val musicViewModel: MusicViewModel = viewModel()
 
     Dialog(onDismissRequest = onDismissRequest) {
         Surface(

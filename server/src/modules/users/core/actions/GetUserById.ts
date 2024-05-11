@@ -10,7 +10,7 @@ export class GetUserById {
     if (user === undefined) {
       throw new UserNotFound(id);
     }
-    return user.withoutPassword();
+    return user;
   }
 }
 

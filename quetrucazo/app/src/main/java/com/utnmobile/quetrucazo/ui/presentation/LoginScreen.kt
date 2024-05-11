@@ -9,17 +9,39 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.utnmobile.quetrucazo.ui.viewmodel.auth.AuthViewModel
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
-fun LoginScreen(onLogin: (String, String) -> Unit, onNavigateTo: OnNavigateTo) {
+fun LoginScreen(navigateTo: NavigateTo) {
     val keyboardController = LocalSoftwareKeyboardController.current
     var username by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
+    var isLoading by remember { mutableStateOf(false) }
+    var errorMessage by remember { mutableStateOf<String?>(null) }
+
+    val authViewModel = viewModel<AuthViewModel>()
+
+    errorMessage?.let {
+        AlertDialog(
+            onDismissRequest = { errorMessage = null },
+            title = { Text("Error de Login") },
+            text = { Text(it) },
+            confirmButton = {
+                Button(onClick = { errorMessage = null }) {
+                    Text("OK")
+                }
+            }
+        )
+    }
 
     Column(
-        modifier = Modifier.fillMaxSize().padding(16.dp),
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
@@ -38,13 +60,27 @@ fun LoginScreen(onLogin: (String, String) -> Unit, onNavigateTo: OnNavigateTo) {
             onValueChange = { password = it },
             label = { Text("Password") },
             singleLine = true,
-            keyboardActions = KeyboardActions { keyboardController?.hide() }
+            keyboardActions = KeyboardActions { keyboardController?.hide() },
+            visualTransformation = PasswordVisualTransformation()
         )
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        Button(onClick = { onLogin(username, password) }) {
-            Text("Iniciar sesión")
+        if (isLoading) {
+            CircularProgressIndicator()
+        } else {
+            Button(onClick = {
+                isLoading = true
+                authViewModel.login(username, password, {
+                    isLoading = false
+                    navigateTo(Screen.Main)
+                }, {
+                    isLoading = false
+                    errorMessage = it
+                })
+            }) {
+                Text("Iniciar sesión")
+            }
         }
 
         Spacer(modifier = Modifier.height(16.dp))
@@ -56,7 +92,7 @@ fun LoginScreen(onLogin: (String, String) -> Unit, onNavigateTo: OnNavigateTo) {
         Text(
             "Registrarse",
             modifier = Modifier.clickable {
-                onNavigateTo(Screen.Register)
+                navigateTo(Screen.Register)
             },
             style = MaterialTheme.typography.bodyLarge.copy(
                 color = MaterialTheme.colorScheme.primary,

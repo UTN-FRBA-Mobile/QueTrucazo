@@ -8,13 +8,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Settings
-import com.utnmobile.quetrucazo.ui.music.MusicViewModel
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.utnmobile.quetrucazo.ui.viewmodel.music.MusicViewModel
 
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MainScreen(musicViewModel: MusicViewModel) {
+fun MainScreen() {
     var showDialog by remember { mutableStateOf(false) }
+
+    viewModel<MusicViewModel>().playMusic()
 
     Scaffold(
         topBar = {
@@ -47,7 +50,7 @@ fun MainScreen(musicViewModel: MusicViewModel) {
             }
 
             if (showDialog) {
-                VolumeControlDialog(musicViewModel = musicViewModel, onDismissRequest = { showDialog = false })
+                VolumeControlDialog(onDismissRequest = { showDialog = false })
             }
         }
     }
