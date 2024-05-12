@@ -12,7 +12,12 @@ class Carta(var palo: CartaPalo, var numero: CartaNumero) {
     fun valorCarta(): Int {
         var valor = 1
         when(this.cartaNumero){
-            CartaNumero.UNO -> valor += if (this.cartaPalo == CartaPalo.BASTO){ 1 } else 0
+            CartaNumero.UNO -> valor += when(this.cartaPalo){
+                                            CartaPalo.BASTO -> 1
+                                            CartaPalo.ORO -> 6
+                                            CartaPalo.COPA -> 6
+                                            CartaPalo.ESPADA -> 0
+                                            }
             CartaNumero.DOS -> valor += 5
             CartaNumero.TRES -> valor += 4
             CartaNumero.CUATRO -> valor += 13
