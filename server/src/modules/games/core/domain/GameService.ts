@@ -7,16 +7,24 @@ export class GameService {
     constructor(private gameRepository: GameRepository) { }
 
     async createGame(u: SafeUser): Promise<Game> {
+        if (await this.gameRepository.getByUserId(u.id)) {
+            throw new Error('User already has a game');
+        }
+
         return this.gameRepository.save(Game.new(u));
     }
 
     async joinGame(id: Game['id'], user: SafeUser): Promise<Game> {
+        if (await this.gameRepository.getByUserId(user.id)) {
+            throw new Error('User already has a game');
+        }
+
         const game = await this.gameRepository.getById(id);
         if (!game) {
             throw new GameNotFound(id);
         }
 
-        if (!game.canJoin(user)) {
+        if (!game.canJoin(user.id)) {
             throw new Error('User cannot join game');
         }
 

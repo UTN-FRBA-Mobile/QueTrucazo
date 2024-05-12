@@ -1,6 +1,6 @@
 import { EntriesResult } from "../../shared/domain/EntriesResult";
 import { Game } from "../core/domain/Game";
-import { GameRepository } from "../core/domain/GameRepository";
+import { GameRepository, GetAllParams } from "../core/domain/GameRepository";
 import { GameNotFound } from "../core/domain/errors/GameNotFound";
 
 export class InMemoryGameRepository implements GameRepository {
@@ -26,15 +26,18 @@ export class InMemoryGameRepository implements GameRepository {
         return Promise.resolve(this.games.get(id));
     }
 
-    getAll(): Promise<EntriesResult<Game>> {
-        return Promise.resolve({
-            entries: Array.from(this.games.values()),
-            pagination: {
-                page: 1,
-                pageSize: this.games.size,
-                total: this.games.size,
-            }
-        });
+    getByUserId(userId: number): Promise<Game | undefined> {
+        return Promise.resolve(
+            Array.from(this.games.values())
+                .find(game => game.players.some(player => player.id === userId))
+        );
+    }
+
+    getAll({available}: GetAllParams): Promise<Game[]> {
+        return Promise.resolve(
+            Array.from(this.games.values())
+                .filter(game => available ? !game.state.started : true)
+        );
     }
 
     delete(id: number): Promise<Game> {

@@ -9,14 +9,18 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Settings
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.utnmobile.quetrucazo.services.SocketIOManager
+import com.utnmobile.quetrucazo.ui.viewmodel.auth.AuthViewModel
 import com.utnmobile.quetrucazo.ui.viewmodel.music.MusicViewModel
 
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MainScreen() {
+fun MainScreen(navigateTo: NavigateTo) {
     var showDialog by remember { mutableStateOf(false) }
 
+    val authViewModel = viewModel<AuthViewModel>()
+    SocketIOManager.connect(authViewModel.user!!.id)
     viewModel<MusicViewModel>().playMusic()
 
     Scaffold(
@@ -39,14 +43,14 @@ fun MainScreen() {
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
-            Button(onClick = { /* Handle Crear Partida */ }) {
-                Text("Crear Partida")
+            Button(onClick = { SocketIOManager.createGame(authViewModel.user!!.id) }) {
+                Text("Crear partida")
             }
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            Button(onClick = { /* Handle Buscar Partida */ }) {
-                Text("Buscar Partida")
+            Button(onClick = { navigateTo(Screen.GameList) }) {
+                Text("Unirse a una partida")
             }
 
             if (showDialog) {

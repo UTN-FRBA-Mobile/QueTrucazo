@@ -73,5 +73,6 @@ dependencies {
     implementation(libs.okhttp.core)
     implementation(libs.gson.core)
     implementation(libs.coroutines.android)
+    implementation(libs.socketio.core)
 
 }

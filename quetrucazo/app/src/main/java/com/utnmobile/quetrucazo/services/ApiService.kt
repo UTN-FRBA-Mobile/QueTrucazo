@@ -8,7 +8,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.Body
 import retrofit2.http.POST
 
-private const val baseUrl = "https://f870-190-247-139-97.ngrok-free.app/"
+const val baseUrl = "https://dfe0-190-247-139-97.ngrok-free.app"
 
 interface ApiService {
     @POST("users/login")
@@ -17,8 +17,9 @@ interface ApiService {
 
 data class Credentials(val username: String, val password: String)
 
+data class User(val id: Int, val username: String)
 data class Token(val token: String)
-data class AuthResponse(val token: Token)
+data class AuthResponse(val user: User, val token: Token)
 
 data class ErrorResponse(val type: String)
 

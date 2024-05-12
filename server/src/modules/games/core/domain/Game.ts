@@ -1,4 +1,4 @@
-import { SafeUser } from "../../../users/core/domain/User";
+import { SafeUser, UserId } from "../../../users/core/domain/User";
 import { Card, getPlayersCards } from "./Cards";
 
 export type GameId = number;
@@ -8,12 +8,6 @@ export enum EnvidoCall {
     REAL_ENVIDO = 'REAL_ENVIDO',
     FALTA_ENVIDO = 'FALTA_ENVIDO',
 }
-
-export type PlayerState = {
-    score: number;
-    cards: Card[];
-    thrownCards: Card[];
-};
 
 export type Envido = {
     call: EnvidoCall;
@@ -45,7 +39,8 @@ export type Step = {
 export type GameState = {
     started: boolean;
     firstPlayer: SafeUser['id'];
-    players: Record<SafeUser['id'], PlayerState>;
+    cards: Record<SafeUser['id'], Card[]>;
+    points: Record<SafeUser['id'], number>;
     envido: Envido | undefined;
     truco: Truco | undefined;
     winner: SafeUser['id'] | undefined;
@@ -129,9 +124,10 @@ export type GameEventThrowCard = {
 export type GameEventNextRound = {
     type: GameEventType.NEXT_ROUND;
     points: Record<SafeUser['id'], number>;
+    cards: Record<SafeUser['id'], Card[]>;
 };
 
-export type GameEvent = GameEventStart 
+export type GameEvent = GameEventStart
     | GameEventEnvidoCall
     | GameEventEnvidoAccept
     | GameEventEnvidoDecline
@@ -144,6 +140,7 @@ export type GameEvent = GameEventStart
 
 export type GameProps = {
     id: GameId;
+    name: string;
     players: SafeUser[];
     state: GameState;
     events: GameEvent[];
@@ -151,17 +148,17 @@ export type GameProps = {
 
 export class Game {
     readonly id: GameId;
+    readonly name: string;
     readonly players: SafeUser[];
     readonly state: GameState;
     readonly events: GameEvent[] = [];
 
-    constructor(props?: GameProps) {
-        if (props) {
-            this.id = props.id;
-            this.players = props.players;
-            this.state = props.state;
-            this.events = props.events;
-        }
+    constructor(props: GameProps) {
+        this.id = props.id;
+        this.name = props.name;
+        this.players = props.players;
+        this.state = props.state;
+        this.events = props.events;
     }
 
     static NEW_GAME_ID = 0;
@@ -169,18 +166,14 @@ export class Game {
     static new(user: SafeUser): Game {
         return new Game({
             id: this.NEW_GAME_ID,
+            name: user.username,
             players: [user],
             events: [],
             state: {
                 started: false,
                 firstPlayer: user.id,
-                players: {
-                    [user.id]: {
-                        score: 0,
-                        cards: [],
-                        thrownCards: [],
-                    },
-                },
+                cards: {},
+                points: {},
                 envido: undefined,
                 truco: undefined,
                 winner: undefined,
@@ -199,45 +192,50 @@ export class Game {
         });
     }
 
-    canJoin(user: SafeUser): boolean {
-        return !this.state.started && this.players.length === 1 && this.players[0].id !== user.id;
+    canJoin(userId: UserId): boolean {
+        return !this.state.started && this.players.length === 1 && this.players[0].id !== userId;
     }
 
     join(user: SafeUser): Game {
         return this.copy({
             players: [...this.players, user],
-            state: {
-                ...this.state,
-                players: {
-                    ...this.state.players,
-                    [user.id]: {
-                        score: 0,
-                        cards: [],
-                        thrownCards: [],
-                    },
-                },
-            },
         });
     }
 
     start(): Game {
         const [player1Cards, player2Cards] = getPlayersCards();
+        const points = {
+            [this.players[0].id]: 0,
+            [this.players[1].id]: 0,
+        }
+        const cards = {
+            [this.players[0].id]: player1Cards,
+            [this.players[1].id]: player2Cards,
+        }
+        const events = [...this.events, this.buildStartEvent(), this.buildNextRoundEvent(points, cards)];
+
         return this.copy({
+            events,
             state: {
                 ...this.state,
                 started: true,
-                players: {
-                    ...this.state.players,
-                    [this.players[0].id]: {
-                        ...this.state.players[this.players[0].id],
-                        cards: player1Cards,
-                    },
-                    [this.players[1].id]: {
-                        ...this.state.players[this.players[1].id],
-                        cards: player2Cards,
-                    },
-                },
+                cards,
+                points,
             },
         });
+    }
+
+    buildStartEvent(): GameEventStart {
+        return {
+            type: GameEventType.START,
+        };
+    }
+
+    buildNextRoundEvent(points: Record<SafeUser['id'], number>, cards: Record<SafeUser['id'], Card[]>): GameEventNextRound {
+        return {
+            type: GameEventType.NEXT_ROUND,
+            points,
+            cards,
+        };
     }
 }
