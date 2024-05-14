@@ -9,6 +9,7 @@ data class Game(
 ) {
     companion object {
         fun from(json: JSONObject): Game {
+            println(json.toString())
             return Game(
                 id = json.getInt("id"),
                 name = json.getString("name"),

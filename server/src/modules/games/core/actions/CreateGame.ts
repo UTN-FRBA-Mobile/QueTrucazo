@@ -7,7 +7,7 @@ export class CreateGame {
 
     public async invoke(user: SafeUser): Promise<void> {
         return this.gameService.createGame(user).then((game) => {
-            this.gameNotifier.notifyJoinGame(user.id, game);
+            this.gameNotifier.notifyCreatedGame(user.id, game.id);
         });
     }
 }

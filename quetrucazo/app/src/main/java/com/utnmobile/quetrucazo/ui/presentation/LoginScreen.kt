@@ -73,7 +73,7 @@ fun LoginScreen(navigateTo: NavigateTo) {
                 isLoading = true
                 authViewModel.login(username, password, {
                     isLoading = false
-                    navigateTo(Screen.Main)
+                    navigateTo(Screen.Main, emptyMap())
                 }, {
                     isLoading = false
                     errorMessage = it
@@ -92,7 +92,7 @@ fun LoginScreen(navigateTo: NavigateTo) {
         Text(
             "Registrarse",
             modifier = Modifier.clickable {
-                navigateTo(Screen.Register)
+                navigateTo(Screen.Register, emptyMap())
             },
             style = MaterialTheme.typography.bodyLarge.copy(
                 color = MaterialTheme.colorScheme.primary,

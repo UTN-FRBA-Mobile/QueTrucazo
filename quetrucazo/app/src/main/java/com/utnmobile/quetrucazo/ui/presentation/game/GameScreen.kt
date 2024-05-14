@@ -11,10 +11,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.utnmobile.quetrucazo.model.Game
 import com.utnmobile.quetrucazo.ui.viewmodel.music.MusicViewModel
 
 @Composable
-fun GameScreen(isPreview: Boolean = false) {
+fun GameScreen(game: Game, isPreview: Boolean = false) {
 
     if (!isPreview) {
         viewModel<MusicViewModel>().playMusic()
@@ -43,5 +44,5 @@ fun GameScreen(isPreview: Boolean = false) {
 @Preview
 @Composable
 fun GameScreenPreview() {
-    GameScreen(isPreview = true)
+    GameScreen(Game(1, "Preview game"), isPreview = true)
 }

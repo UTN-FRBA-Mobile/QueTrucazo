@@ -70,7 +70,7 @@ fun RegisterScreen(navigateTo: NavigateTo) {
                 isLoading = true
                 authViewModel.register(username, password, {
                     isLoading = false
-                    navigateTo(Screen.Main)
+                    navigateTo(Screen.Main, emptyMap())
                 }, {
                     isLoading = false
                     errorMessage = it
@@ -89,7 +89,7 @@ fun RegisterScreen(navigateTo: NavigateTo) {
         Text(
             "Iniciar sesión",
             modifier = Modifier.clickable {
-                navigateTo(Screen.Login)
+                navigateTo(Screen.Login, emptyMap())
             },
             style = MaterialTheme.typography.bodyLarge.copy(
                 color = MaterialTheme.colorScheme.primary,

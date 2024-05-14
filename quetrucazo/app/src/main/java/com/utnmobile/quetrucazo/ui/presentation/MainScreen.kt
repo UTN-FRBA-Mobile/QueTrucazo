@@ -9,9 +9,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Settings
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.utnmobile.quetrucazo.model.toGames
 import com.utnmobile.quetrucazo.services.SocketIOManager
 import com.utnmobile.quetrucazo.ui.viewmodel.auth.AuthViewModel
 import com.utnmobile.quetrucazo.ui.viewmodel.music.MusicViewModel
+import org.json.JSONArray
+import org.json.JSONObject
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -22,6 +25,17 @@ fun MainScreen(navigateTo: NavigateTo) {
     val authViewModel = viewModel<AuthViewModel>()
     SocketIOManager.connect(authViewModel.user!!.id)
     viewModel<MusicViewModel>().playMusic()
+
+    SocketIOManager.socket?.on("created-game") { args ->
+        val gameId = (args[0] as JSONObject).getInt("gameId")
+        navigateTo(Screen.WaitingForOpponent, mapOf("gameId" to gameId))
+    }
+
+    DisposableEffect(Unit) {
+        onDispose {
+            SocketIOManager.socket?.off("created-game")
+        }
+    }
 
     Scaffold(
         topBar = {
@@ -45,14 +59,13 @@ fun MainScreen(navigateTo: NavigateTo) {
         ) {
             Button(onClick = {
                 SocketIOManager.createGame(authViewModel.user!!.id)
-                navigateTo(Screen.WaitingForOpponent)
             }) {
                 Text("Crear partida")
             }
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            Button(onClick = { navigateTo(Screen.GameList) }) {
+            Button(onClick = { navigateTo(Screen.GameList, emptyMap()) }) {
                 Text("Unirse a una partida")
             }
 

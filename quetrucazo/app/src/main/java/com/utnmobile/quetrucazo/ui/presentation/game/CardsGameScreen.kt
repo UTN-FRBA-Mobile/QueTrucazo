@@ -24,6 +24,7 @@ import com.utnmobile.quetrucazo.R
 import com.utnmobile.quetrucazo.model.Carta
 import com.utnmobile.quetrucazo.model.CartaNumero
 import com.utnmobile.quetrucazo.model.CartaPalo
+import com.utnmobile.quetrucazo.model.Game
 
 @Composable
 fun CardsGameScreen(modifier: Modifier = Modifier) {
@@ -139,5 +140,5 @@ fun CardsGameScreen(modifier: Modifier = Modifier) {
 @Preview
 @Composable
 fun CardsPreview() {
-    GameScreen(isPreview = true)
+    GameScreen(game = Game(1, "Preview Game"), isPreview = true)
 }

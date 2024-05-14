@@ -41,6 +41,20 @@ object SocketIOManager {
         _socket?.emit("create-game", data)
     }
 
+    fun joinGame(userId: Int, gameId: Int) {
+        val data = JSONObject()
+        data.put("userId", userId)
+        data.put("gameId", gameId)
+        _socket?.emit("join-game", data)
+    }
+
+    fun cancelGame(userId: Int, gameId: Int) {
+        val data = JSONObject()
+        data.put("userId", userId)
+        data.put("gameId", gameId)
+        _socket?.emit("cancel-game", data)
+    }
+
     fun getGames() {
         _socket?.emit("games-list")
     }

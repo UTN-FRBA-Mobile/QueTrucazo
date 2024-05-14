@@ -8,6 +8,7 @@ import { getAllAvailableGames } from '../../modules/games/core/actions/GetAllGam
 import { GameId, GameStep } from '../../modules/games/core/domain/Game';
 import { Card } from '../../modules/games/core/domain/Cards';
 import { throwCard } from '../../modules/games/core/actions/ThrowCard';
+import { cancelGame } from '../../modules/games/core/actions/CancelGame';
 
 export class SocketManager {
     private io: Server;
@@ -85,6 +86,15 @@ export class SocketManager {
                     await joinGame.invoke(gameId, user);
                 } catch (error) {
                     console.error('Error joining game', error);
+                }
+            });
+
+            socket.on('cancel-game', async ({ userId, gameId }: { userId: UserId, gameId: GameId }) => {
+                try {
+                    console.log('cancelling game')
+                    await cancelGame.invoke(gameId, userId);
+                } catch (error) {
+                    console.error('Error cancelling game', error);
                 }
             });
 
