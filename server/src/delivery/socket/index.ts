@@ -5,7 +5,9 @@ import { UserId } from '../../modules/users/core/domain/User';
 import { getUserById } from '../../modules/users/core/actions/GetUserById';
 import { joinGame } from '../../modules/games/core/actions/JoinGame';
 import { getAllAvailableGames } from '../../modules/games/core/actions/GetAllGames';
-import { GameId } from '../../modules/games/core/domain/Game';
+import { GameId, GameStep } from '../../modules/games/core/domain/Game';
+import { Card } from '../../modules/games/core/domain/Cards';
+import { throwCard } from '../../modules/games/core/actions/ThrowCard';
 
 export class SocketManager {
     private io: Server;
@@ -83,6 +85,15 @@ export class SocketManager {
                     await joinGame.invoke(gameId, user);
                 } catch (error) {
                     console.error('Error joining game', error);
+                }
+            });
+
+            socket.on('throw-card', async ({ userId, gameId, card, step }: { userId: UserId, gameId: GameId, card: Card, step: GameStep }) => {
+                try {
+                    console.log('throwing card')
+                    await throwCard.invoke(gameId, userId, card, step);
+                } catch (error) {
+                    console.error('Error throwing card', error);
                 }
             });
         });

@@ -32,6 +32,23 @@ export class GameService {
 
         return this.gameRepository.save(updatedGame);
     }
+
+    async getUserGame(gameId: Game['id'], userId: SafeUser['id']): Promise<Game> {
+        const game = await this.gameRepository.getById(gameId);
+        if (!game) {
+            throw new GameNotFound(gameId);
+        }
+
+        if (!game.hasUser(userId)) {
+            throw new Error('User is not part of the game');
+        }
+
+        return game;
+    }
+
+    async update(game: Game): Promise<Game> {
+        return this.gameRepository.save(game);
+    }
 }
 
 export const gameService = new GameService(gameRepository);

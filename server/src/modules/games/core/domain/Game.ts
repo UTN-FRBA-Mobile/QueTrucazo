@@ -1,5 +1,5 @@
 import { SafeUser, UserId } from "../../../users/core/domain/User";
-import { Card, getPlayersCards } from "./Cards";
+import { Card, generatePlayersCards, getCardValue, getRoundWinner } from "./Cards";
 
 export type GameId = number;
 
@@ -30,24 +30,16 @@ export type Truco = {
     caller: SafeUser['id'];
 }
 
-export type Step = {
-    starter: SafeUser['id'];
-    cards: Record<SafeUser['id'], string>;
-    winner: SafeUser['id'] | undefined;
-}
-
 export type GameState = {
     started: boolean;
     firstPlayer: SafeUser['id'];
-    cards: Record<SafeUser['id'], Card[]>;
-    points: Record<SafeUser['id'], number>;
-    envido: Envido | undefined;
-    truco: Truco | undefined;
+    playerTurn: SafeUser['id'];
     winner: SafeUser['id'] | undefined;
     round: number;
-    step1: Step | undefined;
-    step2: Step | undefined;
-    step3: Step | undefined;
+    cards: Record<SafeUser['id'], Card[]>;
+    thrownCards: Record<SafeUser['id'], Card[]>;
+    trucoPoints: number;
+    points: UsersPoints;
 };
 
 export enum GameEventType {
@@ -60,7 +52,9 @@ export enum GameEventType {
     TRUCO_ACCEPT = 'TRUCO_ACCEPT',
     TRUCO_DECLINE = 'TRUCO_DECLINE',
     THROW_CARD = 'THROW_CARD',
+    ROUND_RESULT = 'ROUND_RESULT',
     NEXT_ROUND = 'NEXT_ROUND',
+    RESULT = 'RESULT',
 }
 
 export type GameEventStart = {
@@ -114,17 +108,33 @@ export type GameEventTrucoDecline = {
     call: TrucoCall;
 };
 
+export type GameStep = 1 | 2 | 3;
+
 export type GameEventThrowCard = {
     type: GameEventType.THROW_CARD;
     player: SafeUser['id'];
     card: Card;
-    step: 1 | 2 | 3;
+    step: GameStep;
+};
+
+export type UsersPoints = Record<SafeUser['id'], number>;
+
+export type GameEventRoundResult = {
+    type: GameEventType.ROUND_RESULT;
+    winner: SafeUser['id'];
+    points: UsersPoints;
 };
 
 export type GameEventNextRound = {
     type: GameEventType.NEXT_ROUND;
-    points: Record<SafeUser['id'], number>;
     cards: Record<SafeUser['id'], Card[]>;
+    round: number;
+};
+
+export type GameEventResult = {
+    type: GameEventType.RESULT;
+    winner: SafeUser['id'];
+    points: UsersPoints;
 };
 
 export type GameEvent = GameEventStart
@@ -136,7 +146,9 @@ export type GameEvent = GameEventStart
     | GameEventTrucoAccept
     | GameEventTrucoDecline
     | GameEventThrowCard
-    | GameEventNextRound;
+    | GameEventRoundResult
+    | GameEventNextRound
+    | GameEventResult;
 
 export type GameProps = {
     id: GameId;
@@ -172,15 +184,13 @@ export class Game {
             state: {
                 started: false,
                 firstPlayer: user.id,
-                cards: {},
-                points: {},
-                envido: undefined,
-                truco: undefined,
+                playerTurn: user.id,
                 winner: undefined,
-                round: 0,
-                step1: undefined,
-                step2: undefined,
-                step3: undefined,
+                round: 1,
+                cards: {},
+                thrownCards: {},
+                trucoPoints: 1,
+                points: {},
             }
         });
     }
@@ -196,6 +206,10 @@ export class Game {
         return !this.state.started && this.players.length === 1 && this.players[0].id !== userId;
     }
 
+    hasUser(userId: UserId): boolean {
+        return this.players.some(player => player.id === userId);
+    }
+
     join(user: SafeUser): Game {
         return this.copy({
             players: [...this.players, user],
@@ -203,7 +217,7 @@ export class Game {
     }
 
     start(): Game {
-        const [player1Cards, player2Cards] = getPlayersCards();
+        const [player1Cards, player2Cards] = generatePlayersCards();
         const points = {
             [this.players[0].id]: 0,
             [this.players[1].id]: 0,
@@ -212,7 +226,7 @@ export class Game {
             [this.players[0].id]: player1Cards,
             [this.players[1].id]: player2Cards,
         }
-        const events = [...this.events, this.buildStartEvent(), this.buildNextRoundEvent(points, cards)];
+        const events = [...this.events, this.buildStartEvent(), this.buildNextRoundEvent(this.state.round, cards)];
 
         return this.copy({
             events,
@@ -225,17 +239,145 @@ export class Game {
         });
     }
 
+    throwCard(userId: UserId, card: Card, step: GameStep): Game {
+        // it should be player turn
+        if (this.state.playerTurn !== userId) {
+            throw new Error('Not your turn');
+        }
+        
+        // it should be a valid card
+        if (!this.state.cards[userId].includes(card)) {
+            throw new Error('Invalid card');
+        }
+
+        const throwCardEvent = this.buildThrowCardEvent(userId, card, step);
+
+        const updatedGame = this.copy({
+            events: [...this.events, throwCardEvent],
+            state: {
+                ...this.state,
+                cards: {
+                    ...this.state.cards,
+                    [userId]: this.state.cards[userId].filter(c => c !== card),
+                },
+                thrownCards: {
+                    ...this.state.thrownCards,
+                    [userId]: [...(this.state.thrownCards[userId] || []), card],
+                },
+            },
+        });
+
+        return updatedGame.withRoundWinnerValidation();
+    }
+
+    withRoundWinnerValidation(): Game {
+        const winner = getRoundWinner(this.getPlayersIds(), this.state.thrownCards);
+        if (winner === undefined) return this;
+
+        const extraPoints = this.state.trucoPoints;
+        
+        const points = {
+            ...this.state.points,
+            [winner]: this.state.points[winner] + extraPoints,
+        };
+
+        const roundResultEvent = this.buildRoundResultEvent(winner, points);
+
+        const game = this.copy({
+            events: [...this.events, roundResultEvent],
+            state: {
+                ...this.state,
+                points,
+            },
+        });   
+        
+        return game.withNextRoundOrWin();
+    }
+
+    withNextRoundOrWin(): Game {
+        if (this.state.points[this.players[0].id] >= 30 || this.state.points[this.players[1].id] >= 30) {
+            const winner = this.state.points[this.players[0].id] >= this.state.points[this.players[0].id] ? this.players[0].id : this.players[1].id;
+
+            const gameResultEvent = this.buildResultEvent(winner, this.state.points);
+
+            return this.copy({
+                events: [...this.events, gameResultEvent],
+                state: {
+                    ...this.state,
+                    winner,
+                },
+            });
+        }
+
+        const [player1Cards, player2Cards] = generatePlayersCards();
+        const cards = {
+            [this.players[0].id]: player1Cards,
+            [this.players[1].id]: player2Cards,
+        }
+        const round = this.state.round + 1;
+
+        const nextRoundEvent = this.buildNextRoundEvent(round, cards);
+
+        const firstPlayer = this.state.playerTurn === this.players[0].id ? this.players[1].id : this.players[0].id;
+
+        return this.copy({
+            events: [...this.events, nextRoundEvent],
+            state: {
+                ...this.state,
+                round,
+                cards,
+                firstPlayer,
+                thrownCards: {},
+                playerTurn: firstPlayer,
+                trucoPoints: 1,
+            },
+        });
+    }
+
+    getNewEvents(oldGame: Game): GameEvent[] {
+        return this.events.slice(oldGame.events.length);
+    }
+
     buildStartEvent(): GameEventStart {
         return {
             type: GameEventType.START,
         };
     }
 
-    buildNextRoundEvent(points: Record<SafeUser['id'], number>, cards: Record<SafeUser['id'], Card[]>): GameEventNextRound {
+    buildNextRoundEvent(round: number, cards: Record<SafeUser['id'], Card[]>): GameEventNextRound {
         return {
             type: GameEventType.NEXT_ROUND,
-            points,
+            round,
             cards,
         };
+    }
+
+    buildThrowCardEvent(player: SafeUser['id'], card: Card, step: GameStep): GameEventThrowCard {
+        return {
+            type: GameEventType.THROW_CARD,
+            player,
+            card,
+            step,
+        };
+    }
+
+    buildRoundResultEvent(winner: SafeUser['id'], points: UsersPoints): GameEventRoundResult {
+        return {
+            type: GameEventType.ROUND_RESULT,
+            winner,
+            points: this.state.points,
+        };
+    }
+
+    buildResultEvent(winner: SafeUser['id'], points: UsersPoints): GameEventResult {
+        return {
+            type: GameEventType.RESULT,
+            winner,
+            points,
+        };
+    }
+
+    getPlayersIds(): UserId[] {
+        return this.players.map(player => player.id);
     }
 }
