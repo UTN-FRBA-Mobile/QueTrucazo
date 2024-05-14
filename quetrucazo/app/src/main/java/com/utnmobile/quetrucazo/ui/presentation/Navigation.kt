@@ -20,10 +20,6 @@ fun AppNavigation() {
             navigateTo = navigateTo,
         )
         Screen.Register -> RegisterScreen(
-            onRegister = { username, password ->
-                currentScreen = Screen.Main
-                musicViewModel.playMusic()
-            },
             navigateTo = navigateTo,
         )
         Screen.Main -> MainScreen(navigateTo)
