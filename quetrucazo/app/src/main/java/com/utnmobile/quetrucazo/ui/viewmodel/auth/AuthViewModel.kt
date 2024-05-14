@@ -28,7 +28,7 @@ class AuthViewModel(application: Application) : AndroidViewModel(application) {
             val response = try {
                 apiService.loginUser(Credentials(username, password))
             } catch (e: Exception) {
-                onError("Hubo un error al iniciar sesión 1")
+                onError("Hubo un error al iniciar sesión")
                 null
             }
 
@@ -36,7 +36,7 @@ class AuthViewModel(application: Application) : AndroidViewModel(application) {
                 if (response.isSuccessful) {
                     val authResponse = response.body()
                     if (authResponse == null) {
-                        onError("Hubo un error al iniciar sesión 2")
+                        onError("Hubo un error al iniciar sesión")
                     } else {
                         saveAuth(authResponse)
                         onSuccess()
@@ -53,6 +53,35 @@ class AuthViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
+    fun register(username: String, password: String, onSuccess: () -> Unit, onError: (String) -> Unit) {
+        viewModelScope.launch {
+            val response = try {
+                apiService.registerUser(Credentials(username, password))
+            } catch (e: Exception) {
+                onError("Hubo un error al registrarse")
+                null
+            }
+
+            if (response != null) {
+                if (response.isSuccessful) {
+                    val authResponse = response.body()
+                    if (authResponse == null) {
+                        onError("Hubo un error al registrarse")
+                    } else {
+                        saveAuth(authResponse)
+                        onSuccess()
+                    }
+                } else {
+                    val errorBody = response.errorBody()?.string()
+                    val errorResponse = parseError(errorBody)
+                    when (errorResponse?.type) {
+                        "RESOURCE_ALREADY_EXISTS" -> onError("El nombre de usuario ya esta en uso")
+                        else -> onError("Error desconocido")
+                    }
+                }
+            }
+        }
+    }
     private fun saveAuth(res: AuthResponse) {
         _user = res.user
         val sharedPreferences = context.getSharedPreferences("QueTrucazoPreferences", Context.MODE_PRIVATE)
