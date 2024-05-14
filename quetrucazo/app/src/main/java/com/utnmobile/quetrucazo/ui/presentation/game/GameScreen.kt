@@ -16,7 +16,6 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.utnmobile.quetrucazo.model.Game
 import com.utnmobile.quetrucazo.ui.viewmodel.music.MusicViewModel
-import androidx.compose.ui.Alignment
 
 @Composable
 fun GameScreen(game: Game, isPreview: Boolean = false) {
@@ -44,20 +43,20 @@ fun GameScreen(game: Game, isPreview: Boolean = false) {
                     modifier = Modifier
                         .weight(1f)
                         .fillMaxWidth()
-                        .padding(vertical = 16.dp)  // Add horizontal padding
+                        .padding(vertical = 16.dp)
                 )
 
                 CardsGameScreen(
                     modifier = Modifier
                         .weight(7f)
                         .fillMaxWidth()
-                        .padding(horizontal = 32.dp)  // Add horizontal padding
+                        .padding(horizontal = 32.dp)
                 )
 
-                Spacer(modifier = Modifier.weight(1f))  // Takes up all available space and pushes below items to the bottom
+                Spacer(modifier = Modifier.weight(1f))
 
                 PlayGameScreen(
-                    modifier = Modifier.fillMaxWidth()  // Fill the width at the bottom of the Column
+                    modifier = Modifier.fillMaxWidth()
                 )
             }
         }

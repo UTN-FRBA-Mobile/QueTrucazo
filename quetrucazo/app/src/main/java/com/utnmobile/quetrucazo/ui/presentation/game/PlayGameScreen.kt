@@ -9,34 +9,30 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.compose.ui.graphics.RectangleShape
 
 @Composable
 fun PlayGameScreen(modifier: Modifier = Modifier) {
     Row(
         modifier = modifier
-            .fillMaxWidth()  // Ensures the Row takes up all the horizontal space
-            .padding(0.dp),  // Set padding to zero to ensure no extra space on sides
-        horizontalArrangement = Arrangement.SpaceEvenly,  // Ensures buttons are evenly spaced across the width
+            .fillMaxWidth()
+            .padding(0.dp),
+        horizontalArrangement = Arrangement.SpaceEvenly,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        // Define the button style
         val buttonColors = ButtonDefaults.buttonColors(containerColor = Color(0xFF6200EE))
 
-        // TRUCO Button
         Button(
             onClick = { /* Handle Truco */ },
             modifier = Modifier
                 .weight(1f)
-                .fillMaxWidth(),  // Ensures each button stretches to fill the assigned space
-            shape = RectangleShape,  // Ensures the buttons are rectangular
+                .fillMaxWidth(),
+            shape = RectangleShape,
             colors = buttonColors
         ) {
             Text("TRUCO")
         }
 
-        // ENVIDO Button
         Button(
             onClick = { /* Handle Envido */ },
             modifier = Modifier
@@ -48,7 +44,6 @@ fun PlayGameScreen(modifier: Modifier = Modifier) {
             Text("ENVIDO")
         }
 
-        // MAZO Button
         Button(
             onClick = { /* Handle Mazo */ },
             modifier = Modifier
