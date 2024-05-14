@@ -43,7 +43,10 @@ fun MainScreen(navigateTo: NavigateTo) {
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
-            Button(onClick = { SocketIOManager.createGame(authViewModel.user!!.id) }) {
+            Button(onClick = {
+                SocketIOManager.createGame(authViewModel.user!!.id)
+                navigateTo(Screen.WaitingForOpponent)
+            }) {
                 Text("Crear partida")
             }
 

@@ -24,9 +24,10 @@ fun AppNavigation() {
         )
         Screen.Main -> MainScreen(navigateTo)
         Screen.GameList -> GameListScreen(navigateTo)
+        Screen.WaitingForOpponent -> WaitingForOpponentScreen (navigateTo)
     }
 }
 
 enum class Screen {
-    Login, Register, Main, GameList
+    Login, Register, Main, GameList, WaitingForOpponent,
 }
