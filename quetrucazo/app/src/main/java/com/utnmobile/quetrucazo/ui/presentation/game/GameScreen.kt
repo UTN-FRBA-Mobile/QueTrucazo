@@ -3,7 +3,10 @@ package com.utnmobile.quetrucazo.ui.presentation.game
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
@@ -12,10 +15,10 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.utnmobile.quetrucazo.ui.viewmodel.music.MusicViewModel
+import androidx.compose.ui.Alignment
 
 @Composable
 fun GameScreen(isPreview: Boolean = false) {
-
     if (!isPreview) {
         viewModel<MusicViewModel>().playMusic()
     }
@@ -24,17 +27,37 @@ fun GameScreen(isPreview: Boolean = false) {
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(paddingValues)
-                .padding(16.dp)
+                .padding( PaddingValues(
+                    start = 0.dp,
+                    top = paddingValues.calculateTopPadding(),
+                    end = 0.dp,
+                    bottom = paddingValues.calculateBottomPadding()
+                )
+                )
         ) {
             Column(
-                modifier = Modifier
-                    .fillMaxSize(),
+                modifier = Modifier.fillMaxSize(),
                 verticalArrangement = Arrangement.SpaceBetween
             ) {
-                PointsGameScreen(modifier = Modifier.weight(1f))
-                CardsGameScreen(modifier = Modifier.weight(7f))
-                PlayGameScreen(modifier = Modifier.weight(2f))
+                PointsGameScreen(
+                    modifier = Modifier
+                        .weight(1f)
+                        .fillMaxWidth()
+                        .padding(vertical = 16.dp)  // Add horizontal padding
+                )
+
+                CardsGameScreen(
+                    modifier = Modifier
+                        .weight(7f)
+                        .fillMaxWidth()
+                        .padding(horizontal = 32.dp)  // Add horizontal padding
+                )
+
+                Spacer(modifier = Modifier.weight(1f))  // Takes up all available space and pushes below items to the bottom
+
+                PlayGameScreen(
+                    modifier = Modifier.fillMaxWidth()  // Fill the width at the bottom of the Column
+                )
             }
         }
     }
