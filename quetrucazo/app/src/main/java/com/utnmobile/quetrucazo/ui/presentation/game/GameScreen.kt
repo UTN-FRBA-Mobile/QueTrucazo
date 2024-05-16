@@ -43,7 +43,7 @@ fun GameScreen(game: Game, isPreview: Boolean = false) {
     var eventIndex by remember { mutableIntStateOf(0) }
 
     var myCards by remember { mutableStateOf(emptyList<Card>()) }
-    var opponentCardsSize by remember { mutableStateOf(0) }
+    var opponentCardsSize by remember { mutableIntStateOf(0) }
 
     var myPoints by remember { mutableIntStateOf(0) }
     var opponentPoints by remember { mutableIntStateOf(0) }
