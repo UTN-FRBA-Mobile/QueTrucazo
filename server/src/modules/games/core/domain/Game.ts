@@ -112,7 +112,7 @@ export type GameStep = 1 | 2 | 3;
 
 export type GameEventThrowCard = {
     type: GameEventType.THROW_CARD;
-    player: SafeUser['id'];
+    playerId: SafeUser['id'];
     card: Card;
     step: GameStep;
 };
@@ -355,7 +355,7 @@ export class Game {
     buildThrowCardEvent(player: SafeUser['id'], card: Card, step: GameStep): GameEventThrowCard {
         return {
             type: GameEventType.THROW_CARD,
-            player,
+            playerId: player,
             card,
             step,
         };

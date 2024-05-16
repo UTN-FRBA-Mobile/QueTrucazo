@@ -9,13 +9,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 
 @Composable
-fun PointsGameScreen(modifier: Modifier = Modifier) {
+fun PointsGameScreen(modifier: Modifier = Modifier, myPoints: Int, opponentPoints: Int) {
     Column(
         modifier = modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Top
     ) {
-        Text("Puntoss Jugador 1: 13")
-        Text("Puntoss Jugador 2: 6")
+        Text(text = "Mis puntos: $myPoints")
+        Text(text = "Puntos del oponente: $opponentPoints")
     }
 }
