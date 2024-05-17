@@ -52,6 +52,7 @@ export enum GameEventType {
     TRUCO_ACCEPT = 'TRUCO_ACCEPT',
     TRUCO_DECLINE = 'TRUCO_DECLINE',
     THROW_CARD = 'THROW_CARD',
+    TO_DECK = 'TO_DECK',
     ROUND_RESULT = 'ROUND_RESULT',
     NEXT_ROUND = 'NEXT_ROUND',
     RESULT = 'RESULT',
@@ -115,6 +116,11 @@ export type GameEventThrowCard = {
     nextPlayerId: SafeUser['id'];
 };
 
+export type GameEventToDeck = {
+    type: GameEventType.TO_DECK;
+    playerId: SafeUser['id'];
+};
+
 export type UsersPoints = Record<SafeUser['id'], number>;
 
 export type GameEventRoundResult = {
@@ -145,6 +151,7 @@ export type GameEvent = GameEventStart
     | GameEventTrucoAccept
     | GameEventTrucoDecline
     | GameEventThrowCard
+    | GameEventToDeck
     | GameEventRoundResult
     | GameEventNextRound
     | GameEventResult;
@@ -271,10 +278,27 @@ export class Game {
         }).withRoundWinnerValidation();
     }
 
+    goToDeck(userId: UserId): Game {
+        if (this.state.playerTurn !== userId) {
+            throw new Error('Not your turn');
+        }
+
+        const winner = this.players.find(player => player.id !== userId)!.id;
+
+        const toDeckEvent = this.buildToDeckEvent(userId);
+
+        return this.copy({
+            events: [...this.events, toDeckEvent],
+        }).setRoundWinner(winner);
+    }
+
     withRoundWinnerValidation(): Game {
         const winner = getRoundWinner(this.getPlayersIds(), this.state.thrownCards);
         if (winner === undefined) return this;
+        return this.setRoundWinner(winner);        
+    }
 
+    setRoundWinner(winner: SafeUser['id']): Game {
         const extraPoints = this.state.trucoPoints;
 
         const points = {
@@ -376,6 +400,13 @@ export class Game {
             type: GameEventType.RESULT,
             winner,
             points,
+        };
+    }
+
+    buildToDeckEvent(playerId: SafeUser['id']): GameEventToDeck {
+        return {
+            type: GameEventType.TO_DECK,
+            playerId,
         };
     }
 

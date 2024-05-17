@@ -9,6 +9,7 @@ import { GameId } from '../../modules/games/core/domain/Game';
 import { Card } from '../../modules/games/core/domain/Cards';
 import { throwCard } from '../../modules/games/core/actions/ThrowCard';
 import { cancelGame } from '../../modules/games/core/actions/CancelGame';
+import { goToDeck } from '../../modules/games/core/actions/GoToDeck';
 
 export class SocketManager {
     private io: Server;
@@ -104,6 +105,15 @@ export class SocketManager {
                     await throwCard.invoke(gameId, userId, card);
                 } catch (error) {
                     console.error('Error throwing card', error);
+                }
+            });
+
+            socket.on('go-to-deck', async ({ userId, gameId }: { userId: UserId, gameId: GameId }) => {
+                try {
+                    console.log('going to deck')
+                    await goToDeck.invoke(gameId, userId);
+                } catch (error) {
+                    console.error('Error going to deck', error);
                 }
             });
 
