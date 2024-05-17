@@ -6,6 +6,7 @@ import com.utnmobile.quetrucazo.model.events.implementations.ResultGameEvent
 import com.utnmobile.quetrucazo.model.events.implementations.RoundResultGameEvent
 import com.utnmobile.quetrucazo.model.events.implementations.StartGameEvent
 import com.utnmobile.quetrucazo.model.events.implementations.ThrowCardGameEvent
+import com.utnmobile.quetrucazo.model.events.implementations.ToDeckGameEvent
 import org.json.JSONArray
 import org.json.JSONObject
 
@@ -18,6 +19,7 @@ open class GameEvent {
                 "THROW_CARD" -> ThrowCardGameEvent.from(json)
                 "ROUND_RESULT" -> RoundResultGameEvent.from(json)
                 "RESULT" -> ResultGameEvent.from(json)
+                "TO_DECK" -> ToDeckGameEvent.from(json)
                 else -> throw IllegalArgumentException("Invalid event type ${json.getString("type")}")
             }
         }
