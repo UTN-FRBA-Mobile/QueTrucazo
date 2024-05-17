@@ -15,9 +15,9 @@ export const deck: Card[] = [
 
 export const generatePlayersCards = (): [Card[], Card[]] => {
     const currentDeck = [...deck];
-    const player1: Card[] = ['E10'];
-    const player2: Card[] = ['O10'];
-    for (let i = 0; i < 4; i++) {
+    const player1: Card[] = [];
+    const player2: Card[] = [];
+    for (let i = 0; i < 6; i++) {
         const randomIndex = Math.floor(Math.random() * currentDeck.length);
         if (i % 2 === 0) {
             player1.push(currentDeck[randomIndex]);
