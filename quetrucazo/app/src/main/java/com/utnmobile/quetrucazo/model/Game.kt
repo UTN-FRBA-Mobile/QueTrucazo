@@ -5,20 +5,6 @@ import com.utnmobile.quetrucazo.model.events.toGameEvents
 import org.json.JSONArray
 import org.json.JSONObject
 
-enum class Step {
-    FIRST, SECOND, THIRD;
-    companion object {
-        fun from(step: Int): Step {
-            return when (step) {
-                1 -> FIRST
-                2 -> SECOND
-                3 -> THIRD
-                else -> throw IllegalArgumentException("Invalid step")
-            }
-        }
-    }
-}
-
 data class Game(
     val id: Int,
     val name: String,

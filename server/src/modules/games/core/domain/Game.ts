@@ -108,13 +108,11 @@ export type GameEventTrucoDecline = {
     call: TrucoCall;
 };
 
-export type GameStep = 1 | 2 | 3;
-
 export type GameEventThrowCard = {
     type: GameEventType.THROW_CARD;
     playerId: SafeUser['id'];
     card: Card;
-    step: GameStep;
+    nextPlayerId: SafeUser['id'];
 };
 
 export type UsersPoints = Record<SafeUser['id'], number>;
@@ -129,6 +127,7 @@ export type GameEventNextRound = {
     type: GameEventType.NEXT_ROUND;
     cards: Record<SafeUser['id'], Card[]>;
     round: number;
+    nextPlayerId: SafeUser['id'];
 };
 
 export type GameEventResult = {
@@ -226,7 +225,7 @@ export class Game {
             [this.players[0].id]: player1Cards,
             [this.players[1].id]: player2Cards,
         }
-        const events = [...this.events, this.buildStartEvent(), this.buildNextRoundEvent(this.state.round, cards)];
+        const events = [...this.events, this.buildStartEvent(), this.buildNextRoundEvent(this.state.round, cards, this.state.firstPlayer)];
 
         return this.copy({
             events,
@@ -239,21 +238,18 @@ export class Game {
         });
     }
 
-    throwCard(userId: UserId, card: Card, step: GameStep): Game {
+    throwCard(userId: UserId, card: Card): Game {
         // it should be player turn
         if (this.state.playerTurn !== userId) {
             throw new Error('Not your turn');
         }
-        
+
         // it should be a valid card
         if (!this.state.cards[userId].includes(card)) {
             throw new Error('Invalid card');
         }
 
-        const throwCardEvent = this.buildThrowCardEvent(userId, card, step);
-
         const updatedGame = this.copy({
-            events: [...this.events, throwCardEvent],
             state: {
                 ...this.state,
                 cards: {
@@ -265,9 +261,14 @@ export class Game {
                     [userId]: [...(this.state.thrownCards[userId] || []), card],
                 },
             },
-        });
+        }).setNextTurnPlayer();
 
-        return updatedGame.withRoundWinnerValidation();
+        const throwCardEvent = this.buildThrowCardEvent(userId, card, updatedGame.state.playerTurn);
+
+
+        return updatedGame.copy({
+            events: [...this.events, throwCardEvent],
+        }).withRoundWinnerValidation();
     }
 
     withRoundWinnerValidation(): Game {
@@ -275,7 +276,7 @@ export class Game {
         if (winner === undefined) return this;
 
         const extraPoints = this.state.trucoPoints;
-        
+
         const points = {
             ...this.state.points,
             [winner]: this.state.points[winner] + extraPoints,
@@ -289,8 +290,8 @@ export class Game {
                 ...this.state,
                 points,
             },
-        });   
-        
+        });
+
         return game.withNextRoundOrWin();
     }
 
@@ -316,9 +317,9 @@ export class Game {
         }
         const round = this.state.round + 1;
 
-        const nextRoundEvent = this.buildNextRoundEvent(round, cards);
+        const firstPlayer = this.state.firstPlayer === this.players[0].id ? this.players[1].id : this.players[0].id;
 
-        const firstPlayer = this.state.playerTurn === this.players[0].id ? this.players[1].id : this.players[0].id;
+        const nextRoundEvent = this.buildNextRoundEvent(round, cards, firstPlayer);
 
         return this.copy({
             events: [...this.events, nextRoundEvent],
@@ -344,20 +345,21 @@ export class Game {
         };
     }
 
-    buildNextRoundEvent(round: number, cards: Record<SafeUser['id'], Card[]>): GameEventNextRound {
+    buildNextRoundEvent(round: number, cards: Record<SafeUser['id'], Card[]>, nextPlayerId: SafeUser['id']): GameEventNextRound {
         return {
             type: GameEventType.NEXT_ROUND,
             round,
             cards,
+            nextPlayerId,
         };
     }
 
-    buildThrowCardEvent(player: SafeUser['id'], card: Card, step: GameStep): GameEventThrowCard {
+    buildThrowCardEvent(playerId: SafeUser['id'], card: Card, nextPlayerId: SafeUser['id']): GameEventThrowCard {
         return {
             type: GameEventType.THROW_CARD,
-            playerId: player,
+            playerId,
             card,
-            step,
+            nextPlayerId,
         };
     }
 
@@ -365,7 +367,7 @@ export class Game {
         return {
             type: GameEventType.ROUND_RESULT,
             winner,
-            points: this.state.points,
+            points,
         };
     }
 
@@ -379,5 +381,31 @@ export class Game {
 
     getPlayersIds(): UserId[] {
         return this.players.map(player => player.id);
+    }
+
+    setNextTurnPlayer(): Game {
+        const player1ThrownCards = this.state.thrownCards[this.players[0].id] || [];
+        const player2ThrownCards = this.state.thrownCards[this.players[1].id] || [];
+
+        if (player1ThrownCards.length === player2ThrownCards.length) {
+            const player1LastCardValue = getCardValue(player1ThrownCards[player1ThrownCards.length - 1]);
+            const player2LastCardValue = getCardValue(player2ThrownCards[player2ThrownCards.length - 1]);
+            
+            return this.copy({
+                state: {
+                    ...this.state,
+                    playerTurn: player1LastCardValue === player2LastCardValue
+                        ? this.state.playerTurn === this.players[0].id ? this.players[1].id : this.players[0].id
+                        : player1LastCardValue > player2LastCardValue ? this.players[0].id : this.players[1].id,
+                },
+            });
+        }
+
+        return this.copy({
+            state: {
+                ...this.state,
+                playerTurn: player1ThrownCards.length < player2ThrownCards.length ? this.players[0].id : this.players[1].id,
+            },
+        });
     }
 }

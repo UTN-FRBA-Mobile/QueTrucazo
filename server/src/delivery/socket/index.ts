@@ -5,7 +5,7 @@ import { UserId } from '../../modules/users/core/domain/User';
 import { getUserById } from '../../modules/users/core/actions/GetUserById';
 import { joinGame } from '../../modules/games/core/actions/JoinGame';
 import { getAllAvailableGames } from '../../modules/games/core/actions/GetAllGames';
-import { GameId, GameStep } from '../../modules/games/core/domain/Game';
+import { GameId } from '../../modules/games/core/domain/Game';
 import { Card } from '../../modules/games/core/domain/Cards';
 import { throwCard } from '../../modules/games/core/actions/ThrowCard';
 import { cancelGame } from '../../modules/games/core/actions/CancelGame';
@@ -98,13 +98,17 @@ export class SocketManager {
                 }
             });
 
-            socket.on('throw-card', async ({ userId, gameId, card, step }: { userId: UserId, gameId: GameId, card: Card, step: GameStep }) => {
+            socket.on('throw-card', async ({ userId, gameId, card }: { userId: UserId, gameId: GameId, card: Card }) => {
                 try {
                     console.log('throwing card')
-                    await throwCard.invoke(gameId, userId, card, step);
+                    await throwCard.invoke(gameId, userId, card);
                 } catch (error) {
                     console.error('Error throwing card', error);
                 }
+            });
+
+            socket.on('disconnect', () => {
+                console.log('User disconnected');
             });
         });
     }
