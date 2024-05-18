@@ -1,5 +1,5 @@
 import { SafeUser, UserId } from "../../../users/core/domain/User";
-import { Card, generatePlayersCards, getCardValue, getRoundWinner } from "./Cards";
+import { Card, generatePlayersCards, getCardValue, getEnvidoCardsValue, getRoundWinner } from "./Cards";
 
 const MAX_POINTS = 5;
 
@@ -12,11 +12,12 @@ export enum EnvidoCall {
 }
 
 export type Envido = {
-    call: EnvidoCall;
-    caller: SafeUser['id'];
-    previousCalls: EnvidoCall[];
+    calls: EnvidoCall[];
+    firstCaller: SafeUser['id'] | undefined;
+    lastCaller: SafeUser['id'] | undefined;
+    acceptedBy: SafeUser['id'] | undefined;
     accepted: boolean | undefined;
-    lastResponseBy: SafeUser['id'] | undefined;
+    waitingResponse: boolean;
     winner: SafeUser['id'] | undefined;
     playersPoints: Record<SafeUser['id'], number> | undefined;
 }
@@ -42,14 +43,14 @@ export type GameState = {
     thrownCards: Record<SafeUser['id'], Card[]>;
     trucoPoints: number;
     points: UsersPoints;
+    envido: Envido;
 };
 
 export enum GameEventType {
     START = 'START',
     ENVIDO_CALL = 'ENVIDO_CALL',
-    ENVIDO_ACCEPT = 'ENVIDO_ACCEPT',
-    ENVIDO_DECLINE = 'ENVIDO_DECLINE',
-    ENVIDO_RESULT = 'ENVIDO_RESULT',
+    ENVIDO_ACCEPTED = 'ENVIDO_ACCEPTED',
+    ENVIDO_DECLINED = 'ENVIDO_DECLINED',
     TRUCO_CALL = 'TRUCO_CALL',
     TRUCO_ACCEPT = 'TRUCO_ACCEPT',
     TRUCO_DECLINE = 'TRUCO_DECLINE',
@@ -66,31 +67,20 @@ export type GameEventStart = {
 
 export type GameEventEnvidoCall = {
     type: GameEventType.ENVIDO_CALL;
-    previousCalls: EnvidoCall[];
     call: EnvidoCall;
     caller: SafeUser['id'];
 };
 
-export type GameEventEnvidoAccept = {
-    type: GameEventType.ENVIDO_ACCEPT;
+export type GameEventEnvidoAccepted = {
+    type: GameEventType.ENVIDO_ACCEPTED;
     acceptedBy: SafeUser['id'];
+    points: Record<SafeUser['id'], number>;
 };
 
-export type GameEventEnvidoDecline = {
-    type: GameEventType.ENVIDO_DECLINE;
+export type GameEventEnvidoDeclined = {
+    type: GameEventType.ENVIDO_DECLINED;
     declinedBy: SafeUser['id'];
-};
-
-export enum EnvidoWinnerReason {
-    MAS_PUNTOS = 'MAS_PUNTOS',
-    ES_MANO = 'ES_MANO',
-}
-
-export type GameEventEnvidoResult = {
-    type: GameEventType.ENVIDO_RESULT;
-    winner: SafeUser['id'];
-    playersPoints: Record<SafeUser['id'], number>;
-    reason: EnvidoWinnerReason;
+    points: Record<SafeUser['id'], number>;
 };
 
 export type GameEventTrucoCall = {
@@ -146,9 +136,8 @@ export type GameEventResult = {
 
 export type GameEvent = GameEventStart
     | GameEventEnvidoCall
-    | GameEventEnvidoAccept
-    | GameEventEnvidoDecline
-    | GameEventEnvidoResult
+    | GameEventEnvidoAccepted
+    | GameEventEnvidoDeclined
     | GameEventTrucoCall
     | GameEventTrucoAccept
     | GameEventTrucoDecline
@@ -199,6 +188,16 @@ export class Game {
                 thrownCards: {},
                 trucoPoints: 1,
                 points: {},
+                envido: {
+                    calls: [],
+                    firstCaller: undefined,
+                    lastCaller: undefined,
+                    acceptedBy: undefined,
+                    accepted: undefined,
+                    winner: undefined,
+                    playersPoints: undefined,
+                    waitingResponse: false,
+                },
             }
         });
     }
@@ -253,6 +252,10 @@ export class Game {
             throw new Error('Not your turn');
         }
 
+        if (this.isWaitingResponse()) {
+            throw new Error('Waiting response');
+        }
+
         // it should be a valid card
         if (!this.state.cards[userId].includes(card)) {
             throw new Error('Invalid card');
@@ -280,9 +283,193 @@ export class Game {
         }).withRoundWinnerValidation();
     }
 
+    envido(userId: UserId, call: EnvidoCall): Game {
+        if (this.state.playerTurn !== userId) {
+            throw new Error('Not your turn');
+        }
+
+        if (this.step() !== 1) {
+            throw new Error('Invalid step');
+        }
+
+        const envido = this.state.envido;
+
+        if (!this.isValidEnvidoCall(call)) {
+            throw new Error('Invalid envido call');
+        }
+
+        const newEnvido: Envido = {
+            calls: [...envido.calls, call],
+            firstCaller: envido.firstCaller || userId,
+            lastCaller: userId,
+            acceptedBy: undefined,
+            accepted: undefined,
+            winner: undefined,
+            playersPoints: undefined,
+            waitingResponse: true,
+        };
+
+        const envidoCallEvent: GameEventEnvidoCall = {
+            type: GameEventType.ENVIDO_CALL,
+            call,
+            caller: userId,
+        };
+
+        return this.copy({
+            events: [...this.events, envidoCallEvent],
+            state: {
+                ...this.state,
+                envido: newEnvido,
+                playerTurn: this.players.find(player => player.id !== userId)!.id,
+
+            },
+        });
+    }
+
+    answerEnvido(userId: UserId, accepted: boolean): Game {
+        if (this.state.playerTurn !== userId) {
+            throw new Error('Not your turn');
+        }
+
+        if (this.step() !== 1) {
+            throw new Error('Invalid step');
+        }
+
+        const envido = this.state.envido;
+
+        if (!envido.waitingResponse) {
+            throw new Error('Not waiting response');
+        }
+
+        const { winner, playersPoints } = this.analyzeEnvido(userId, accepted);
+
+        const newEnvido: Envido = {
+            calls: envido.calls,
+            firstCaller: envido.firstCaller,
+            lastCaller: envido.lastCaller,
+            acceptedBy: userId,
+            accepted,
+            winner,
+            playersPoints,
+            waitingResponse: false,
+        };
+
+        const points = {
+            [this.players[0].id]: this.state.points[this.players[0].id] + playersPoints[this.players[0].id],
+            [this.players[1].id]: this.state.points[this.players[1].id] + playersPoints[this.players[1].id],
+        }
+
+        const envidoEvent: GameEventEnvidoAccepted | GameEventEnvidoDeclined = accepted
+            ? {
+                type: GameEventType.ENVIDO_ACCEPTED,
+                acceptedBy: userId,
+                points,
+            }
+            : {
+                type: GameEventType.ENVIDO_DECLINED,
+                declinedBy: userId,
+                points,
+            };
+
+        const game = this.copy({
+            events: [...this.events, envidoEvent],
+            state: {
+                ...this.state,
+                envido: newEnvido,
+                playerTurn: newEnvido.firstCaller!!,
+                points,
+            },
+        });
+
+        const gameWithWinnerAnalysis = game.withWinnerResult();
+
+        return gameWithWinnerAnalysis || game;
+    }
+
+    analyzeEnvido(userId: UserId, accepted: boolean): { winner: SafeUser['id'], playersPoints: Record<SafeUser['id'], number> } {
+        const envido = this.state.envido;
+
+        if (!accepted) {
+            return {
+                winner: envido.lastCaller!,
+                playersPoints: {
+                    [envido.lastCaller!]: envido.calls.length,
+                    [userId]: 0,
+                },
+            };
+        }
+
+        const player1EnvidoPoints = getEnvidoCardsValue([...this.state.cards[this.players[0].id], ...this.state.thrownCards[this.players[0].id] || []]);
+        const player2EnvidoPoints = getEnvidoCardsValue([...this.state.cards[this.players[1].id], ...this.state.thrownCards[this.players[1].id] || []]);
+
+        const winner = player1EnvidoPoints === player2EnvidoPoints
+            ? this.state.firstPlayer
+            : player1EnvidoPoints > player2EnvidoPoints
+                ? this.players[0].id
+                : this.players[1].id;
+
+        return {
+            winner,
+            playersPoints: {
+                [winner]: this.getEnvidoPoints(winner),
+                [this.players.find(player => player.id !== winner)!.id]: 0,
+            },
+        };
+    }
+
+    getEnvidoPoints(winner: UserId): number {
+        let points = 0;
+
+        for (const call of this.state.envido.calls) {
+            switch (call) {
+                case EnvidoCall.ENVIDO:
+                    points += 2;
+                    break;
+                case EnvidoCall.REAL_ENVIDO:
+                    points += 3;
+                    break;
+                case EnvidoCall.FALTA_ENVIDO:
+                    const otherPoints = this.state.points[this.players.find(player => player.id !== winner)!.id];
+                    if (otherPoints < 15) {
+                        points += MAX_POINTS;
+                    } else {
+                        points += 30 - otherPoints;
+                    }
+                    break;
+            }
+        }
+
+        return points;
+    }
+
+    isValidEnvidoCall(call: EnvidoCall): boolean {
+        const calls = this.state.envido.calls;
+
+        if (calls.length === 0) {
+            return true;
+        }
+
+        const lastCall = calls[calls.length - 1];
+
+        switch (lastCall) {
+            case EnvidoCall.ENVIDO:
+                return call === EnvidoCall.ENVIDO && calls.length === 1
+                    || call === EnvidoCall.REAL_ENVIDO
+                    || call === EnvidoCall.FALTA_ENVIDO;
+            case EnvidoCall.REAL_ENVIDO:
+                return call === EnvidoCall.FALTA_ENVIDO;
+            case EnvidoCall.FALTA_ENVIDO:
+                return false;
+        }
+    }
+
     goToDeck(userId: UserId): Game {
         if (this.state.playerTurn !== userId) {
             throw new Error('Not your turn');
+        }
+
+        if (this.isWaitingResponse()) {
+            throw new Error('Waiting response');
         }
 
         const winner = this.players.find(player => player.id !== userId)!.id;
@@ -297,7 +484,11 @@ export class Game {
     withRoundWinnerValidation(): Game {
         const winner = getRoundWinner(this.getPlayersIds(), this.state.thrownCards);
         if (winner === undefined) return this;
-        return this.setRoundWinner(winner);        
+        return this.setRoundWinner(winner);
+    }
+
+    isWaitingResponse(): boolean {
+        return this.state.envido.waitingResponse;
     }
 
     setRoundWinner(winner: SafeUser['id']): Game {
@@ -322,19 +513,8 @@ export class Game {
     }
 
     withNextRoundOrWin(): Game {
-        if (this.state.points[this.players[0].id] >= MAX_POINTS || this.state.points[this.players[1].id] >= MAX_POINTS) {
-            const winner = this.state.points[this.players[0].id] >= this.state.points[this.players[0].id] ? this.players[0].id : this.players[1].id;
-
-            const gameResultEvent = this.buildResultEvent(winner, this.state.points);
-
-            return this.copy({
-                events: [...this.events, gameResultEvent],
-                state: {
-                    ...this.state,
-                    winner,
-                },
-            });
-        }
+        const game = this.withWinnerResult();
+        if (game) return game;
 
         const [player1Cards, player2Cards] = generatePlayersCards();
         const cards = {
@@ -350,15 +530,45 @@ export class Game {
         return this.copy({
             events: [...this.events, nextRoundEvent],
             state: {
-                ...this.state,
+                started: true,
+                winner: undefined,
                 round,
                 cards,
                 firstPlayer,
                 thrownCards: {},
                 playerTurn: firstPlayer,
                 trucoPoints: 1,
+                points: this.state.points,
+                envido: {
+                    calls: [],
+                    firstCaller: undefined,
+                    lastCaller: undefined,
+                    acceptedBy: undefined,
+                    accepted: undefined,
+                    winner: undefined,
+                    playersPoints: undefined,
+                    waitingResponse: false,
+                },
             },
         });
+    }
+
+    withWinnerResult(): Game | undefined {
+        if (this.state.points[this.players[0].id] >= MAX_POINTS || this.state.points[this.players[1].id] >= MAX_POINTS) {
+            const winner = this.state.points[this.players[0].id] >= this.state.points[this.players[0].id] ? this.players[0].id : this.players[1].id;
+
+            const gameResultEvent = this.buildResultEvent(winner, this.state.points);
+
+            return this.copy({
+                events: [...this.events, gameResultEvent],
+                state: {
+                    ...this.state,
+                    winner,
+                },
+            });
+        }
+
+        return undefined;
     }
 
     getNewEvents(oldGame: Game): GameEvent[] {
@@ -416,6 +626,15 @@ export class Game {
         return this.players.map(player => player.id);
     }
 
+    step(): 1 | 2 | 3 {
+        const player1ThrownCards = this.state.thrownCards[this.players[0].id] || [];
+        const player2ThrownCards = this.state.thrownCards[this.players[1].id] || [];
+
+        const thrownCards = player1ThrownCards.length < player2ThrownCards.length ? player1ThrownCards : player2ThrownCards;
+
+        return thrownCards.length + 1 as 1 | 2 | 3;
+    }
+
     setNextTurnPlayer(): Game {
         const player1ThrownCards = this.state.thrownCards[this.players[0].id] || [];
         const player2ThrownCards = this.state.thrownCards[this.players[1].id] || [];
@@ -423,7 +642,7 @@ export class Game {
         if (player1ThrownCards.length === player2ThrownCards.length) {
             const player1LastCardValue = getCardValue(player1ThrownCards[player1ThrownCards.length - 1]);
             const player2LastCardValue = getCardValue(player2ThrownCards[player2ThrownCards.length - 1]);
-            
+
             return this.copy({
                 state: {
                     ...this.state,

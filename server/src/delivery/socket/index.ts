@@ -5,11 +5,13 @@ import { UserId } from '../../modules/users/core/domain/User';
 import { getUserById } from '../../modules/users/core/actions/GetUserById';
 import { joinGame } from '../../modules/games/core/actions/JoinGame';
 import { getAllAvailableGames } from '../../modules/games/core/actions/GetAllGames';
-import { GameId } from '../../modules/games/core/domain/Game';
+import { EnvidoCall, GameId } from '../../modules/games/core/domain/Game';
 import { Card } from '../../modules/games/core/domain/Cards';
 import { throwCard } from '../../modules/games/core/actions/ThrowCard';
 import { cancelGame } from '../../modules/games/core/actions/CancelGame';
 import { goToDeck } from '../../modules/games/core/actions/GoToDeck';
+import { envido } from '../../modules/games/core/actions/Envido';
+import { answerEnvido } from '../../modules/games/core/actions/AnswerEnvido';
 
 export class SocketManager {
     private io: Server;
@@ -114,6 +116,27 @@ export class SocketManager {
                     await goToDeck.invoke(gameId, userId);
                 } catch (error) {
                     console.error('Error going to deck', error);
+                }
+            });
+
+            socket.on('envido', async ({ userId, gameId, call }: { userId: UserId, gameId: GameId, call: EnvidoCall }) => {
+                try {
+                    console.log('envido')
+                    if (call !== EnvidoCall.ENVIDO && call !== EnvidoCall.REAL_ENVIDO && call !== EnvidoCall.FALTA_ENVIDO) {
+                        throw new Error('Invalid envido call');
+                    }
+                    await envido.invoke(gameId, userId, call);
+                } catch (error) {
+                    console.error('Error envido', error);
+                }
+            });
+
+            socket.on('answer-envido', async ({ userId, gameId, accepted }: { userId: UserId, gameId: GameId, accepted: boolean }) => {
+                try {
+                    console.log('responder envido')
+                    await answerEnvido.invoke(gameId, userId, accepted);
+                } catch (error) {
+                    console.error('Error envido', error);
                 }
             });
 

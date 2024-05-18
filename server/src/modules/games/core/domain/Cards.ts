@@ -138,3 +138,41 @@ export const getRoundWinner = (players: UserId[], cards: Record<UserId, Card[]>)
     }
     return players[step3Winner];
 }
+
+const getEnvidoCardValue = (card: Card): number => {
+    const number = parseInt(card.slice(1));
+    if (number >= 10) {
+        return 0;
+    }
+    return number;
+}
+
+export const getEnvidoCardsValue = (cards: Card[]): number => {
+    const suits: Record<string, Card[]> = {
+        O: [],
+        E: [],
+        B: [],
+        C: [],
+    };
+
+    cards.forEach((card) => {
+        suits[card[0]].push(card);
+    });
+
+    const suitsPoints = Object.values(suits).map((suit) => {
+        if (suit.length === 0) {
+            return 0;
+        }
+        if (suit.length === 1) {
+            return getEnvidoCardValue(suit[0]);
+        }
+
+        return suit
+            .map((card) => getEnvidoCardValue(card))
+            .sort((a, b) => b - a)
+            .slice(0, 2)
+            .reduce((acc, value) => acc + value, 20);
+    });
+
+    return Math.max(...suitsPoints);
+}
