@@ -393,7 +393,7 @@ export class Game {
             return {
                 winner: envido.lastCaller!,
                 playersPoints: {
-                    [envido.lastCaller!]: envido.calls.length,
+                    [envido.lastCaller!]: this.getNotWantedEnvidoPoints(),
                     [userId]: 0,
                 },
             };
@@ -415,6 +415,21 @@ export class Game {
                 [this.players.find(player => player.id !== winner)!.id]: 0,
             },
         };
+    }
+
+    getNotWantedEnvidoPoints(): number {
+        let points = 0;
+        for (let i = 0; i < this.state.envido.calls.length - 1; i++) {
+            switch (this.state.envido.calls[i]) {
+                case EnvidoCall.ENVIDO:
+                    points += 2;
+                    break;
+                case EnvidoCall.REAL_ENVIDO:
+                    points += 3;
+                    break;
+            }
+        }
+        return points;
     }
 
     getEnvidoPoints(winner: UserId): number {
