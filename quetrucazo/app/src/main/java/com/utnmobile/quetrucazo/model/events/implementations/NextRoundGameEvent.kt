@@ -9,7 +9,8 @@ import org.json.JSONObject
 
 class NextRoundGameEvent(
     val round: Int,
-    val cards: Map<UserId, List<Card>>
+    val cards: Map<UserId, List<Card>>,
+    val nextPlayerId: UserId
 ): GameEvent() {
     companion object {
         fun from(json: JSONObject): NextRoundGameEvent {
@@ -17,7 +18,8 @@ class NextRoundGameEvent(
             val cards: Map<UserId, List<Card>> = json.toUserMapList("cards") {
                 it.toCards()
             }
-            return NextRoundGameEvent(round, cards)
+            val nextPlayerId = json.getInt("nextPlayerId")
+            return NextRoundGameEvent(round, cards, nextPlayerId)
         }
     }
 }

@@ -33,6 +33,16 @@ class Card(private val palo: CartaPalo, private val number: Int) {
         return R.drawable::class.java.getField("${palo}$number").getInt(null)
     }
 
+    fun shortCutName(): String {
+        val palo = when (palo) {
+            CartaPalo.ORO -> "O"
+            CartaPalo.COPA -> "C"
+            CartaPalo.BASTO -> "B"
+            CartaPalo.ESPADA -> "E"
+        }
+        return "$palo$number"
+    }
+
     fun value(): Int {
         return when (number) {
             1 -> when (palo) {

@@ -8,12 +8,14 @@ import org.json.JSONObject
 class ThrowCardGameEvent(
     val playerId: UserId,
     val card: Card,
+    val nextPlayerId: UserId
 ): GameEvent() {
     companion object {
         fun from(json: JSONObject): ThrowCardGameEvent {
             val playerId = json.getInt("playerId")
             val card = Card.from(json.getString("card"))
-            return ThrowCardGameEvent(playerId, card)
+            val nextPlayerId = json.getInt("nextPlayerId")
+            return ThrowCardGameEvent(playerId, card, nextPlayerId)
         }
     }
 }
