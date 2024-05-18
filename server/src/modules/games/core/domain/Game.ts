@@ -1,6 +1,8 @@
 import { SafeUser, UserId } from "../../../users/core/domain/User";
 import { Card, generatePlayersCards, getCardValue, getRoundWinner } from "./Cards";
 
+const MAX_POINTS = 5;
+
 export type GameId = number;
 
 export enum EnvidoCall {
@@ -320,7 +322,7 @@ export class Game {
     }
 
     withNextRoundOrWin(): Game {
-        if (this.state.points[this.players[0].id] >= 30 || this.state.points[this.players[1].id] >= 30) {
+        if (this.state.points[this.players[0].id] >= MAX_POINTS || this.state.points[this.players[1].id] >= MAX_POINTS) {
             const winner = this.state.points[this.players[0].id] >= this.state.points[this.players[0].id] ? this.players[0].id : this.players[1].id;
 
             const gameResultEvent = this.buildResultEvent(winner, this.state.points);
