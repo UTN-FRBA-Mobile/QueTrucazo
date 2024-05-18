@@ -48,4 +48,14 @@ export class InMemoryGameRepository implements GameRepository {
         this.games.delete(id);
         return Promise.resolve(game);
     }
+
+    deleteByUser(userId: number): Promise<Game> {
+        const game = Array.from(this.games.values())
+            .find(game => game.players.some(player => player.id === userId));
+        if (!game) {
+            throw new Error("User has no game");
+        }
+        this.games.delete(game.id);
+        return Promise.resolve(game);
+    }
 }

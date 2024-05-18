@@ -8,7 +8,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.Body
 import retrofit2.http.POST
 
-const val baseUrl = "https://9a81-190-247-139-97.ngrok-free.app"
+const val baseUrl = "https://quetrucazo.atcode.tech"
 
 interface ApiService {
     @POST("users/login")

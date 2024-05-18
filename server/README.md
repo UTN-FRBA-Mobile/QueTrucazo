@@ -6,3 +6,13 @@
 6. Ejecutar `npm run dev`
 7. Ejecutar `./ngrok http 8080`
 8. Copiar la url `https` en la app mobile como la `baseUrl` en `ApiService.kt`. Esto se debe a que las aplicaciones móviles no pueden acceder a una url `http`.
+
+## Buildear y subir docker image
+1. `doctl registry login`
+2. `docker build -t quetrucazo-api:0.0.2 .`
+3. `docker tag quetrucazo-api:0.0.2 registry.digitalocean.com/miutn/quetrucazo-api:0.0.2`
+4. `docker push registry.digitalocean.com/miutn/quetrucazo-api:0.0.2`
+
+## Pullear y deployar en droplet
+1. `docker --config /home/deve/.docker pull registry.digitalocean.com/miutn/quetrucazo-api:0.0.2`
+2. `docker run --name quetrucazo-api -d --restart=on-failure:3 -p 32025:8080 --env-file=/home/deve/quetrucazo/api/env.list registry.digitalocean.com/miutn/quetrucazo-api:0.0.2`

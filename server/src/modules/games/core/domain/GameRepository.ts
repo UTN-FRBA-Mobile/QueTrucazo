@@ -12,6 +12,7 @@ export interface GameRepository {
     getByUserId(userId: UserId): Promise<Game | undefined>;
     getAll(params: GetAllParams): Promise<Game[]>;
     delete(id: GameId): Promise<Game>;
+    deleteByUser(userId: UserId): Promise<Game>;
 }
 
 export const gameRepository = new InMemoryGameRepository();
