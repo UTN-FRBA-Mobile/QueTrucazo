@@ -24,7 +24,6 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.utnmobile.quetrucazo.model.Card
 import com.utnmobile.quetrucazo.model.Game
 import com.utnmobile.quetrucazo.model.UserId
-import com.utnmobile.quetrucazo.model.events.GameEvent
 import com.utnmobile.quetrucazo.model.events.implementations.NextRoundGameEvent
 import com.utnmobile.quetrucazo.model.events.implementations.ResultGameEvent
 import com.utnmobile.quetrucazo.model.events.implementations.RoundResultGameEvent
@@ -35,7 +34,6 @@ import com.utnmobile.quetrucazo.services.SocketIOManager
 import com.utnmobile.quetrucazo.ui.viewmodel.auth.AuthViewModel
 import com.utnmobile.quetrucazo.ui.viewmodel.music.MusicViewModel
 import org.json.JSONArray
-import org.json.JSONObject
 
 @Composable
 fun GameScreen(game: Game, isPreview: Boolean = false) {
@@ -53,10 +51,13 @@ fun GameScreen(game: Game, isPreview: Boolean = false) {
 
     var winner by remember { mutableStateOf<UserId?>(null) }
 
-    val userId = viewModel<AuthViewModel>().user!!.id
+    var userId = 1
+
+    var myTurn by remember { mutableStateOf(false) }
 
     if (!isPreview) {
         viewModel<MusicViewModel>().playMusic()
+        userId = viewModel<AuthViewModel>().user!!.id
     }
 
     fun analyzeEvents() {
@@ -73,25 +74,30 @@ fun GameScreen(game: Game, isPreview: Boolean = false) {
                 opponentThrownCards = emptyList()
                 myCards = event.cards[userId] ?: emptyList()
                 opponentCardsSize = event.cards.entries.first { it.key != userId }.value.size
+                myTurn = event.nextPlayerId == userId
             }
+
             is ResultGameEvent -> {
                 myPoints = event.points[userId] ?: 0
                 opponentPoints = event.points.entries.first { it.key != userId }.value
                 winner = event.winner
             }
+
             is RoundResultGameEvent -> {
                 myPoints = event.points[userId] ?: 0
                 opponentPoints = event.points.entries.first { it.key != userId }.value
             }
+
             is StartGameEvent -> {}
             is ThrowCardGameEvent -> {
-                if (event.playerId == userId) {
-                    myThrownCards += event.card
-                    myCards -= event.card
-                } else {
+
+                if (event.playerId != userId) {
                     opponentThrownCards += event.card
                     opponentCardsSize--
                 }
+
+                myTurn = event.nextPlayerId == userId
+
             }
         }
         eventIndex++
@@ -100,6 +106,7 @@ fun GameScreen(game: Game, isPreview: Boolean = false) {
 
     SocketIOManager.socket?.on("new-events") { args ->
         val newEvents = (args[0] as JSONArray).toGameEvents()
+        println(newEvents)
         events += newEvents
         analyzeEvents()
     }
@@ -149,6 +156,15 @@ fun GameScreen(game: Game, isPreview: Boolean = false) {
                     removeMyCard = { card ->
                         myCards = myCards.filter { it != card }
                     },
+                    addMyThrownCard = { card ->
+                        myThrownCards = myThrownCards + card
+                    },
+                    opponentCardsSize = opponentCardsSize,
+                    myThrownCards = myThrownCards,
+                    opponentThrownCards = opponentThrownCards,
+                    myTurn = myTurn,
+                    gameId = game.id,
+                    userId = userId
                 )
 
                 Spacer(modifier = Modifier.weight(1f))

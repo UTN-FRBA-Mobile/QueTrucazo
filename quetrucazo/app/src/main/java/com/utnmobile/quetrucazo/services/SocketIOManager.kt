@@ -1,5 +1,6 @@
 package com.utnmobile.quetrucazo.services
 
+import com.utnmobile.quetrucazo.model.Card
 import io.socket.client.IO
 import io.socket.client.Socket
 import org.json.JSONObject
@@ -59,10 +60,20 @@ object SocketIOManager {
         _socket?.emit("games-list")
     }
 
+    fun throwCard(userId: Int, gameId: Int, card: Card) {
+        val data = JSONObject()
+        data.put("userId", userId)
+        data.put("gameId", gameId)
+        data.put("card", card.shortCutName())
+        _socket?.emit("throw-card", data)
+
+    }
+
     fun disconnectSocket() {
         _socket?.disconnect()
         _socket?.off(Socket.EVENT_CONNECT)
         _socket?.off("games-list")
+        _socket?.off("throw-card")
         _socket?.off(Socket.EVENT_CONNECT_ERROR)
     }
 }
