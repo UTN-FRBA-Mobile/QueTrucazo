@@ -29,7 +29,7 @@ fun AppNavigation() {
         Screen.Main -> MainScreen(navigateTo)
         Screen.GameList -> GameListScreen(navigateTo)
         Screen.WaitingForOpponent -> WaitingForOpponentScreen (navigateTo, currentScreenParams["gameId"] as Int)
-        Screen.Game -> GameScreen(currentScreenParams["game"] as Game)
+        Screen.Game -> GameScreen(game = currentScreenParams["game"] as Game, navigateTo = navigateTo)
     }
 }
 

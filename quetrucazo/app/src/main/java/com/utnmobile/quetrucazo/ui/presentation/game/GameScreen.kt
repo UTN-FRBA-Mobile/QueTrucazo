@@ -31,12 +31,14 @@ import com.utnmobile.quetrucazo.model.events.implementations.StartGameEvent
 import com.utnmobile.quetrucazo.model.events.implementations.ThrowCardGameEvent
 import com.utnmobile.quetrucazo.model.events.toGameEvents
 import com.utnmobile.quetrucazo.services.SocketIOManager
+import com.utnmobile.quetrucazo.ui.presentation.NavigateTo
+import com.utnmobile.quetrucazo.ui.presentation.YouWinDialog
 import com.utnmobile.quetrucazo.ui.viewmodel.auth.AuthViewModel
 import com.utnmobile.quetrucazo.ui.viewmodel.music.MusicViewModel
 import org.json.JSONArray
 
 @Composable
-fun GameScreen(game: Game, isPreview: Boolean = false) {
+fun GameScreen(navigateTo: NavigateTo, game: Game, isPreview: Boolean = false) {
     var events by remember { mutableStateOf(listOf(*game.events.toTypedArray())) }
     var eventIndex by remember { mutableIntStateOf(0) }
 
@@ -54,6 +56,8 @@ fun GameScreen(game: Game, isPreview: Boolean = false) {
     var userId = 1
 
     var myTurn by remember { mutableStateOf(false) }
+
+    var showWinDialog by remember { mutableStateOf(false) }
 
     if (!isPreview) {
         viewModel<MusicViewModel>().playMusic()
@@ -81,6 +85,7 @@ fun GameScreen(game: Game, isPreview: Boolean = false) {
                 myPoints = event.points[userId] ?: 0
                 opponentPoints = event.points.entries.first { it.key != userId }.value
                 winner = event.winner
+                showWinDialog = winner == userId
             }
 
             is RoundResultGameEvent -> {
@@ -172,6 +177,16 @@ fun GameScreen(game: Game, isPreview: Boolean = false) {
                 PlayGameScreen(
                     modifier = Modifier.fillMaxWidth()
                 )
+
+                if (showWinDialog) {
+                    YouWinDialog(
+                        onDismissRequest = { showWinDialog = false },
+                        myPoints = myPoints,
+                        opponentPoints = opponentPoints,
+                        navigateTo = navigateTo
+                    )
+                }
+
             }
         }
     }
@@ -180,5 +195,5 @@ fun GameScreen(game: Game, isPreview: Boolean = false) {
 @Preview
 @Composable
 fun GameScreenPreview() {
-    GameScreen(Game.default, isPreview = true)
+    GameScreen(game = Game.default, isPreview = true, navigateTo = { _, _ -> })
 }
