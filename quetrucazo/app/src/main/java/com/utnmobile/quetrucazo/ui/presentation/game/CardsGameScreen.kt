@@ -1,7 +1,7 @@
 package com.utnmobile.quetrucazo.ui.presentation.game
 
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -11,15 +11,25 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Rect
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.layout.LayoutCoordinates
+import androidx.compose.ui.layout.boundsInWindow
+import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import com.utnmobile.quetrucazo.R
 import com.utnmobile.quetrucazo.model.Card
 import com.utnmobile.quetrucazo.model.CartaPalo
 import com.utnmobile.quetrucazo.services.SocketIOManager
+import kotlin.math.roundToInt
 
 @Composable
 fun CardsGameScreen(
@@ -35,7 +45,7 @@ fun CardsGameScreen(
     userId: Int
 ) {
 
-
+    val inGameCardsRowBounds = remember { mutableStateOf<Rect?>(null) }
     Column(
         modifier = modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally
@@ -54,7 +64,10 @@ fun CardsGameScreen(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .weight(2f),
+                .weight(2f)
+                .onGloballyPositioned { coordinates ->
+                    inGameCardsRowBounds.value = coordinates.boundsInWindow()
+                },
             horizontalArrangement = Arrangement.Absolute.Left,
             verticalAlignment = Alignment.CenterVertically
         ) {
@@ -68,7 +81,15 @@ fun CardsGameScreen(
             horizontalArrangement = Arrangement.SpaceEvenly,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            DisplayMyCards(myCards, removeMyCard, addMyThrownCard, myTurn, gameId, userId)
+            DisplayMyCards(
+                myCards,
+                removeMyCard,
+                addMyThrownCard,
+                myTurn,
+                gameId,
+                userId,
+                inGameCardsRowBounds.value
+            )
         }
 
     }
@@ -140,23 +161,55 @@ fun DisplayMyCards(
     addMyThrownCard: (Card) -> Unit,
     myTurn: Boolean,
     gameId: Int,
-    userId: Int
+    userId: Int,
+    inGameCardsRowBounds: Rect?
 ) {
-
     myCards.forEach { card ->
+        val offset = remember { mutableStateOf(Offset.Zero) }
+        val cardCoordinates = remember { mutableStateOf<LayoutCoordinates?>(null) }
+        val imageModifier = Modifier
+            .offset { IntOffset(offset.value.x.roundToInt(), offset.value.y.roundToInt()) }
+            .pointerInput(myTurn, offset, cardCoordinates, userId, gameId, card) {
+                detectDragGestures(
+                    onDragStart = {
+
+                    },
+                    onDragEnd = {
+                        val cardPosition = cardCoordinates.value?.boundsInWindow()?.center
+
+                        if (myTurn && isCardInCenter(cardPosition, inGameCardsRowBounds)) {
+                            SocketIOManager.throwCard(userId, gameId, card)
+                            removeMyCard(card)
+                            addMyThrownCard(card)
+                            offset.value = Offset.Zero
+                        } else {
+                            offset.value = Offset.Zero
+                        }
+                    },
+                    onDragCancel = {
+                    },
+                    onDrag = { change, dragAmount ->
+                        if (change.pressed) {
+                            offset.value += dragAmount
+                        }
+                        change.consume()
+                    }
+                )
+            }
+            .onGloballyPositioned { coordinates ->
+                cardCoordinates.value = coordinates
+            }
+
         Image(
             painter = painterResource(id = card.resource()),
             contentDescription = "Card Image",
-            modifier = Modifier.clickable {
-                if (myTurn) {
-                    SocketIOManager.throwCard(userId, gameId, card)
-                    removeMyCard(card)
-                    addMyThrownCard(card)
-                }
-            }
+            modifier = imageModifier
         )
     }
+}
 
+fun isCardInCenter(offset: Offset?, rowBounds: Rect?): Boolean {
+    return offset?.let { rowBounds?.contains(it) } == true
 }
 
 @Preview
