@@ -59,6 +59,8 @@ export enum GameEventType {
     ROUND_RESULT = 'ROUND_RESULT',
     NEXT_ROUND = 'NEXT_ROUND',
     RESULT = 'RESULT',
+    PLAY_AGAIN = 'PLAY_AGAIN',
+    NO_PLAY_AGAIN = 'NO_PLAY_AGAIN',
 }
 
 export type GameEventStart = {
@@ -134,6 +136,16 @@ export type GameEventResult = {
     points: UsersPoints;
 };
 
+export type GameEventPlayAgain = {
+    type: GameEventType.PLAY_AGAIN;
+    userId: SafeUser['id'];
+};
+
+export type GameEventNoPlayAgain = {
+    type: GameEventType.NO_PLAY_AGAIN;
+    userId: SafeUser['id'];
+};
+
 export type GameEvent = GameEventStart
     | GameEventEnvidoCall
     | GameEventEnvidoAccepted
@@ -145,7 +157,9 @@ export type GameEvent = GameEventStart
     | GameEventToDeck
     | GameEventRoundResult
     | GameEventNextRound
-    | GameEventResult;
+    | GameEventResult
+    | GameEventPlayAgain
+    | GameEventNoPlayAgain;
 
 export type GameProps = {
     id: GameId;
@@ -153,6 +167,9 @@ export type GameProps = {
     players: SafeUser[];
     state: GameState;
     events: GameEvent[];
+    finished: boolean;
+    closed: boolean;
+    playAgainResponse: SafeUser['id'][];
 };
 
 export class Game {
@@ -161,6 +178,9 @@ export class Game {
     readonly players: SafeUser[];
     readonly state: GameState;
     readonly events: GameEvent[] = [];
+    readonly finished: boolean;
+    readonly playAgainResponse: SafeUser['id'][];
+    readonly closed: boolean;
 
     constructor(props: GameProps) {
         this.id = props.id;
@@ -168,6 +188,9 @@ export class Game {
         this.players = props.players;
         this.state = props.state;
         this.events = props.events;
+        this.finished = props.finished;
+        this.playAgainResponse = props.playAgainResponse;
+        this.closed = props.closed;
     }
 
     static NEW_GAME_ID = 0;
@@ -198,7 +221,10 @@ export class Game {
                     playersPoints: undefined,
                     waitingResponse: false,
                 },
-            }
+            },
+            finished: false,
+            playAgainResponse: [],
+            closed: false,
         });
     }
 
@@ -223,6 +249,52 @@ export class Game {
         });
     }
 
+    noPlayAgain(userId: UserId): Game {
+        if (!this.finished) {
+            throw new Error('Game not finished');
+        }
+
+        const noPlayAgainEvent: GameEventNoPlayAgain = {
+            type: GameEventType.NO_PLAY_AGAIN,
+            userId,
+        };
+
+        return this.copy({
+            events: [...this.events, noPlayAgainEvent],
+            closed: true,
+        });
+    }
+
+    playAgain(userId: UserId): Game {
+        if (!this.finished) {
+            throw new Error('Game not finished');
+        }
+
+        if (this.playAgainResponse.includes(userId)) {
+            throw new Error('Already responded');
+        }
+
+        const playAgainResponse = [...this.playAgainResponse, userId];
+
+        const playAgainEvent: GameEventPlayAgain = {
+            type: GameEventType.PLAY_AGAIN,
+            userId,
+        };
+
+        return this.copy({
+            events: [...this.events, playAgainEvent],
+            playAgainResponse,
+        }).checkPlayAgain();
+    }
+
+    checkPlayAgain(): Game {
+        if (this.playAgainResponse.length === this.players.length) {
+            return this.start();
+        }
+
+        return this;
+    }
+
     start(): Game {
         const [player1Cards, player2Cards] = generatePlayersCards();
         const points = {
@@ -238,11 +310,27 @@ export class Game {
         return this.copy({
             events,
             state: {
-                ...this.state,
                 started: true,
                 cards,
                 points,
+                envido: {
+                    calls: [],
+                    firstCaller: undefined,
+                    lastCaller: undefined,
+                    acceptedBy: undefined,
+                    accepted: undefined,
+                    winner: undefined,
+                    playersPoints: undefined,
+                    waitingResponse: false,
+                },
+                firstPlayer: this.state.firstPlayer,
+                playerTurn: this.state.firstPlayer,
+                trucoPoints: 1,
+                round: 1,
+                thrownCards: {},
+                winner: undefined,
             },
+            finished: false,            
         });
     }
 
@@ -580,6 +668,7 @@ export class Game {
                     ...this.state,
                     winner,
                 },
+                finished: true,
             });
         }
 

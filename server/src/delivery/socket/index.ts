@@ -12,6 +12,8 @@ import { cancelGame } from '../../modules/games/core/actions/CancelGame';
 import { goToDeck } from '../../modules/games/core/actions/GoToDeck';
 import { envido } from '../../modules/games/core/actions/Envido';
 import { answerEnvido } from '../../modules/games/core/actions/AnswerEnvido';
+import { playAgain } from '../../modules/games/core/actions/PlayAgain';
+import { noPlayAgain } from '../../modules/games/core/actions/NoPlayAgain';
 
 export class SocketManager {
     private io: Server;
@@ -137,6 +139,24 @@ export class SocketManager {
                     await answerEnvido.invoke(gameId, userId, accepted);
                 } catch (error) {
                     console.error('Error envido', error);
+                }
+            });
+
+            socket.on('play-again', async ({ userId, gameId }: { userId: UserId, gameId: GameId }) => {
+                try {
+                    console.log('playing again')
+                    await playAgain.invoke(gameId, userId);
+                } catch (error) {
+                    console.error('Error playing again', error);
+                }
+            });
+
+            socket.on('no-play-again', async ({ userId, gameId }: { userId: UserId, gameId: GameId }) => {
+                try {
+                    console.log('no playing again')
+                    await noPlayAgain.invoke(gameId, userId);
+                } catch (error) {
+                    console.error('Error no playing again', error);
                 }
             });
 
