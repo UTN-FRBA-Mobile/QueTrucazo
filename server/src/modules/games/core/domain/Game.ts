@@ -658,7 +658,7 @@ export class Game {
 
     withWinnerResult(): Game | undefined {
         if (this.state.points[this.players[0].id] >= MAX_POINTS || this.state.points[this.players[1].id] >= MAX_POINTS) {
-            const winner = this.state.points[this.players[0].id] >= this.state.points[this.players[0].id] ? this.players[0].id : this.players[1].id;
+            const winner = this.state.points[this.players[0].id] >= this.state.points[this.players[1].id] ? this.players[0].id : this.players[1].id;
 
             const gameResultEvent = this.buildResultEvent(winner, this.state.points);
 
