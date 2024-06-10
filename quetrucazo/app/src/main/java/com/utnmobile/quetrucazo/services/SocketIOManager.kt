@@ -12,7 +12,7 @@ object SocketIOManager {
     val socket: Socket?
         get() = _socket
 
-    fun connect(userId: Int) {
+    fun connect(userId: Int, onConnect: () -> Unit) {
         try {
             // Configurar y conectar el socket
             _socket = IO.socket(baseUrl)
@@ -21,6 +21,7 @@ object SocketIOManager {
             // Escuchar eventos de conexión
             _socket?.on(Socket.EVENT_CONNECT) {
                 // Una vez conectado, registrar el usuario
+                onConnect()
                 val data = JSONObject()
                 data.put("userId", userId)
                 _socket?.emit("register-connection", data)

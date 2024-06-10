@@ -23,20 +23,24 @@ export class InMemoryGameRepository implements GameRepository {
     }
 
     getById(id: number): Promise<Game | undefined> {
-        return Promise.resolve(this.games.get(id));
+        const game = this.games.get(id);
+        if (game && !game.closed) {
+            return Promise.resolve(game);
+        }
+        return Promise.resolve(undefined);
     }
 
     getByUserId(userId: number): Promise<Game | undefined> {
         return Promise.resolve(
             Array.from(this.games.values())
-                .find(game => game.players.some(player => player.id === userId))
+                .find(game => !game.closed && game.players.some(player => player.id === userId))
         );
     }
 
     getAll({available}: GetAllParams): Promise<Game[]> {
         return Promise.resolve(
             Array.from(this.games.values())
-                .filter(game => available ? !game.state.started : true)
+                .filter(game => available ? (!game.state.started && !game.closed) : true)
         );
     }
 

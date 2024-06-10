@@ -9,6 +9,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Settings
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.utnmobile.quetrucazo.model.Game
 import com.utnmobile.quetrucazo.model.toGames
 import com.utnmobile.quetrucazo.services.SocketIOManager
 import com.utnmobile.quetrucazo.ui.viewmodel.auth.AuthViewModel
@@ -23,7 +24,14 @@ fun MainScreen(navigateTo: NavigateTo) {
     var showDialog by remember { mutableStateOf(false) }
 
     val authViewModel = viewModel<AuthViewModel>()
-    SocketIOManager.connect(authViewModel.user!!.id)
+
+    SocketIOManager.connect(authViewModel.user!!.id) {
+        SocketIOManager.socket?.on("join-game") { args ->
+            val game = Game.from(args[0] as JSONObject)
+            navigateTo(Screen.Game, mapOf("game" to game))
+        }
+    }
+
     viewModel<MusicViewModel>().playMusic()
 
     SocketIOManager.socket?.on("created-game") { args ->
