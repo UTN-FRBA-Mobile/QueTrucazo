@@ -16,6 +16,7 @@ import { playAgain } from '../../modules/games/core/actions/PlayAgain';
 import { noPlayAgain } from '../../modules/games/core/actions/NoPlayAgain';
 import { truco } from '../../modules/games/core/actions/Truco';
 import { answerTruco } from '../../modules/games/core/actions/AnswerTruco';
+import { checkUserGame } from '../../modules/games/core/actions/CheckUserGame';
 
 export class SocketManager {
     private io: Server;
@@ -60,7 +61,11 @@ export class SocketManager {
             socket.on('register-connection', ({ userId }: { userId: UserId }) => {
                 try {
                     console.log('User registered connection', userId);
+                    if (this.sockets.has(userId)) {
+                        this.sockets.get(userId)?.disconnect();
+                    }
                     this.sockets.set(userId, socket);
+                    checkUserGame.invoke(userId);
                 } catch (error) {
                     console.error('Error registering connection', error);
                 }
