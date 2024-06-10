@@ -22,15 +22,21 @@ export type Envido = {
     playersPoints: Record<SafeUser['id'], number> | undefined;
 }
 
+export type Truco = {
+    lastCall: TrucoCall | undefined;
+    firstCaller: SafeUser['id'] | undefined;
+    lastCaller: SafeUser['id'] | undefined;
+    playerTurnAfterResponse: SafeUser['id'] | undefined;
+    acceptedBy: SafeUser['id'] | undefined;
+    accepted: boolean | undefined;
+    waitingResponse: boolean;
+    points: number;
+}
+
 export enum TrucoCall {
     TRUCO = 'TRUCO',
     RETRUCO = 'RETRUCO',
     VALE_CUATRO = 'VALE_CUATRO',
-}
-
-export type Truco = {
-    call: TrucoCall;
-    caller: SafeUser['id'];
 }
 
 export type GameState = {
@@ -41,9 +47,9 @@ export type GameState = {
     round: number;
     cards: Record<SafeUser['id'], Card[]>;
     thrownCards: Record<SafeUser['id'], Card[]>;
-    trucoPoints: number;
     points: UsersPoints;
     envido: Envido;
+    truco: Truco;
 };
 
 export enum GameEventType {
@@ -94,13 +100,11 @@ export type GameEventTrucoCall = {
 export type GameEventTrucoAccept = {
     type: GameEventType.TRUCO_ACCEPT;
     acceptedBy: SafeUser['id'];
-    call: TrucoCall;
 };
 
 export type GameEventTrucoDecline = {
     type: GameEventType.TRUCO_DECLINE;
     declinedBy: SafeUser['id'];
-    call: TrucoCall;
 };
 
 export type GameEventThrowCard = {
@@ -209,7 +213,6 @@ export class Game {
                 round: 1,
                 cards: {},
                 thrownCards: {},
-                trucoPoints: 1,
                 points: {},
                 envido: {
                     calls: [],
@@ -220,6 +223,16 @@ export class Game {
                     winner: undefined,
                     playersPoints: undefined,
                     waitingResponse: false,
+                },
+                truco: {
+                    lastCall: undefined,
+                    firstCaller: undefined,
+                    lastCaller: undefined,
+                    acceptedBy: undefined,
+                    accepted: undefined,
+                    playerTurnAfterResponse: undefined,
+                    waitingResponse: false,
+                    points: 1,
                 },
             },
             finished: false,
@@ -325,7 +338,16 @@ export class Game {
                 },
                 firstPlayer: this.state.firstPlayer,
                 playerTurn: this.state.firstPlayer,
-                trucoPoints: 1,
+                truco: {
+                    lastCall: undefined,
+                    firstCaller: undefined,
+                    lastCaller: undefined,
+                    acceptedBy: undefined,
+                    accepted: undefined,
+                    waitingResponse: false,
+                    playerTurnAfterResponse: undefined,
+                    points: 1,
+                },
                 round: 1,
                 thrownCards: {},
                 winner: undefined,
@@ -369,6 +391,100 @@ export class Game {
         return updatedGame.copy({
             events: [...this.events, throwCardEvent],
         }).withRoundWinnerValidation();
+    }
+
+    truco(userId: UserId, call: TrucoCall): Game {
+        if (this.state.playerTurn !== userId) {
+            throw new Error('Not your turn');
+        }
+
+        const truco = this.state.truco;
+
+        if (!this.isValidTrucoCall(call)) {
+            throw new Error('Invalid envido call');
+        }
+
+        let trucoPoints = 1;
+        if (call === TrucoCall.RETRUCO) trucoPoints = 2;
+        if (call === TrucoCall.VALE_CUATRO) trucoPoints = 3;
+
+        const newTruco: Truco = {
+            lastCall: call,
+            firstCaller: truco.firstCaller || userId,
+            lastCaller: userId,
+            acceptedBy: undefined,
+            accepted: undefined,
+            waitingResponse: true,
+            playerTurnAfterResponse: truco.playerTurnAfterResponse || userId,
+            points: trucoPoints,
+        };
+
+        const envidoCallEvent: GameEventTrucoCall = {
+            type: GameEventType.TRUCO_CALL,
+            call,
+            caller: userId,
+        };
+
+        return this.copy({
+            events: [...this.events, envidoCallEvent],
+            state: {
+                ...this.state,
+                playerTurn: this.players.find(player => player.id !== userId)!.id,
+                truco: newTruco,
+            },
+        });
+    }
+
+    answerTruco(userId: UserId, accepted: boolean): Game {
+        if (this.state.playerTurn !== userId) {
+            throw new Error('Not your turn');
+        }
+
+        const truco = this.state.truco;
+
+        if (!truco.waitingResponse) {
+            throw new Error('Not waiting response');
+        }
+
+        if (!truco.playerTurnAfterResponse === undefined) {
+            console.log("playerTurnAfterResponse is undefined");
+        }
+
+        const playerTurn = truco.playerTurnAfterResponse || this.players.find(player => player.id !== userId)!.id;
+
+        const newTruco: Truco = {
+            ...truco,
+            acceptedBy: userId,
+            accepted,
+            waitingResponse: false,
+            points: accepted ? truco.points + 1 : truco.points,
+            playerTurnAfterResponse: undefined,
+        };
+
+        const trucoEvent: GameEventTrucoAccept | GameEventTrucoDecline = accepted
+            ? {
+                type: GameEventType.TRUCO_ACCEPT,
+                acceptedBy: userId,
+            }
+            : {
+                type: GameEventType.TRUCO_DECLINE,
+                declinedBy: userId,
+            };
+
+        const game = this.copy({
+            events: [...this.events, trucoEvent],
+            state: {
+                ...this.state,
+                truco: newTruco,
+                playerTurn,
+            },
+        });
+
+        if (!accepted) {
+            return game.goToDeck(userId);
+        }
+
+        return game;
     }
 
     envido(userId: UserId, call: EnvidoCall): Game {
@@ -566,6 +682,19 @@ export class Game {
         }
     }
 
+    isValidTrucoCall(call: TrucoCall): boolean {
+        switch (this.state.truco.lastCall) {
+            case undefined:
+                return call === TrucoCall.TRUCO;
+            case TrucoCall.TRUCO:
+                return call === TrucoCall.RETRUCO;
+            case TrucoCall.RETRUCO:
+                return call === TrucoCall.VALE_CUATRO;
+            case TrucoCall.VALE_CUATRO:
+                return false;
+        }
+    }
+
     goToDeck(userId: UserId): Game {
         if (this.state.playerTurn !== userId) {
             throw new Error('Not your turn');
@@ -591,11 +720,11 @@ export class Game {
     }
 
     isWaitingResponse(): boolean {
-        return this.state.envido.waitingResponse;
+        return this.state.envido.waitingResponse || this.state.truco.waitingResponse;
     }
 
     setRoundWinner(winner: SafeUser['id']): Game {
-        const extraPoints = this.state.trucoPoints;
+        const extraPoints = this.state.truco.points;
 
         const points = {
             ...this.state.points,
@@ -640,7 +769,6 @@ export class Game {
                 firstPlayer,
                 thrownCards: {},
                 playerTurn: firstPlayer,
-                trucoPoints: 1,
                 points: this.state.points,
                 envido: {
                     calls: [],
@@ -651,6 +779,16 @@ export class Game {
                     winner: undefined,
                     playersPoints: undefined,
                     waitingResponse: false,
+                },
+                truco: {
+                    lastCall: undefined,
+                    firstCaller: undefined,
+                    lastCaller: undefined,
+                    acceptedBy: undefined,
+                    accepted: undefined,
+                    waitingResponse: false,
+                    playerTurnAfterResponse: undefined,
+                    points: 1,
                 },
             },
         });

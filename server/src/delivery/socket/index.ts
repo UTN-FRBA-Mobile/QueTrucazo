@@ -5,7 +5,7 @@ import { UserId } from '../../modules/users/core/domain/User';
 import { getUserById } from '../../modules/users/core/actions/GetUserById';
 import { joinGame } from '../../modules/games/core/actions/JoinGame';
 import { getAllAvailableGames } from '../../modules/games/core/actions/GetAllGames';
-import { EnvidoCall, GameId } from '../../modules/games/core/domain/Game';
+import { EnvidoCall, GameId, TrucoCall } from '../../modules/games/core/domain/Game';
 import { Card } from '../../modules/games/core/domain/Cards';
 import { throwCard } from '../../modules/games/core/actions/ThrowCard';
 import { cancelGame } from '../../modules/games/core/actions/CancelGame';
@@ -14,6 +14,8 @@ import { envido } from '../../modules/games/core/actions/Envido';
 import { answerEnvido } from '../../modules/games/core/actions/AnswerEnvido';
 import { playAgain } from '../../modules/games/core/actions/PlayAgain';
 import { noPlayAgain } from '../../modules/games/core/actions/NoPlayAgain';
+import { truco } from '../../modules/games/core/actions/Truco';
+import { answerTruco } from '../../modules/games/core/actions/AnswerTruco';
 
 export class SocketManager {
     private io: Server;
@@ -139,6 +141,24 @@ export class SocketManager {
                     await answerEnvido.invoke(gameId, userId, accepted);
                 } catch (error) {
                     console.error('Error envido', error);
+                }
+            });
+
+            socket.on('truco', async ({ userId, gameId, call }: { userId: UserId, gameId: GameId, call: TrucoCall }) => {
+                try {
+                    console.log('truco')
+                    await truco.invoke(gameId, userId, call);
+                } catch (error) {
+                    console.error('Error truco', error);
+                }
+            });
+
+            socket.on('answer-truco', async ({ userId, gameId, accepted }: { userId: UserId, gameId: GameId, accepted: boolean }) => {
+                try {
+                    console.log('responder truco')
+                    await answerTruco.invoke(gameId, userId, accepted);
+                } catch (error) {
+                    console.error('Error truco', error);
                 }
             });
 
