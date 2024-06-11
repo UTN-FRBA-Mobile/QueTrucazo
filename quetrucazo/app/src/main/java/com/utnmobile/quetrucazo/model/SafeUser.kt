@@ -27,3 +27,11 @@ fun JSONArray.toSafeUsers(): List<SafeUser> {
     }
     return usersList
 }
+
+fun JSONArray.toUserIds(): List<UserId> {
+    val usersList = mutableListOf<UserId>()
+    for (i in 0 until length()) {
+        usersList.add(getInt(i))
+    }
+    return usersList
+}

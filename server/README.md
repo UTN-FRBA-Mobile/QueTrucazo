@@ -9,10 +9,10 @@
 
 ## Buildear y subir docker image
 1. `doctl registry login`
-2. `docker build -t quetrucazo-api:0.0.7 .`
-3. `docker tag quetrucazo-api:0.0.7 registry.digitalocean.com/miutn/quetrucazo-api:0.0.7`
-4. `docker push registry.digitalocean.com/miutn/quetrucazo-api:0.0.7`
+2. `docker build -t quetrucazo-api:0.0.8 .`
+3. `docker tag quetrucazo-api:0.0.8 registry.digitalocean.com/miutn/quetrucazo-api:0.0.8`
+4. `docker push registry.digitalocean.com/miutn/quetrucazo-api:0.0.8`
 
 ## Pullear y deployar en droplet
-1. `docker --config /home/deve/.docker pull registry.digitalocean.com/miutn/quetrucazo-api:0.0.7`
-2. `docker run --name quetrucazo-api -d --restart=on-failure:3 -p 32025:8080 --env-file=/home/deve/quetrucazo/api/env.list registry.digitalocean.com/miutn/quetrucazo-api:0.0.7`
+1. `docker --config /home/deve/.docker pull registry.digitalocean.com/miutn/quetrucazo-api:0.0.8`
+2. `docker run --name quetrucazo-api -d --restart=on-failure:3 -p 32025:8080 --env-file=/home/deve/quetrucazo/api/env.list registry.digitalocean.com/miutn/quetrucazo-api:0.0.8`

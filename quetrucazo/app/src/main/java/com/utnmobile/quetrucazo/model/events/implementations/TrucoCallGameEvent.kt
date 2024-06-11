@@ -1,11 +1,8 @@
 package com.utnmobile.quetrucazo.model.events.implementations;
 
 
-import com.utnmobile.quetrucazo.model.TrucoJuego
-import com.utnmobile.quetrucazo.model.TrucoJuegoPunto
 import com.utnmobile.quetrucazo.model.UserId
 import com.utnmobile.quetrucazo.model.events.GameEvent
-import com.utnmobile.quetrucazo.model.events.toPoints
 import org.json.JSONObject
 
 class TrucoCallGameEvent (
