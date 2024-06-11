@@ -17,6 +17,7 @@ import { noPlayAgain } from '../../modules/games/core/actions/NoPlayAgain';
 import { truco } from '../../modules/games/core/actions/Truco';
 import { answerTruco } from '../../modules/games/core/actions/AnswerTruco';
 import { checkUserGame } from '../../modules/games/core/actions/CheckUserGame';
+import { checkNoPlayAgain } from '../../modules/games/core/actions/CheckNoPlayAgain';
 
 export class SocketManager {
     private io: Server;
@@ -186,7 +187,12 @@ export class SocketManager {
             });
 
             socket.on('disconnect', () => {
-                console.log('User disconnected');
+                const userId = Array.from(this.sockets.entries()).find(([_, s]) => s === socket)?.[0];
+                if (userId) {
+                    this.sockets.delete(userId);
+                    console.log('User disconnected', userId);
+                    checkNoPlayAgain.invoke(userId);
+                }
             });
         });
     }

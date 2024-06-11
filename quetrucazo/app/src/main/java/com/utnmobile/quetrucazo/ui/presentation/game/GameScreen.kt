@@ -39,30 +39,31 @@ import org.json.JSONArray
 
 @Composable
 fun GameScreen(navigateTo: NavigateTo, game: Game, isPreview: Boolean = false) {
-    var events by remember { mutableStateOf(listOf(*game.events.toTypedArray())) }
-    var eventIndex by remember { mutableIntStateOf(0) }
-
-    var myCards by remember { mutableStateOf(emptyList<Card>()) }
-    var opponentCardsSize by remember { mutableIntStateOf(0) }
-
-    var myPoints by remember { mutableIntStateOf(0) }
-    var opponentPoints by remember { mutableIntStateOf(0) }
-
-    var myThrownCards by remember { mutableStateOf(emptyList<Card>()) }
-    var opponentThrownCards by remember { mutableStateOf(emptyList<Card>()) }
-
-    var winner by remember { mutableStateOf<UserId?>(null) }
 
     var userId = 1
-
-    var myTurn by remember { mutableStateOf(false) }
-
-    var showWinDialog by remember { mutableStateOf(false) }
 
     if (!isPreview) {
         viewModel<MusicViewModel>().playMusic()
         userId = viewModel<AuthViewModel>().user!!.id
     }
+
+    var events by remember { mutableStateOf(listOf(*game.events.toTypedArray())) }
+    var eventIndex by remember { mutableIntStateOf(game.events.size) }
+
+    var myCards by remember { mutableStateOf(game.state.userCards(userId)) }
+    var opponentCardsSize by remember { mutableIntStateOf(game.state.opponentCardsSize(userId)) }
+
+    var myPoints by remember { mutableIntStateOf(game.state.myPoints(userId)) }
+    var opponentPoints by remember { mutableIntStateOf(game.state.opponentPoints(userId)) }
+
+    var myThrownCards by remember { mutableStateOf(game.state.myThrownCards(userId)) }
+    var opponentThrownCards by remember { mutableStateOf(game.state.opponentThrownCards(userId)) }
+
+    var winner by remember { mutableStateOf(game.state.winner) }
+
+    var myTurn by remember { mutableStateOf(game.state.playerTurn == userId) }
+
+    var showWinDialog by remember { mutableStateOf(false) }
 
     fun analyzeEvents() {
         println("Analyzing events: $eventIndex - ${events.size}")
@@ -109,15 +110,17 @@ fun GameScreen(navigateTo: NavigateTo, game: Game, isPreview: Boolean = false) {
         analyzeEvents()
     }
 
-    SocketIOManager.socket?.on("new-events") { args ->
-        val newEvents = (args[0] as JSONArray).toGameEvents()
-        println(newEvents)
-        events += newEvents
-        analyzeEvents()
-    }
+
 
     LaunchedEffect(Unit) {
         analyzeEvents()
+
+        SocketIOManager.socket?.on("new-events") { args ->
+            val newEvents = (args[0] as JSONArray).toGameEvents()
+            println(newEvents)
+            events += newEvents
+            analyzeEvents()
+        }
     }
 
     DisposableEffect(Unit) {

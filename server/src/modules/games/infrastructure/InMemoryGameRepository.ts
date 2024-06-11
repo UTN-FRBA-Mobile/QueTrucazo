@@ -1,4 +1,3 @@
-import { EntriesResult } from "../../shared/domain/EntriesResult";
 import { Game } from "../core/domain/Game";
 import { GameRepository, GetAllParams } from "../core/domain/GameRepository";
 import { GameNotFound } from "../core/domain/errors/GameNotFound";

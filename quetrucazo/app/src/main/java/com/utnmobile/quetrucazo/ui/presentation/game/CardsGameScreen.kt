@@ -1,6 +1,7 @@
 package com.utnmobile.quetrucazo.ui.presentation.game
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -11,8 +12,11 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
@@ -45,7 +49,12 @@ fun CardsGameScreen(
     userId: Int
 ) {
 
-    val inGameCardsRowBounds = remember { mutableStateOf<Rect?>(null) }
+    var inGameCardsRowBounds by remember { mutableStateOf<Rect?>(null) }
+
+    LaunchedEffect(inGameCardsRowBounds) {
+        println("cambio de bounds $inGameCardsRowBounds")
+    }
+
     Column(
         modifier = modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally
@@ -66,7 +75,7 @@ fun CardsGameScreen(
                 .fillMaxWidth()
                 .weight(2f)
                 .onGloballyPositioned { coordinates ->
-                    inGameCardsRowBounds.value = coordinates.boundsInWindow()
+                    inGameCardsRowBounds = coordinates.boundsInWindow()
                 },
             horizontalArrangement = Arrangement.Absolute.Left,
             verticalAlignment = Alignment.CenterVertically
@@ -82,13 +91,13 @@ fun CardsGameScreen(
             verticalAlignment = Alignment.CenterVertically
         ) {
             DisplayMyCards(
-                myCards,
+                if (inGameCardsRowBounds != null) myCards else emptyList(),
                 removeMyCard,
                 addMyThrownCard,
                 myTurn,
                 gameId,
                 userId,
-                inGameCardsRowBounds.value
+                inGameCardsRowBounds
             )
         }
 
@@ -164,7 +173,9 @@ fun DisplayMyCards(
     userId: Int,
     inGameCardsRowBounds: Rect?
 ) {
+    println("sape $inGameCardsRowBounds")
     myCards.forEach { card ->
+        println("haciendo devuelta el foreach con $inGameCardsRowBounds")
         val offset = remember { mutableStateOf(Offset.Zero) }
         val cardCoordinates = remember { mutableStateOf<LayoutCoordinates?>(null) }
         val imageModifier = Modifier
@@ -176,7 +187,10 @@ fun DisplayMyCards(
                     },
                     onDragEnd = {
                         val cardPosition = cardCoordinates.value?.boundsInWindow()?.center
-
+                        println("es mi turno2: $myTurn")
+                        println("cardPosition $cardPosition")
+                        println("inGameCardsRowBounds $inGameCardsRowBounds")
+                        println("esta en posicion: ${isCardInCenter(cardPosition, inGameCardsRowBounds)}")
                         if (myTurn && isCardInCenter(cardPosition, inGameCardsRowBounds)) {
                             SocketIOManager.throwCard(userId, gameId, card)
                             removeMyCard(card)

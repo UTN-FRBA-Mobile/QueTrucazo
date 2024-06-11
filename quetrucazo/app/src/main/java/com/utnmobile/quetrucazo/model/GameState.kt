@@ -43,4 +43,28 @@ data class GameState(
             )
         }
     }
+
+    fun userCards(userId: UserId): List<Card> {
+        return cards[userId] ?: emptyList()
+    }
+
+    fun opponentCardsSize(myUserId: UserId): Int {
+        return cards.entries.firstOrNull { it.key != myUserId }?.value?.size ?: 0
+    }
+
+    fun myPoints(userId: UserId): Int {
+        return points[userId] ?: 0
+    }
+
+    fun opponentPoints(myUserId: UserId): Int {
+        return points.entries.firstOrNull { it.key != myUserId }?.value ?: 0
+    }
+
+    fun myThrownCards(userId: UserId): List<Card> {
+        return thrownCards[userId] ?: emptyList()
+    }
+
+    fun opponentThrownCards(myUserId: UserId): List<Card> {
+        return thrownCards.entries.firstOrNull { it.key != myUserId }?.value ?: emptyList()
+    }
 }
