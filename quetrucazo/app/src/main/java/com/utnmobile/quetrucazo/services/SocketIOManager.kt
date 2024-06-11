@@ -12,7 +12,7 @@ object SocketIOManager {
     val socket: Socket?
         get() = _socket
 
-    fun connect(userId: Int, onConnect: () -> Unit) {
+    fun connect(userId: Int, onConnect: () -> Unit, onDisconnect: () -> Unit) {
         try {
             // Configurar y conectar el socket
             _socket = IO.socket(baseUrl)
@@ -30,6 +30,11 @@ object SocketIOManager {
             // Manejo de errores
             _socket?.on(Socket.EVENT_CONNECT_ERROR) { args ->
                 println("Connection error: ${args[0]}")
+            }
+
+            // on disconnect
+            _socket?.on(Socket.EVENT_DISCONNECT) {
+                onDisconnect()
             }
 
         } catch (e: Exception) {

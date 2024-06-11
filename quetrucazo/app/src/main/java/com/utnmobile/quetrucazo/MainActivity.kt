@@ -7,6 +7,7 @@ import com.utnmobile.quetrucazo.ui.presentation.AppNavigation
 import com.utnmobile.quetrucazo.ui.theme.QueTrucazoTheme
 import com.utnmobile.quetrucazo.ui.viewmodel.music.MusicViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.utnmobile.quetrucazo.ui.viewmodel.connection.ConnectionViewModel
 import com.utnmobile.quetrucazo.ui.viewmodel.music.MusicViewModelFactory
 
 class MainActivity : ComponentActivity() {
@@ -16,7 +17,8 @@ class MainActivity : ComponentActivity() {
             QueTrucazoTheme {
                 // Use ViewModel with factory
                 viewModel<MusicViewModel>(factory = MusicViewModelFactory(applicationContext))
-                AppNavigation()
+                viewModel<ConnectionViewModel>()
+                AppNavigation(applicationContext)
             }
         }
     }

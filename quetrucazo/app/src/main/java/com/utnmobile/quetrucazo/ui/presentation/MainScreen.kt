@@ -13,6 +13,7 @@ import com.utnmobile.quetrucazo.model.Game
 import com.utnmobile.quetrucazo.model.toGames
 import com.utnmobile.quetrucazo.services.SocketIOManager
 import com.utnmobile.quetrucazo.ui.viewmodel.auth.AuthViewModel
+import com.utnmobile.quetrucazo.ui.viewmodel.connection.ConnectionViewModel
 import com.utnmobile.quetrucazo.ui.viewmodel.music.MusicViewModel
 import org.json.JSONArray
 import org.json.JSONObject
@@ -24,13 +25,22 @@ fun MainScreen(navigateTo: NavigateTo) {
     var showDialog by remember { mutableStateOf(false) }
 
     val authViewModel = viewModel<AuthViewModel>()
+    val connectionViewModel = viewModel<ConnectionViewModel>()
 
-    SocketIOManager.connect(authViewModel.user!!.id) {
+    val onConnect = onConnect@{
         SocketIOManager.socket?.on("join-game") { args ->
             val game = Game.from(args[0] as JSONObject)
             navigateTo(Screen.Game, mapOf("game" to game))
         }
+        return@onConnect
     }
+
+    val onDisconnect = onDisconnect@{
+        // mostrar dialogo que diga "se perdió la conexión" y un boton que reinicie la app
+        connectionViewModel.updateShowDisconnect(true)
+    }
+
+    SocketIOManager.connect(authViewModel.user!!.id, onConnect, onDisconnect)
 
     viewModel<MusicViewModel>().playMusic()
 
