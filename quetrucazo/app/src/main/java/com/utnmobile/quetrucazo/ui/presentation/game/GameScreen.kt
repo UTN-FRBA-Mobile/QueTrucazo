@@ -35,12 +35,15 @@ import com.utnmobile.quetrucazo.ui.presentation.NavigateTo
 import com.utnmobile.quetrucazo.ui.presentation.YouWinDialog
 import com.utnmobile.quetrucazo.ui.viewmodel.auth.AuthViewModel
 import com.utnmobile.quetrucazo.ui.viewmodel.music.MusicViewModel
+import kotlinx.coroutines.delay
 import org.json.JSONArray
 
 @Composable
 fun GameScreen(navigateTo: NavigateTo, game: Game, isPreview: Boolean = false) {
 
     var userId = 1
+
+    var analyzingEvents = false
 
     if (!isPreview) {
         viewModel<MusicViewModel>().playMusic()
@@ -65,9 +68,11 @@ fun GameScreen(navigateTo: NavigateTo, game: Game, isPreview: Boolean = false) {
 
     var showWinDialog by remember { mutableStateOf(false) }
 
-    fun analyzeEvents() {
+    suspend fun analyzeEvents() {
+        analyzingEvents = true
         println("Analyzing events: $eventIndex - ${events.size}")
         if (eventIndex >= events.size) {
+            analyzingEvents = false
             return
         }
 
@@ -75,6 +80,7 @@ fun GameScreen(navigateTo: NavigateTo, game: Game, isPreview: Boolean = false) {
 
         when (val event = events[eventIndex]) {
             is NextRoundGameEvent -> {
+                delay(1500)
                 myThrownCards = emptyList()
                 opponentThrownCards = emptyList()
                 myCards = event.cards[userId] ?: emptyList()
@@ -103,23 +109,23 @@ fun GameScreen(navigateTo: NavigateTo, game: Game, isPreview: Boolean = false) {
                 }
 
                 myTurn = event.nextPlayerId == userId
-
             }
         }
         eventIndex++
         analyzeEvents()
     }
 
-
+    LaunchedEffect(events) {
+        if (!analyzingEvents) {
+            analyzeEvents()
+        }
+    }
 
     LaunchedEffect(Unit) {
-        analyzeEvents()
-
         SocketIOManager.socket?.on("new-events") { args ->
             val newEvents = (args[0] as JSONArray).toGameEvents()
             println(newEvents)
             events += newEvents
-            analyzeEvents()
         }
     }
 
@@ -172,7 +178,7 @@ fun GameScreen(navigateTo: NavigateTo, game: Game, isPreview: Boolean = false) {
                     opponentThrownCards = opponentThrownCards,
                     myTurn = myTurn,
                     gameId = game.id,
-                    userId = userId
+                    userId = userId,
                 )
 
                 Spacer(modifier = Modifier.weight(1f))

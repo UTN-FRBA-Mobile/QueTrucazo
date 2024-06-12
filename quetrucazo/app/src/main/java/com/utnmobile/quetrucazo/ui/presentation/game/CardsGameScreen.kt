@@ -1,7 +1,8 @@
 package com.utnmobile.quetrucazo.ui.presentation.game
 
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -30,6 +31,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.zIndex
 import com.utnmobile.quetrucazo.R
 import com.utnmobile.quetrucazo.model.Card
 import com.utnmobile.quetrucazo.model.CartaPalo
@@ -47,14 +49,10 @@ fun CardsGameScreen(
     addMyThrownCard: (Card) -> Unit,
     myTurn: Boolean,
     gameId: Int,
-    userId: Int
+    userId: Int,
 ) {
 
     var inGameCardsRowBounds by remember { mutableStateOf<Rect?>(null) }
-
-    LaunchedEffect(inGameCardsRowBounds) {
-        println("cambio de bounds $inGameCardsRowBounds")
-    }
 
     Column(
         modifier = modifier.fillMaxSize(),
@@ -71,15 +69,13 @@ fun CardsGameScreen(
             DisplayOpponentCards(opponentCardsSize)
         }
 
-        Row(
+        Box(
             modifier = Modifier
                 .fillMaxWidth()
                 .weight(2f)
                 .onGloballyPositioned { coordinates ->
                     inGameCardsRowBounds = coordinates.boundsInWindow()
                 },
-            horizontalArrangement = Arrangement.Absolute.Left,
-            verticalAlignment = Alignment.CenterVertically
         ) {
             DisplayInGameCards(myThrownCards, opponentThrownCards)
         }
@@ -129,9 +125,9 @@ fun DisplayOpponentCards(opponentCardsSize: Int) {
             else 0
 
             val currentOffsetY = if (i == 0 && opponentCardsSize > 1) offsetY
-                else if (i == 2 && opponentCardsSize == 3) offsetY
-                else if (i == 1 && opponentCardsSize == 2) offsetY
-                else 0
+            else if (i == 2 && opponentCardsSize == 3) offsetY
+            else if (i == 1 && opponentCardsSize == 2) offsetY
+            else 0
 
             Image(
                 painter = painterResource(id = R.drawable.reverso),
@@ -145,49 +141,67 @@ fun DisplayOpponentCards(opponentCardsSize: Int) {
 }
 
 @Composable
-fun DisplayInGameCards(misCartasJugadas: List<Card>, oponenteCartasJugadas: List<Card>) {
-
-    val maxCards = maxOf(misCartasJugadas.size, oponenteCartasJugadas.size)
-
-    repeat(maxCards) {
-
-        val myCard = misCartasJugadas.getOrNull(it)
-        val opponentCard = oponenteCartasJugadas.getOrNull(it)
-
-        Box(modifier = Modifier.padding(15.dp)) {
-            if (myCard != null && opponentCard != null) {
-                DisplayCardsPair(myCard, opponentCard)
-            } else {
-                DisplayCard(myCard, offset = true)
-                DisplayCard(opponentCard)
+fun DisplayInGameCards(
+    misCartasJugadas: List<Card>,
+    oponenteCartasJugadas: List<Card>,
+) {
+    Row(
+        horizontalArrangement = Arrangement.Absolute.Left,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        repeat(oponenteCartasJugadas.size) { index ->
+            val opponentCard = oponenteCartasJugadas.get(index)
+            Box(modifier = Modifier.padding(15.dp)) {
+                AnimatedOpponentCard(opponentCard, index == oponenteCartasJugadas.size - 1,  true)
             }
         }
-
-
     }
 
+    Row(
+        horizontalArrangement = Arrangement.Absolute.Left,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        repeat(misCartasJugadas.size) { index ->
+            val myCard = misCartasJugadas.get(index)
+            Box(modifier = Modifier.padding(15.dp)) {
+                DisplayCard(myCard, true, offset = true)
+            }
+        }
+    }
 }
 
 @Composable
-fun DisplayCard(card: Card?, offset: Boolean = false) {
+fun AnimatedOpponentCard(card: Card, animate: Boolean, top: Boolean) {
+    val offsetY = remember { Animatable(if (animate) -200f else 0f) }
+    var hasAnimated by remember { mutableStateOf(false) }
+
+    LaunchedEffect(Unit) {
+        if (!hasAnimated && animate) {
+            offsetY.animateTo(
+                targetValue = 0f,
+                animationSpec = tween(durationMillis = 500)
+            )
+            hasAnimated = true
+        }
+    }
+
+    Image(
+        painter = painterResource(id = card.resource()),
+        contentDescription = "Card Image",
+        modifier = Modifier
+            .offset { IntOffset(0, offsetY.value.toInt()) }
+            .zIndex(if (top) 1f else 0f)
+    )
+}
+
+@Composable
+fun DisplayCard(card: Card?, top: Boolean, offset: Boolean = false) {
     card?.let {
         Image(
             painter = painterResource(id = it.resource()),
             contentDescription = "Card Image",
-            modifier = if (offset) Modifier.offset(y = 40.dp) else Modifier
+            modifier = (if (offset) Modifier.offset(y = 40.dp) else Modifier).zIndex(if (top) 1f else 0f)
         )
-    }
-}
-
-@Composable
-fun DisplayCardsPair(myCard: Card, opponentCard: Card) {
-    val isMyCardWinning = myCard.value() > opponentCard.value()
-    if (isMyCardWinning) {
-        DisplayCard(opponentCard)
-        DisplayCard(myCard, offset = true)
-    } else {
-        DisplayCard(myCard, offset = true)
-        DisplayCard(opponentCard)
     }
 }
 
@@ -201,9 +215,7 @@ fun DisplayMyCards(
     userId: Int,
     inGameCardsRowBounds: Rect?
 ) {
-    println("sape $inGameCardsRowBounds")
     myCards.forEach { card ->
-        println("haciendo devuelta el foreach con $inGameCardsRowBounds")
         val offset = remember { mutableStateOf(Offset.Zero) }
         val cardCoordinates = remember { mutableStateOf<LayoutCoordinates?>(null) }
         val imageModifier = Modifier
@@ -215,10 +227,6 @@ fun DisplayMyCards(
                     },
                     onDragEnd = {
                         val cardPosition = cardCoordinates.value?.boundsInWindow()?.center
-                        println("es mi turno2: $myTurn")
-                        println("cardPosition $cardPosition")
-                        println("inGameCardsRowBounds $inGameCardsRowBounds")
-                        println("esta en posicion: ${isCardInCenter(cardPosition, inGameCardsRowBounds)}")
                         if (myTurn && isCardInCenter(cardPosition, inGameCardsRowBounds)) {
                             SocketIOManager.throwCard(userId, gameId, card)
                             removeMyCard(card)
@@ -280,6 +288,6 @@ fun CardsPreview() {
         addMyThrownCard = {},
         myTurn = true,
         gameId = 1,
-        userId = 1
+        userId = 1,
     )
 }
