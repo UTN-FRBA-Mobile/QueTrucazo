@@ -154,7 +154,6 @@ fun GameScreen(navigateTo: NavigateTo, game: Game, isPreview: Boolean = false) {
             ) {
                 PointsGameScreen(
                     modifier = Modifier
-                        .weight(1f)
                         .fillMaxWidth()
                         .padding(vertical = 16.dp),
                     myPoints = myPoints,
