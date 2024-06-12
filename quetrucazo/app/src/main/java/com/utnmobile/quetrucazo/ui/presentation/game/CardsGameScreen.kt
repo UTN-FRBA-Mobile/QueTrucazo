@@ -1,6 +1,7 @@
 package com.utnmobile.quetrucazo.ui.presentation.game
 
 import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.VectorConverter
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.gestures.detectDragGestures
@@ -27,6 +28,7 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.layout.boundsInWindow
 import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.layout.positionInRoot
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntOffset
@@ -53,6 +55,7 @@ fun CardsGameScreen(
 ) {
 
     var inGameCardsRowBounds by remember { mutableStateOf<Rect?>(null) }
+    var opponentCardsRowBounds by remember { mutableStateOf<Rect?>(null) }
 
     Column(
         modifier = modifier.fillMaxSize(),
@@ -62,7 +65,10 @@ fun CardsGameScreen(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .weight(1f),
+                .weight(1f)
+                .onGloballyPositioned { coordinates ->
+                    opponentCardsRowBounds = coordinates.boundsInWindow()
+                },
             horizontalArrangement = Arrangement.SpaceEvenly,
             verticalAlignment = Alignment.CenterVertically
         ) {
@@ -77,7 +83,7 @@ fun CardsGameScreen(
                     inGameCardsRowBounds = coordinates.boundsInWindow()
                 },
         ) {
-            DisplayInGameCards(myThrownCards, opponentThrownCards)
+            DisplayInGameCards(myThrownCards, opponentThrownCards, opponentCardsRowBounds)
         }
 
         Row(
@@ -144,6 +150,7 @@ fun DisplayOpponentCards(opponentCardsSize: Int) {
 fun DisplayInGameCards(
     misCartasJugadas: List<Card>,
     oponenteCartasJugadas: List<Card>,
+    opponentCardsRowBounds: Rect?
 ) {
     Row(
         horizontalArrangement = Arrangement.Absolute.Left,
@@ -152,7 +159,7 @@ fun DisplayInGameCards(
         repeat(oponenteCartasJugadas.size) { index ->
             val opponentCard = oponenteCartasJugadas.get(index)
             Box(modifier = Modifier.padding(15.dp)) {
-                AnimatedOpponentCard(opponentCard, index == oponenteCartasJugadas.size - 1,  true)
+                AnimatedOpponentCard(opponentCard, index == oponenteCartasJugadas.size - 1, true, opponentCardsRowBounds)
             }
         }
     }
@@ -171,14 +178,33 @@ fun DisplayInGameCards(
 }
 
 @Composable
-fun AnimatedOpponentCard(card: Card, animate: Boolean, top: Boolean) {
-    val offsetY = remember { Animatable(if (animate) -200f else 0f) }
+fun AnimatedOpponentCard(card: Card, animate: Boolean, top: Boolean, inGameCardsRowBounds: Rect?) {
+    var componentPosition by remember { mutableStateOf<Offset?>(null) }
+
+    val offset = remember { Animatable(Offset(0f, 0f), Offset.VectorConverter) }
     var hasAnimated by remember { mutableStateOf(false) }
 
-    LaunchedEffect(Unit) {
-        if (!hasAnimated && animate) {
-            offsetY.animateTo(
-                targetValue = 0f,
+    // Función para calcular las posiciones iniciales y finales de la animación
+    fun calculateInitialOffset(): Offset {
+        val startX = inGameCardsRowBounds?.center?.let {
+            it.x - 208 / 2
+        } ?: 0f
+        val startY = inGameCardsRowBounds?.center?.let {
+            it.y - 320 / 2
+        } ?: 0f
+        val currentX = componentPosition?.x ?: 0f
+        val currentY = componentPosition?.y ?: 0f
+        return Offset(startX - currentX, startY - currentY)
+    }
+
+    LaunchedEffect(card, animate, componentPosition) {
+        if (!hasAnimated && animate && componentPosition != null) {
+            val initialOffset = calculateInitialOffset()
+
+            offset.snapTo(initialOffset) // Posicionar en el punto inicial calculado
+
+            offset.animateTo(
+                targetValue = Offset(0f, 0f),
                 animationSpec = tween(durationMillis = 500)
             )
             hasAnimated = true
@@ -189,7 +215,12 @@ fun AnimatedOpponentCard(card: Card, animate: Boolean, top: Boolean) {
         painter = painterResource(id = card.resource()),
         contentDescription = "Card Image",
         modifier = Modifier
-            .offset { IntOffset(0, offsetY.value.toInt()) }
+            .onGloballyPositioned { coordinates ->
+                if (componentPosition == null) {
+                    componentPosition = coordinates.positionInRoot()
+                }
+            }
+            .offset { IntOffset(offset.value.x.toInt(), offset.value.y.toInt()) }
             .zIndex(if (top) 1f else 0f)
     )
 }
