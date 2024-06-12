@@ -19,6 +19,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.input.pointer.pointerInput
@@ -107,12 +108,39 @@ fun CardsGameScreen(
 
 @Composable
 fun DisplayOpponentCards(opponentCardsSize: Int) {
-    repeat(opponentCardsSize) {
-        val imageResource = R.drawable.reverso
-        Image(
-            painter = painterResource(id = imageResource),
-            contentDescription = "Card Image"
-        )
+    val angle = 15f
+    val offsetY = -10
+    val offsetX = 15
+
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.Center,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        for (i in 0 until opponentCardsSize) {
+            val currentAngle = if (i == 0 && opponentCardsSize > 1) angle
+            else if (i == 1 && opponentCardsSize == 2 || i == 2 && opponentCardsSize == 3) -angle
+            else 0f
+
+            val currentOffsetX = if (i == 0 && opponentCardsSize == 3) offsetX
+            else if (i == 2 && opponentCardsSize == 3) -offsetX
+            else if (i == 0 && opponentCardsSize == 2) (offsetX * 1.5).toInt()
+            else if (i == 1 && opponentCardsSize == 2) -(offsetX * 1.5).toInt()
+            else 0
+
+            val currentOffsetY = if (i == 0 && opponentCardsSize > 1) offsetY
+                else if (i == 2 && opponentCardsSize == 3) offsetY
+                else if (i == 1 && opponentCardsSize == 2) offsetY
+                else 0
+
+            Image(
+                painter = painterResource(id = R.drawable.reverso),
+                contentDescription = "Card Image",
+                modifier = Modifier
+                    .offset(x = currentOffsetX.dp, y = currentOffsetY.toInt().dp)
+                    .rotate(currentAngle)
+            )
+        }
     }
 }
 
