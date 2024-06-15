@@ -9,6 +9,9 @@ import com.utnmobile.quetrucazo.model.events.implementations.RoundResultGameEven
 import com.utnmobile.quetrucazo.model.events.implementations.StartGameEvent
 import com.utnmobile.quetrucazo.model.events.implementations.ThrowCardGameEvent
 import com.utnmobile.quetrucazo.model.events.implementations.ToDeckGameEvent
+import com.utnmobile.quetrucazo.model.events.implementations.TrucoAcceptGameEvent
+import com.utnmobile.quetrucazo.model.events.implementations.TrucoCallGameEvent
+import com.utnmobile.quetrucazo.model.events.implementations.TrucoDeclineGameEvent
 import org.json.JSONArray
 import org.json.JSONObject
 
@@ -21,6 +24,9 @@ open class GameEvent {
                 "THROW_CARD" -> ThrowCardGameEvent.from(json)
                 "ROUND_RESULT" -> RoundResultGameEvent.from(json)
                 "RESULT" -> ResultGameEvent.from(json)
+                "TRUCO_CALL" -> TrucoCallGameEvent.from(json)
+                "TRUCO_ACCEPT" -> TrucoAcceptGameEvent.from(json)
+                "TRUCO_DECLINE" -> TrucoDeclineGameEvent.from(json)
                 "TO_DECK" -> ToDeckGameEvent.from(json)
                 "PLAY_AGAIN" -> PlayAgainEvent.from(json)
                 "NO_PLAY_AGAIN" -> NoPlayAgainEvent.from(json)

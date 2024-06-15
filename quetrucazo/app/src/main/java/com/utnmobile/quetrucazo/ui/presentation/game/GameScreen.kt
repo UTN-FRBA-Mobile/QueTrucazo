@@ -29,6 +29,7 @@ import com.utnmobile.quetrucazo.model.events.implementations.ResultGameEvent
 import com.utnmobile.quetrucazo.model.events.implementations.RoundResultGameEvent
 import com.utnmobile.quetrucazo.model.events.implementations.StartGameEvent
 import com.utnmobile.quetrucazo.model.events.implementations.ThrowCardGameEvent
+import com.utnmobile.quetrucazo.model.events.implementations.TrucoCallGameEvent
 import com.utnmobile.quetrucazo.model.events.toGameEvents
 import com.utnmobile.quetrucazo.services.SocketIOManager
 import com.utnmobile.quetrucazo.ui.presentation.EndGameDialog
@@ -124,6 +125,11 @@ fun GameScreen(navigateTo: NavigateTo, game: Game, isPreview: Boolean = false) {
                 navigateTo(Screen.Main, emptyMap())
             }
 
+            is TrucoCallGameEvent -> {
+                println("TRUCO EVENTO COMENZADO!!!!!!!!!!!!!")
+
+            }
+
         }
         eventIndex++
         analyzeEvents()
@@ -197,7 +203,9 @@ fun GameScreen(navigateTo: NavigateTo, game: Game, isPreview: Boolean = false) {
                 Spacer(modifier = Modifier.weight(1f))
 
                 PlayGameScreen(
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth(),
+                    userId = userId,
+                    gameId = game.id
                 )
 
                 if (winner != null) {

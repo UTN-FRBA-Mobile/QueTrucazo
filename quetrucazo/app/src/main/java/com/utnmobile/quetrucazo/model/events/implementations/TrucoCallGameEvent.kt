@@ -11,7 +11,7 @@ class TrucoCallGameEvent (
     ): GameEvent(){
         companion object{
             fun from(json: JSONObject): TrucoCallGameEvent{
-                val caller = json.getInt("playerId")
+                val caller = json.getInt("caller")
                 val call = json.getString("call")
                 return TrucoCallGameEvent(caller,call)
             }

@@ -97,4 +97,12 @@ object SocketIOManager {
         _socket?.emit("no-play-again", data)
     }
 
+    fun trucoCall(userId: Int, gameId: Int, call: String){
+        val data = JSONObject()
+        data.put("userId",userId)
+        data.put("gameId", gameId)
+        data.put("call", call)
+        _socket?.emit("truco", data)
+    }
+
 }

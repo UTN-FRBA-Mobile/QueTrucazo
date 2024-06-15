@@ -10,9 +10,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.graphics.RectangleShape
+import com.utnmobile.quetrucazo.services.SocketIOManager
 
 @Composable
-fun PlayGameScreen(modifier: Modifier = Modifier) {
+fun PlayGameScreen(modifier: Modifier = Modifier, userId: Int, gameId: Int) {
     Row(
         modifier = modifier
             .fillMaxWidth()
@@ -23,7 +24,7 @@ fun PlayGameScreen(modifier: Modifier = Modifier) {
         val buttonColors = ButtonDefaults.buttonColors(containerColor = Color(0xFF6200EE))
 
         Button(
-            onClick = { /* Handle Truco */ },
+            onClick = { SocketIOManager.trucoCall(userId,gameId,"TRUCO") },
             modifier = Modifier
                 .weight(1f)
                 .fillMaxWidth(),
