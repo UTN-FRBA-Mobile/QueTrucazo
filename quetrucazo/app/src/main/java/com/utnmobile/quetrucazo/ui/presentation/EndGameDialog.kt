@@ -24,17 +24,20 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
+import com.utnmobile.quetrucazo.services.SocketIOManager
 
 @Composable
-fun YouWinDialog(
-    navigateTo: NavigateTo,
+fun EndGameDialog(
     onDismissRequest: () -> Unit,
     myPoints: Int,
-    opponentPoints: Int
+    opponentPoints: Int,
+    isWinner: Boolean,
+    gameId: Int,
+    userId: Int,
+
 ) {
 
     val buttonColors = ButtonDefaults.buttonColors(containerColor = Color(0xFF6200EE))
-
     Dialog(onDismissRequest = onDismissRequest) {
         Surface(
             shape = MaterialTheme.shapes.medium,
@@ -49,7 +52,7 @@ fun YouWinDialog(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
-                        "¡Felicitaciones, has ganado el juego!",
+                        if (isWinner) "¡Felicitaciones, has ganado el juego!" else "¡Has perdido el juego!",
                         style = TextStyle(
                             fontSize = 30.sp,
                             color = Color.Black,
@@ -80,7 +83,10 @@ fun YouWinDialog(
                         .fillMaxHeight(0.25f)
                 ) {
                     Button(
-                        onClick = { /* Handle VOLVER A JUGAR */ },
+                        onClick = {
+                            onDismissRequest()
+                            SocketIOManager.playAgain(userId, gameId)
+                        },
                         modifier = Modifier
                             .fillMaxWidth(),
                         shape = RectangleShape,
@@ -95,7 +101,10 @@ fun YouWinDialog(
                         .fillMaxHeight(0.25f)
                 ) {
                     Button(
-                        onClick = { navigateTo(Screen.Main, emptyMap()) },
+                        onClick = {
+                            onDismissRequest()
+                            SocketIOManager.noPlayAgain(userId, gameId)
+                        },
                         modifier = Modifier
                             .fillMaxWidth(),
                         shape = RectangleShape,
@@ -108,15 +117,19 @@ fun YouWinDialog(
             }
         }
     }
+
+
 }
 
 @Preview
 @Composable
 fun YouWinDialogPreview() {
-    YouWinDialog(
+    EndGameDialog(
         onDismissRequest = { },
         myPoints = 10,
         opponentPoints = 5,
-        navigateTo = { _, _ -> }
+        isWinner = false,
+        gameId = 1,
+        userId = 2
     )
 }

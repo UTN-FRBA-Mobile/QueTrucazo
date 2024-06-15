@@ -82,4 +82,19 @@ object SocketIOManager {
         _socket?.off("throw-card")
         _socket?.off(Socket.EVENT_CONNECT_ERROR)
     }
+
+    fun playAgain(userId: Int, gameId: Int) {
+        val data = JSONObject()
+        data.put("userId", userId)
+        data.put("gameId", gameId)
+        _socket?.emit("play-again", data)
+    }
+
+    fun noPlayAgain(userId: Int, gameId: Int) {
+        val data = JSONObject()
+        data.put("userId", userId)
+        data.put("gameId", gameId)
+        _socket?.emit("no-play-again", data)
+    }
+
 }

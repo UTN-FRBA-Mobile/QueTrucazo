@@ -21,18 +21,20 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.utnmobile.quetrucazo.model.Card
 import com.utnmobile.quetrucazo.model.Game
-import com.utnmobile.quetrucazo.model.UserId
 import com.utnmobile.quetrucazo.model.events.implementations.NextRoundGameEvent
+import com.utnmobile.quetrucazo.model.events.implementations.NoPlayAgainEvent
+import com.utnmobile.quetrucazo.model.events.implementations.PlayAgainEvent
 import com.utnmobile.quetrucazo.model.events.implementations.ResultGameEvent
 import com.utnmobile.quetrucazo.model.events.implementations.RoundResultGameEvent
 import com.utnmobile.quetrucazo.model.events.implementations.StartGameEvent
 import com.utnmobile.quetrucazo.model.events.implementations.ThrowCardGameEvent
 import com.utnmobile.quetrucazo.model.events.toGameEvents
 import com.utnmobile.quetrucazo.services.SocketIOManager
+import com.utnmobile.quetrucazo.ui.presentation.EndGameDialog
 import com.utnmobile.quetrucazo.ui.presentation.NavigateTo
-import com.utnmobile.quetrucazo.ui.presentation.YouWinDialog
+import com.utnmobile.quetrucazo.ui.presentation.PlayAgainDialog
+import com.utnmobile.quetrucazo.ui.presentation.Screen
 import com.utnmobile.quetrucazo.ui.viewmodel.auth.AuthViewModel
 import com.utnmobile.quetrucazo.ui.viewmodel.music.MusicViewModel
 import kotlinx.coroutines.delay
@@ -66,7 +68,9 @@ fun GameScreen(navigateTo: NavigateTo, game: Game, isPreview: Boolean = false) {
 
     var myTurn by remember { mutableStateOf(game.state.playerTurn == userId) }
 
-    var showWinDialog by remember { mutableStateOf(false) }
+    var endGameDialog by remember { mutableStateOf(false) }
+
+    var playAgainDialog by remember { mutableStateOf(false) }
 
     suspend fun analyzeEvents() {
         analyzingEvents = true
@@ -92,7 +96,7 @@ fun GameScreen(navigateTo: NavigateTo, game: Game, isPreview: Boolean = false) {
                 myPoints = event.points[userId] ?: 0
                 opponentPoints = event.points.entries.first { it.key != userId }.value
                 winner = event.winner
-                showWinDialog = winner == userId
+                endGameDialog = true
             }
 
             is RoundResultGameEvent -> {
@@ -100,7 +104,10 @@ fun GameScreen(navigateTo: NavigateTo, game: Game, isPreview: Boolean = false) {
                 opponentPoints = event.points.entries.first { it.key != userId }.value
             }
 
-            is StartGameEvent -> {}
+            is StartGameEvent -> {
+                playAgainDialog = false
+            }
+
             is ThrowCardGameEvent -> {
 
                 if (event.playerId != userId) {
@@ -110,6 +117,14 @@ fun GameScreen(navigateTo: NavigateTo, game: Game, isPreview: Boolean = false) {
 
                 myTurn = event.nextPlayerId == userId
             }
+
+            is PlayAgainEvent -> {
+            }
+
+            is NoPlayAgainEvent -> {
+                navigateTo(Screen.Main, emptyMap())
+            }
+
         }
         eventIndex++
         analyzeEvents()
@@ -186,12 +201,24 @@ fun GameScreen(navigateTo: NavigateTo, game: Game, isPreview: Boolean = false) {
                     modifier = Modifier.fillMaxWidth()
                 )
 
-                if (showWinDialog) {
-                    YouWinDialog(
-                        onDismissRequest = { showWinDialog = false },
+                if (endGameDialog) {
+                    EndGameDialog(
+                        onDismissRequest = {
+                            endGameDialog = false
+                            playAgainDialog = true
+                        },
                         myPoints = myPoints,
                         opponentPoints = opponentPoints,
-                        navigateTo = navigateTo
+                        isWinner = winner == userId,
+                        gameId = game.id,
+                        userId = userId
+
+                    )
+                } else if (playAgainDialog) {
+                    PlayAgainDialog(
+                        onDismissRequest = { playAgainDialog = false },
+                        gameId = game.id,
+                        userId = userId,
                     )
                 }
 

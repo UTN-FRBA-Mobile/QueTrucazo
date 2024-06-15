@@ -2,6 +2,8 @@ package com.utnmobile.quetrucazo.model.events
 
 import com.utnmobile.quetrucazo.model.UserId
 import com.utnmobile.quetrucazo.model.events.implementations.NextRoundGameEvent
+import com.utnmobile.quetrucazo.model.events.implementations.NoPlayAgainEvent
+import com.utnmobile.quetrucazo.model.events.implementations.PlayAgainEvent
 import com.utnmobile.quetrucazo.model.events.implementations.ResultGameEvent
 import com.utnmobile.quetrucazo.model.events.implementations.RoundResultGameEvent
 import com.utnmobile.quetrucazo.model.events.implementations.StartGameEvent
@@ -20,6 +22,8 @@ open class GameEvent {
                 "ROUND_RESULT" -> RoundResultGameEvent.from(json)
                 "RESULT" -> ResultGameEvent.from(json)
                 "TO_DECK" -> ToDeckGameEvent.from(json)
+                "PLAY_AGAIN" -> PlayAgainEvent.from(json)
+                "NO_PLAY_AGAIN" -> NoPlayAgainEvent.from(json)
                 else -> throw IllegalArgumentException("Invalid event type ${json.getString("type")}")
             }
         }
@@ -37,6 +41,7 @@ fun <T> JSONObject.toUserMap(key: String, f: (JSONObject, String) -> T): Map<Use
 
     return map
 }
+
 fun JSONObject.toPoints(): Map<UserId, Int> {
     return toUserMap("points") { points, key ->
         points.getInt(key)
