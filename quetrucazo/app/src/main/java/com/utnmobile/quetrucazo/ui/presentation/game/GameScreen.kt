@@ -68,8 +68,6 @@ fun GameScreen(navigateTo: NavigateTo, game: Game, isPreview: Boolean = false) {
 
     var myTurn by remember { mutableStateOf(game.state.playerTurn == userId) }
 
-    var endGameDialog by remember { mutableStateOf(false) }
-
     var playAgainDialog by remember { mutableStateOf(false) }
 
     suspend fun analyzeEvents() {
@@ -96,7 +94,6 @@ fun GameScreen(navigateTo: NavigateTo, game: Game, isPreview: Boolean = false) {
                 myPoints = event.points[userId] ?: 0
                 opponentPoints = event.points.entries.first { it.key != userId }.value
                 winner = event.winner
-                endGameDialog = true
             }
 
             is RoundResultGameEvent -> {
@@ -106,6 +103,8 @@ fun GameScreen(navigateTo: NavigateTo, game: Game, isPreview: Boolean = false) {
 
             is StartGameEvent -> {
                 playAgainDialog = false
+                myPoints = 0
+                opponentPoints = 0
             }
 
             is ThrowCardGameEvent -> {
@@ -201,10 +200,10 @@ fun GameScreen(navigateTo: NavigateTo, game: Game, isPreview: Boolean = false) {
                     modifier = Modifier.fillMaxWidth()
                 )
 
-                if (endGameDialog) {
+                if (winner != null) {
                     EndGameDialog(
                         onDismissRequest = {
-                            endGameDialog = false
+                            winner = null
                             playAgainDialog = true
                         },
                         myPoints = myPoints,

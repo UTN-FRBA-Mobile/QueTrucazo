@@ -8,14 +8,17 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.*
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.utnmobile.quetrucazo.model.Game
+import com.utnmobile.quetrucazo.services.SocketIOManager
 import com.utnmobile.quetrucazo.ui.presentation.game.GameScreen
+import com.utnmobile.quetrucazo.ui.viewmodel.auth.AuthViewModel
 import com.utnmobile.quetrucazo.ui.viewmodel.connection.ConnectionViewModel
-import com.utnmobile.quetrucazo.ui.viewmodel.music.MusicViewModel
+import org.json.JSONObject
 
 typealias NavigateTo = (Screen, params: Map<String, Any>) -> Unit
 
 @Composable
 fun AppNavigation(context: Context) {
+    val authViewModel = viewModel<AuthViewModel>()
     val connectionViewModel = viewModel<ConnectionViewModel>()
     val showDisconnect by connectionViewModel.showDisconnect.collectAsState()
 
@@ -27,10 +30,25 @@ fun AppNavigation(context: Context) {
         currentScreenParams = params
     }
 
+    val onConnect = onConnect@{
+        SocketIOManager.socket?.on("join-game") { args ->
+            val game = Game.from(args[0] as JSONObject)
+            navigateTo(Screen.Game, mapOf("game" to game))
+        }
+        return@onConnect
+    }
+
     if (showDisconnect) {
         ConnectionLostDialog(
             onRestartApp = { restartApp(context) }
         )
+    }
+
+    LaunchedEffect(authViewModel.user) {
+        if (authViewModel.user != null) {
+            connectionViewModel.connect(authViewModel.user!!.id, onConnect)
+            navigateTo(Screen.Main, emptyMap())
+        }
     }
 
     when (currentScreen) {

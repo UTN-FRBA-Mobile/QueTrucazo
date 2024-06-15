@@ -25,28 +25,18 @@ fun MainScreen(navigateTo: NavigateTo) {
     var showDialog by remember { mutableStateOf(false) }
 
     val authViewModel = viewModel<AuthViewModel>()
-    val connectionViewModel = viewModel<ConnectionViewModel>()
-
-    val onConnect = onConnect@{
-        SocketIOManager.socket?.on("join-game") { args ->
-            val game = Game.from(args[0] as JSONObject)
-            navigateTo(Screen.Game, mapOf("game" to game))
-        }
-        return@onConnect
-    }
-
-    val onDisconnect = onDisconnect@{
-        // mostrar dialogo que diga "se perdió la conexión" y un boton que reinicie la app
-        connectionViewModel.updateShowDisconnect(true)
-    }
-
-    SocketIOManager.connect(authViewModel.user!!.id, onConnect, onDisconnect)
 
     viewModel<MusicViewModel>().playMusic()
 
-    SocketIOManager.socket?.on("created-game") { args ->
-        val gameId = (args[0] as JSONObject).getInt("gameId")
-        navigateTo(Screen.WaitingForOpponent, mapOf("gameId" to gameId))
+
+
+    LaunchedEffect(authViewModel.user) {
+        if (authViewModel.user != null) {
+            SocketIOManager.socket?.on("created-game") { args ->
+                val gameId = (args[0] as JSONObject).getInt("gameId")
+                navigateTo(Screen.WaitingForOpponent, mapOf("gameId" to gameId))
+            }
+        }
     }
 
     DisposableEffect(Unit) {
