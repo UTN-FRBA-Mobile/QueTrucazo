@@ -109,7 +109,6 @@ fun GameScreen(navigateTo: NavigateTo, game: Game, isPreview: Boolean = false) {
             }
 
             is ThrowCardGameEvent -> {
-
                 if (event.playerId != userId) {
                     opponentThrownCards += event.card
                     opponentCardsSize--

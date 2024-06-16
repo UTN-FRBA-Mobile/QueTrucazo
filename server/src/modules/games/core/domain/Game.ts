@@ -394,6 +394,7 @@ export class Game {
     }
 
     truco(userId: UserId, call: TrucoCall): Game {
+    
         if (this.state.playerTurn !== userId) {
             throw new Error('Not your turn');
         }

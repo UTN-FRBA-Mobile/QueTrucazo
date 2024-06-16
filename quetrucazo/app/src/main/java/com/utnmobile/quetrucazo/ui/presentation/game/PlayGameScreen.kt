@@ -30,7 +30,8 @@ fun PlayGameScreen(modifier: Modifier = Modifier, userId: Int, gameId: Int) {
                 .fillMaxWidth(),
             shape = RectangleShape,
             colors = buttonColors
-        ) {
+        )
+        {
             Text("TRUCO")
         }
 
