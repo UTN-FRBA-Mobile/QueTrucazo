@@ -47,7 +47,7 @@ fun PlayGameScreen(modifier: Modifier = Modifier, userId: Int, gameId: Int) {
         }
 
         Button(
-            onClick = { /* Handle Mazo */ },
+            onClick = { SocketIOManager.goToDeck(userId, gameId); println("Me fui al mazo") },
             modifier = Modifier
                 .weight(1f)
                 .fillMaxWidth(),

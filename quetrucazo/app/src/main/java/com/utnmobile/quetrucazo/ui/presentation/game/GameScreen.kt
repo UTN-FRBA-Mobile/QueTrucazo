@@ -29,6 +29,7 @@ import com.utnmobile.quetrucazo.model.events.implementations.ResultGameEvent
 import com.utnmobile.quetrucazo.model.events.implementations.RoundResultGameEvent
 import com.utnmobile.quetrucazo.model.events.implementations.StartGameEvent
 import com.utnmobile.quetrucazo.model.events.implementations.ThrowCardGameEvent
+import com.utnmobile.quetrucazo.model.events.implementations.ToDeckGameEvent
 import com.utnmobile.quetrucazo.model.events.implementations.TrucoCallGameEvent
 import com.utnmobile.quetrucazo.model.events.toGameEvents
 import com.utnmobile.quetrucazo.services.SocketIOManager
@@ -126,9 +127,13 @@ fun GameScreen(navigateTo: NavigateTo, game: Game, isPreview: Boolean = false) {
 
             is TrucoCallGameEvent -> {
                 println("TRUCO EVENTO COMENZADO!!!!!!!!!!!!!")
-
             }
 
+            is ToDeckGameEvent -> {
+                if (event.playerId != userId) {
+                    println("El oponente se fue al mazo")
+                }
+            }
         }
         eventIndex++
         analyzeEvents()

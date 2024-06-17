@@ -105,4 +105,11 @@ object SocketIOManager {
         _socket?.emit("truco", data)
     }
 
+    fun goToDeck(userId: Int, gameId: Int){
+        val data = JSONObject()
+        data.put("userId",userId)
+        data.put("gameId", gameId)
+        _socket?.emit("go-to-deck", data)
+    }
+
 }
