@@ -105,6 +105,4 @@ object SocketIOManager {
         _socket?.emit("truco", data)
     }
 
-
-
 }
