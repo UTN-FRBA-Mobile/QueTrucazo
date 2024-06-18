@@ -126,6 +126,7 @@ fun GameScreen(navigateTo: NavigateTo, game: Game, isPreview: Boolean = false) {
 
             is TrucoCallGameEvent -> {
                 println("TRUCO EVENTO COMENZADO!!!!!!!!!!!!!")
+                var myOpponent = game.players.filter { it.id != event.caller }
 
             }
 
