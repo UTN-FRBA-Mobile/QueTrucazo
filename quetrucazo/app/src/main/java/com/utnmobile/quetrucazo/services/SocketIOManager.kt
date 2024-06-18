@@ -105,16 +105,4 @@ object SocketIOManager {
         _socket?.emit("truco", data)
     }
 
-<<<<<<< HEAD
-    fun answerTruco(userId: Int, gameId: Int, accepted: Boolean){
-        val data = JSONObject()
-        data.put("userId",userId)
-        data.put("gameId", gameId)
-        data.put("accepted", accepted)
-        _socket?.emit("answer-truco", data)
-    }
-=======
-
->>>>>>> parent of 1a8aa7e (Merge remote-tracking branch 'origin/main')
-
 }
