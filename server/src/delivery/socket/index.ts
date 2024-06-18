@@ -187,11 +187,16 @@ export class SocketManager {
             });
 
             socket.on('disconnect', () => {
-                const userId = Array.from(this.sockets.entries()).find(([_, s]) => s === socket)?.[0];
-                if (userId) {
-                    this.sockets.delete(userId);
-                    console.log('User disconnected', userId);
-                    checkNoPlayAgain.invoke(userId);
+                try {
+                    const userId = Array.from(this.sockets.entries()).find(([_, s]) => s === socket)?.[0];
+                    if (userId) {
+                        this.sockets.delete(userId);
+                        console.log('User disconnected', userId);
+                        checkNoPlayAgain.invoke(userId);
+                    }
+                } catch (error) {
+                    console.error('Error disconnecting', error);
+                    
                 }
             });
         });

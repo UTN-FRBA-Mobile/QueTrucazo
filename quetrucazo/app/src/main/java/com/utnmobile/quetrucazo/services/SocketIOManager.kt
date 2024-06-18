@@ -105,6 +105,30 @@ object SocketIOManager {
         _socket?.emit("truco", data)
     }
 
+    fun goToDeck(userId: Int, gameId: Int){
+        val data = JSONObject()
+        data.put("userId",userId)
+        data.put("gameId", gameId)
+        _socket?.emit("go-to-deck", data)
+    }
+    fun envido(userId: Int, gameId: Int, call: String){
+        val data = JSONObject()
+        data.put("userId",userId)
+        data.put("gameId", gameId)
+        data.put("call", call)
+        _socket?.emit("envido", data)
+    }
+
+    fun answerEnvido(userId: Int, gameId: Int, accepted: Boolean){
+        val data = JSONObject()
+        data.put("userId",userId)
+        data.put("gameId", gameId)
+        data.put("accepted", accepted)
+        _socket?.emit("answer-envido", data)
+    }
+
+
+
 
 
 }
