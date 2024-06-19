@@ -127,6 +127,7 @@ fun GameScreen(navigateTo: NavigateTo, game: Game, isPreview: Boolean = false) {
 
             is TrucoCallGameEvent -> {
                 println("TRUCO EVENTO COMENZADO!!!!!!!!!!!!!")
+
             }
 
             is ToDeckGameEvent -> {
@@ -134,6 +135,7 @@ fun GameScreen(navigateTo: NavigateTo, game: Game, isPreview: Boolean = false) {
                     println("El oponente se fue al mazo")
                 }
             }
+
         }
         eventIndex++
         analyzeEvents()

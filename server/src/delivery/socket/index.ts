@@ -196,6 +196,7 @@ export class SocketManager {
                     }
                 } catch (error) {
                     console.error('Error disconnecting', error);
+                    
                 }
             });
         });

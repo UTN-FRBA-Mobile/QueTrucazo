@@ -111,7 +111,6 @@ object SocketIOManager {
         data.put("gameId", gameId)
         _socket?.emit("go-to-deck", data)
     }
-
     fun envido(userId: Int, gameId: Int, call: String){
         val data = JSONObject()
         data.put("userId",userId)
@@ -127,5 +126,9 @@ object SocketIOManager {
         data.put("accepted", accepted)
         _socket?.emit("answer-envido", data)
     }
+
+
+
+
 
 }
