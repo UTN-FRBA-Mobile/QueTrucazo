@@ -209,7 +209,8 @@ fun GameScreen(navigateTo: NavigateTo, game: Game, isPreview: Boolean = false) {
                 PlayGameScreen(
                     modifier = Modifier.fillMaxWidth(),
                     userId = userId,
-                    gameId = game.id
+                    gameId = game.id,
+                    myTurn = myTurn,
                 )
 
                 if (winner != null) {
