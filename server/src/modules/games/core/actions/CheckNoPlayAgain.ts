@@ -8,7 +8,7 @@ export class CheckNoPlayAgain {
 
     public async invoke(userId: UserId): Promise<void> {
         const game = await this.gameRepository.getByUserId(userId);
-        if (!game) {
+        if (!game || !game.finished) {
             return;
         }
         const updatedGame = game.noPlayAgain(userId);

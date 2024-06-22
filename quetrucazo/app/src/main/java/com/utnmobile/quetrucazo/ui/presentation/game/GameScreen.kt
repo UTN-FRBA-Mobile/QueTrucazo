@@ -22,6 +22,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.utnmobile.quetrucazo.model.Game
+import com.utnmobile.quetrucazo.model.UserId
 import com.utnmobile.quetrucazo.model.events.implementations.NextRoundGameEvent
 import com.utnmobile.quetrucazo.model.events.implementations.NoPlayAgainEvent
 import com.utnmobile.quetrucazo.model.events.implementations.PlayAgainEvent
@@ -37,6 +38,7 @@ import com.utnmobile.quetrucazo.ui.presentation.EndGameDialog
 import com.utnmobile.quetrucazo.ui.presentation.NavigateTo
 import com.utnmobile.quetrucazo.ui.presentation.PlayAgainDialog
 import com.utnmobile.quetrucazo.ui.presentation.Screen
+import com.utnmobile.quetrucazo.ui.presentation.TrucoDialog
 import com.utnmobile.quetrucazo.ui.viewmodel.auth.AuthViewModel
 import com.utnmobile.quetrucazo.ui.viewmodel.music.MusicViewModel
 import kotlinx.coroutines.delay
@@ -71,6 +73,13 @@ fun GameScreen(navigateTo: NavigateTo, game: Game, isPreview: Boolean = false) {
     var myTurn by remember { mutableStateOf(game.state.playerTurn == userId) }
 
     var playAgainDialog by remember { mutableStateOf(false) }
+
+    var trucoDialog by remember { mutableStateOf(false)}
+    data class TrucoDatos(var userId: Int, var gameId: Int, var call: String)
+
+    var trucoDatos: TrucoDatos? = null
+
+
 
     suspend fun analyzeEvents() {
         analyzingEvents = true
@@ -126,7 +135,11 @@ fun GameScreen(navigateTo: NavigateTo, game: Game, isPreview: Boolean = false) {
             }
 
             is TrucoCallGameEvent -> {
-                println("TRUCO EVENTO COMENZADO!!!!!!!!!!!!!")
+                if (userId != event.caller){
+                    trucoDatos = TrucoDatos(userId,game.id,event.call)
+                    trucoDialog = true
+                }
+
 
             }
 
@@ -235,6 +248,17 @@ fun GameScreen(navigateTo: NavigateTo, game: Game, isPreview: Boolean = false) {
                         userId = userId,
                     )
                 }
+
+                if (trucoDialog && trucoDatos != null) {
+                    TrucoDialog(
+                        onDismissRequest = { trucoDialog = false },
+                        gameId = trucoDatos!!.gameId,
+                        userId = trucoDatos!!.userId,
+                        call = trucoDatos!!.call
+                    )
+                }
+
+
 
             }
         }

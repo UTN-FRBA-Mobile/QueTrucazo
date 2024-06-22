@@ -105,6 +105,15 @@ object SocketIOManager {
         _socket?.emit("truco", data)
     }
 
+    fun trucoAccept(userId: Int,gameId: Int,accepted: Boolean){
+        val data = JSONObject()
+        data.put("userId",userId)
+        data.put("gameId", gameId)
+        data.put("accepted", accepted)
+        _socket?.emit("answer-truco", data)
+
+    }
+
     fun goToDeck(userId: Int, gameId: Int){
         val data = JSONObject()
         data.put("userId",userId)

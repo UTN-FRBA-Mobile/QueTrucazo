@@ -63,8 +63,9 @@ fun TrucoDialog(
                     .fillMaxWidth()
 
                 ) {
-                    Button(onClick = { onDismissRequest()
-                        //SocketIOManager.trucoCallAccept
+                    Button(onClick = {
+                        onDismissRequest()
+                        SocketIOManager.trucoAccept(userId,gameId,true)
                     },
                         modifier = Modifier
                             .fillMaxWidth(),
@@ -101,7 +102,9 @@ fun TrucoDialog(
                     .fillMaxWidth()
                     .fillMaxHeight(0.25f),
                 ) {
-                    Button(onClick = { onDismissRequest() },
+                    Button(onClick = {
+                        onDismissRequest()
+                        SocketIOManager.trucoAccept(userId,gameId,false)             },
                         modifier = Modifier
                             .fillMaxWidth(),
                         shape = RectangleShape,
