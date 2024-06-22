@@ -451,7 +451,10 @@ export class Game {
             console.log("playerTurnAfterResponse is undefined");
         }
 
-        const playerTurn = truco.playerTurnAfterResponse || this.players.find(player => player.id !== userId)!.id;
+        let playerTurn = truco.playerTurnAfterResponse || this.players.find(player => player.id !== userId)!.id;
+        if (!accepted) {
+            playerTurn = userId;
+        }
 
         const newTruco: Truco = {
             ...truco,
