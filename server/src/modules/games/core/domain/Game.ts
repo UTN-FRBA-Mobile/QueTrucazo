@@ -1,7 +1,7 @@
 import { SafeUser, UserId } from "../../../users/core/domain/User";
 import { Card, generatePlayersCards, getCardValue, getEnvidoCardsValue, getRoundWinner } from "./Cards";
 
-const MAX_POINTS = 5;
+const MAX_POINTS = 15;
 
 export type GameId = number;
 
