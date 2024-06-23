@@ -164,7 +164,7 @@ export class SocketManager {
                     console.log('responder truco')
                     await answerTruco.invoke(gameId, userId, accepted);
                 } catch (error) {
-                    console.error('Error truco', error);
+                    console.error('Error answer truco', error);
                 }
             });
 

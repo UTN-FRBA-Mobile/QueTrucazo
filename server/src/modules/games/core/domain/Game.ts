@@ -402,7 +402,7 @@ export class Game {
         const truco = this.state.truco;
 
         if (!this.isValidTrucoCall(call)) {
-            throw new Error('Invalid envido call');
+            throw new Error('Invalid truco call');
         }
 
         let trucoPoints = 1;

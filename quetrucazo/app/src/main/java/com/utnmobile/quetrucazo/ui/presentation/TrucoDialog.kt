@@ -47,7 +47,7 @@ fun TrucoDialog(
                     .fillMaxHeight(0.25f),
                     horizontalArrangement = Arrangement.Center,
                     verticalAlignment = Alignment.CenterVertically){
-                    Text(text = "¡$call!",
+                    Text(text = "¡${call.replace("_", " ")}!",
                         style = TextStyle(
                             fontSize = 30.sp,
                             color = Color.Black,
@@ -81,7 +81,7 @@ fun TrucoDialog(
                 ) {
                     val nextCall: String = if (call == "TRUCO"){
                         "RETRUCO"
-                    } else "VALE CUATRO"
+                    } else "VALE_CUATRO"
                     Button(
                         onClick = {
                             onDismissRequest()
@@ -92,9 +92,9 @@ fun TrucoDialog(
                             .fillMaxWidth(),
                         shape = RectangleShape,
                         colors = buttonColors,
-                        enabled = (call != "VALE CUATRO")
+                        enabled = (call != "VALE_CUATRO")
                     ) {
-                        Text("¡$nextCall!")
+                        Text("¡${nextCall.replace("_", " ")}!")
                     }
 
                 }
