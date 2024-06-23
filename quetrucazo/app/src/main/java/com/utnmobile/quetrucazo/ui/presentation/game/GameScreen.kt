@@ -1,44 +1,18 @@
 package com.utnmobile.quetrucazo.ui.presentation.game
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.material3.Scaffold
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.utnmobile.quetrucazo.model.Game
-import com.utnmobile.quetrucazo.model.UserId
-import com.utnmobile.quetrucazo.model.events.implementations.NextRoundGameEvent
-import com.utnmobile.quetrucazo.model.events.implementations.NoPlayAgainEvent
-import com.utnmobile.quetrucazo.model.events.implementations.PlayAgainEvent
-import com.utnmobile.quetrucazo.model.events.implementations.ResultGameEvent
-import com.utnmobile.quetrucazo.model.events.implementations.RoundResultGameEvent
-import com.utnmobile.quetrucazo.model.events.implementations.StartGameEvent
-import com.utnmobile.quetrucazo.model.events.implementations.ThrowCardGameEvent
-import com.utnmobile.quetrucazo.model.events.implementations.ToDeckGameEvent
-import com.utnmobile.quetrucazo.model.events.implementations.TrucoCallGameEvent
+import com.utnmobile.quetrucazo.model.events.implementations.*
 import com.utnmobile.quetrucazo.model.events.toGameEvents
 import com.utnmobile.quetrucazo.services.SocketIOManager
-import com.utnmobile.quetrucazo.ui.presentation.EndGameDialog
-import com.utnmobile.quetrucazo.ui.presentation.NavigateTo
-import com.utnmobile.quetrucazo.ui.presentation.PlayAgainDialog
-import com.utnmobile.quetrucazo.ui.presentation.Screen
-import com.utnmobile.quetrucazo.ui.presentation.TrucoDialog
+import com.utnmobile.quetrucazo.ui.presentation.*
 import com.utnmobile.quetrucazo.ui.viewmodel.auth.AuthViewModel
 import com.utnmobile.quetrucazo.ui.viewmodel.music.MusicViewModel
 import kotlinx.coroutines.delay
@@ -77,7 +51,10 @@ fun GameScreen(navigateTo: NavigateTo, game: Game, isPreview: Boolean = false) {
     var trucoDialog by remember { mutableStateOf(false)}
     data class TrucoDatos(var userId: Int, var gameId: Int, var call: String)
 
-    var trucoDatos: TrucoDatos? = null
+    var trucoDatos by remember { mutableStateOf<TrucoDatos?>(null) }
+
+    var myDialogText by remember { mutableStateOf<String?>(null) }
+    var opponentDialogText by remember { mutableStateOf<String?>(null) }
 
 
 
@@ -145,7 +122,12 @@ fun GameScreen(navigateTo: NavigateTo, game: Game, isPreview: Boolean = false) {
 
             is ToDeckGameEvent -> {
                 if (event.playerId != userId) {
-                    println("El oponente se fue al mazo")
+                    opponentDialogText = "Me voy al mazo"
+                    delay(1000)
+                    opponentDialogText = null
+                } else {
+                    delay(700)
+                    myDialogText = null
                 }
             }
 
@@ -226,6 +208,7 @@ fun GameScreen(navigateTo: NavigateTo, game: Game, isPreview: Boolean = false) {
                     userId = userId,
                     gameId = game.id,
                     myTurn = myTurn,
+                    onMyDialogText = { myDialogText = it },
                 )
 
                 if (winner != null) {
@@ -257,9 +240,21 @@ fun GameScreen(navigateTo: NavigateTo, game: Game, isPreview: Boolean = false) {
                         call = trucoDatos!!.call
                     )
                 }
-
-
-
+            }
+            opponentDialogText?.let {
+                OpponentBubbleDialog(
+                    text = it,
+                    modifier = Modifier
+                        .absoluteOffset(x = 16.dp, y = 32.dp)
+                )
+            }
+            myDialogText?.let {
+                MyBubbleDialog(
+                    text = it,
+                    modifier = Modifier
+                        .absoluteOffset(x = (-20).dp, y = (-60).dp)
+                        .align(Alignment.BottomEnd)
+                )
             }
         }
     }

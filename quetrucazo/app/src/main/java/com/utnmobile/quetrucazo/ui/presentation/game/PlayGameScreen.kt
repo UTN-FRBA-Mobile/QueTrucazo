@@ -18,7 +18,7 @@ import com.utnmobile.quetrucazo.services.SocketIOManager
 import androidx.compose.runtime.setValue
 
 @Composable
-fun PlayGameScreen(modifier: Modifier = Modifier, userId: Int, gameId: Int, myTurn: Boolean) {
+fun PlayGameScreen(modifier: Modifier = Modifier, userId: Int, gameId: Int, myTurn: Boolean, onMyDialogText: (String) -> Unit) {
     var showEnvidoOptions by remember { mutableStateOf(false) }
     //faltaria deshabilitar el envido despues de la primera ronda
     if(myTurn){
@@ -130,8 +130,8 @@ fun PlayGameScreen(modifier: Modifier = Modifier, userId: Int, gameId: Int, myTu
 
                 Button(
                     onClick = {
-                        println("Me fui al mazo")
                         SocketIOManager.goToDeck(userId, gameId)
+                        onMyDialogText("Me voy al mazo")
                     },
                     modifier = Modifier
                         .weight(1f)
