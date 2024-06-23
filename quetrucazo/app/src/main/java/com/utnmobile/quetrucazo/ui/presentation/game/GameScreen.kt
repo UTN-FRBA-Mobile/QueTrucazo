@@ -201,15 +201,7 @@ fun GameScreen(navigateTo: NavigateTo, game: Game, isPreview: Boolean = false) {
                     userId = userId,
                 )
 
-                Spacer(modifier = Modifier.weight(1f))
-
-                PlayGameScreen(
-                    modifier = Modifier.fillMaxWidth(),
-                    userId = userId,
-                    gameId = game.id,
-                    myTurn = myTurn,
-                    onMyDialogText = { myDialogText = it },
-                )
+                Spacer(modifier = Modifier.weight(1.5f))
 
                 if (winner != null) {
                     EndGameDialog(
@@ -241,6 +233,17 @@ fun GameScreen(navigateTo: NavigateTo, game: Game, isPreview: Boolean = false) {
                     )
                 }
             }
+
+            PlayGameScreen(
+                modifier = Modifier.fillMaxWidth()
+                    .absoluteOffset(x = 0.dp, y = 0.dp)
+                    .align(Alignment.BottomEnd),
+                userId = userId,
+                gameId = game.id,
+                myTurn = myTurn,
+                onMyDialogText = { myDialogText = it },
+            )
+
             opponentDialogText?.let {
                 OpponentBubbleDialog(
                     text = it,

@@ -145,6 +145,8 @@ fun PlayGameScreen(modifier: Modifier = Modifier, userId: Int, gameId: Int, myTu
                 }
             }
         }
+    } else {
+        showEnvidoOptions = false
     }
 }
 
