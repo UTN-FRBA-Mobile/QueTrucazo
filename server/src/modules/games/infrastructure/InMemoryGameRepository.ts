@@ -61,4 +61,14 @@ export class InMemoryGameRepository implements GameRepository {
         this.games.delete(game.id);
         return Promise.resolve(game);
     }
+
+    deleteNotStartedByUser(userId: number): Promise<Game | undefined> {
+        const game = Array.from(this.games.values())
+            .find(game => !game.state.started && game.players.some(player => player.id === userId));
+        if (!game) {
+            return Promise.resolve(undefined);
+        }
+        this.games.delete(game.id);
+        return Promise.resolve(game);
+    }
 }

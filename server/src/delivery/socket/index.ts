@@ -18,6 +18,7 @@ import { truco } from '../../modules/games/core/actions/Truco';
 import { answerTruco } from '../../modules/games/core/actions/AnswerTruco';
 import { checkUserGame } from '../../modules/games/core/actions/CheckUserGame';
 import { checkNoPlayAgain } from '../../modules/games/core/actions/CheckNoPlayAgain';
+import { deleteWaitingUserGame } from '../../modules/games/core/actions/DeleteWaitingUserGame';
 
 export class SocketManager {
     private io: Server;
@@ -192,6 +193,7 @@ export class SocketManager {
                     if (userId) {
                         this.sockets.delete(userId);
                         console.log('User disconnected', userId);
+                        deleteWaitingUserGame.invoke(userId);
                         checkNoPlayAgain.invoke(userId);
                     }
                 } catch (error) {
