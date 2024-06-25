@@ -19,7 +19,7 @@ import androidx.compose.runtime.setValue
 
 @Composable
 fun PlayGameScreen(modifier: Modifier = Modifier, userId: Int, gameId: Int, myTurn: Boolean, onMyDialogText: (String) -> Unit) {
-    var showEnvidoOptions by remember { mutableStateOf(false) }
+    var showEnvidoCallOptions by remember { mutableStateOf(false) }
     //faltaria deshabilitar el envido despues de la primera ronda
     if(myTurn){
         Column(
@@ -29,7 +29,7 @@ fun PlayGameScreen(modifier: Modifier = Modifier, userId: Int, gameId: Int, myTu
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Bottom
         ) {
-            if (showEnvidoOptions) {
+            if (showEnvidoCallOptions) {
                 val lightPurple = Color(0xFFBB86FC)
                 val buttonHeight = 64.dp
 
@@ -116,7 +116,7 @@ fun PlayGameScreen(modifier: Modifier = Modifier, userId: Int, gameId: Int, myTu
                 }
 
                 Button(
-                    onClick = { showEnvidoOptions = !showEnvidoOptions },
+                    onClick = { showEnvidoCallOptions = !showEnvidoCallOptions },
                     modifier = Modifier
                         .weight(1f)
                         .height(buttonHeight),
@@ -146,7 +146,7 @@ fun PlayGameScreen(modifier: Modifier = Modifier, userId: Int, gameId: Int, myTu
             }
         }
     } else {
-        showEnvidoOptions = false
+        showEnvidoCallOptions = false
     }
 }
 

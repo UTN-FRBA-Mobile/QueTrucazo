@@ -1,6 +1,7 @@
 package com.utnmobile.quetrucazo.model.events
 
 import com.utnmobile.quetrucazo.model.UserId
+import com.utnmobile.quetrucazo.model.events.implementations.EnvidoAcceptedGameEvent
 import com.utnmobile.quetrucazo.model.events.implementations.NextRoundGameEvent
 import com.utnmobile.quetrucazo.model.events.implementations.NoPlayAgainEvent
 import com.utnmobile.quetrucazo.model.events.implementations.PlayAgainEvent
@@ -12,6 +13,8 @@ import com.utnmobile.quetrucazo.model.events.implementations.ToDeckGameEvent
 import com.utnmobile.quetrucazo.model.events.implementations.TrucoAcceptGameEvent
 import com.utnmobile.quetrucazo.model.events.implementations.TrucoCallGameEvent
 import com.utnmobile.quetrucazo.model.events.implementations.TrucoDeclineGameEvent
+import com.utnmobile.quetrucazo.model.events.implementations.EnvidoCallGameEvent
+import com.utnmobile.quetrucazo.model.events.implementations.EnvidoDeclinedGameEvent
 import org.json.JSONArray
 import org.json.JSONObject
 
@@ -28,6 +31,9 @@ open class GameEvent {
                 "TRUCO_ACCEPT" -> TrucoAcceptGameEvent.from(json)
                 "TRUCO_DECLINE" -> TrucoDeclineGameEvent.from(json)
                 "TO_DECK" -> ToDeckGameEvent.from(json)
+                "ENVIDO_CALL" -> EnvidoCallGameEvent.from(json)
+                "ENVIDO_ACCEPT" -> EnvidoAcceptedGameEvent.from(json)
+                "ENVIDO_DECLINE" -> EnvidoDeclinedGameEvent.from(json)
                 "PLAY_AGAIN" -> PlayAgainEvent.from(json)
                 "NO_PLAY_AGAIN" -> NoPlayAgainEvent.from(json)
                 else -> throw IllegalArgumentException("Invalid event type ${json.getString("type")}")

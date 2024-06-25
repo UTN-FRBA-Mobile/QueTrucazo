@@ -116,8 +116,6 @@ fun GameScreen(navigateTo: NavigateTo, game: Game, isPreview: Boolean = false) {
                     trucoDatos = TrucoDatos(userId,game.id,event.call)
                     trucoDialog = true
                 }
-
-
             }
 
             is ToDeckGameEvent -> {
@@ -128,6 +126,14 @@ fun GameScreen(navigateTo: NavigateTo, game: Game, isPreview: Boolean = false) {
                 } else {
                     delay(700)
                     myDialogText = null
+                }
+            }
+
+            is EnvidoCallGameEvent -> {
+                if (event.caller != userId ){
+                    println("El oponente me canto envido")
+                } else {
+                    println("Envido")
                 }
             }
 
