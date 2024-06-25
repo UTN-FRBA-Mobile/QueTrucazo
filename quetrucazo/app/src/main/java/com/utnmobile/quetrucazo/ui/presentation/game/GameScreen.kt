@@ -77,6 +77,7 @@ fun GameScreen(navigateTo: NavigateTo, game: Game, isPreview: Boolean = false) {
                 myCards = event.cards[userId] ?: emptyList()
                 opponentCardsSize = event.cards.entries.first { it.key != userId }.value.size
                 myTurn = event.nextPlayerId == userId
+                trucoDatos = TrucoDatos(userId,game.id,"")
             }
 
             is ResultGameEvent -> {
@@ -118,6 +119,7 @@ fun GameScreen(navigateTo: NavigateTo, game: Game, isPreview: Boolean = false) {
                     trucoDialog = true
                 }
             }
+
 
             is ToDeckGameEvent -> {
                 if (event.playerId != userId) {
@@ -267,6 +269,7 @@ fun GameScreen(navigateTo: NavigateTo, game: Game, isPreview: Boolean = false) {
                 myTurn = myTurn,
                 onMyDialogText = { myDialogText = it },
                 showEnvidoAnswerOptions = showEnvidoAnswerOptions,
+                trucoCall = trucoDatos?.call
             )
 
             opponentDialogText?.let {

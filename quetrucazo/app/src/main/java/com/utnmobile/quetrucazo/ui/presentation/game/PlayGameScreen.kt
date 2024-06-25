@@ -16,9 +16,16 @@ import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.unit.sp
 import com.utnmobile.quetrucazo.services.SocketIOManager
 import androidx.compose.runtime.setValue
+import com.utnmobile.quetrucazo.model.events.implementations.TrucoCallGameEvent
 
 @Composable
-fun PlayGameScreen(modifier: Modifier = Modifier, userId: Int, gameId: Int, myTurn: Boolean, onMyDialogText: (String) -> Unit, showEnvidoAnswerOptions: Boolean) {
+fun PlayGameScreen(modifier: Modifier = Modifier,
+                   userId: Int,
+                   gameId: Int,
+                   myTurn: Boolean,
+                   onMyDialogText: (String) -> Unit,
+                   showEnvidoAnswerOptions: Boolean,
+                   trucoCall: String?) {
     var showEnvidoCallOptions by remember { mutableStateOf(false) }
 
     //faltaria deshabilitar el envido despues de la primera ronda
@@ -159,19 +166,25 @@ fun PlayGameScreen(modifier: Modifier = Modifier, userId: Int, gameId: Int, myTu
                         ButtonDefaults.buttonColors(containerColor = Color(0xFF6200EE))
                     val buttonHeight = 48.dp
 
+
+                    val nextCall = if (trucoCall == null || trucoCall == "") "TRUCO" else if (trucoCall == "TRUCO") "RETRUCO" else if (trucoCall == "RETRUCO") "VALE_CUATRO" else "TRUCO"
+
                     Button(
-                        onClick = { SocketIOManager.trucoCall(userId, gameId, "TRUCO") },
+                        onClick = { SocketIOManager.trucoCall(userId, gameId, nextCall)
+                                    onMyDialogText(nextCall.replace("_", " "))
+                                  },
                         modifier = Modifier
                             .weight(1f)
                             .height(buttonHeight),
                         shape = RectangleShape,
-                        colors = buttonColors
+                        colors = buttonColors,
+                        enabled = (trucoCall != "VALE_CUATRO")
                     ) {
                         Box(
                             contentAlignment = Alignment.Center,
                             modifier = Modifier.fillMaxSize()
                         ) {
-                            Text("TRUCO", fontSize = 16.sp, maxLines = 1)
+                            Text(nextCall.replace("_", " "), fontSize = 16.sp, maxLines = 1)
                         }
                     }
 
