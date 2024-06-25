@@ -1,7 +1,7 @@
 import { SafeUser, UserId } from "../../../users/core/domain/User";
 import { Card, generatePlayersCards, getCardValue, getEnvidoCardsValue, getRoundWinner } from "./Cards";
 
-const MAX_POINTS = 15;
+const MAX_POINTS = 30;
 
 export type GameId = number;
 
@@ -654,7 +654,7 @@ export class Game {
                 case EnvidoCall.FALTA_ENVIDO:
                     const otherPoints = this.state.points[this.players.find(player => player.id !== winner)!.id];
                     if (otherPoints < 15) {
-                        points += MAX_POINTS;
+                        points = MAX_POINTS;
                     } else {
                         points += 30 - otherPoints;
                     }
