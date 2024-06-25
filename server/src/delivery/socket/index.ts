@@ -132,7 +132,7 @@ export class SocketManager {
 
             socket.on('envido', async ({ userId, gameId, call }: { userId: UserId, gameId: GameId, call: EnvidoCall }) => {
                 try {
-                    console.log('envido')
+                    console.log('envido', call)
                     if (call !== EnvidoCall.ENVIDO && call !== EnvidoCall.REAL_ENVIDO && call !== EnvidoCall.FALTA_ENVIDO) {
                         throw new Error('Invalid envido call');
                     }

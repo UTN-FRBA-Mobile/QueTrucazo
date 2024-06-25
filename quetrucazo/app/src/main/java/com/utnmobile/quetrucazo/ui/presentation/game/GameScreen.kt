@@ -56,6 +56,7 @@ fun GameScreen(navigateTo: NavigateTo, game: Game, isPreview: Boolean = false) {
     var myDialogText by remember { mutableStateOf<String?>(null) }
     var opponentDialogText by remember { mutableStateOf<String?>(null) }
 
+    var showEnvidoAnswerOptions by remember { mutableStateOf(false) }
 
 
     suspend fun analyzeEvents() {
@@ -130,11 +131,28 @@ fun GameScreen(navigateTo: NavigateTo, game: Game, isPreview: Boolean = false) {
             }
 
             is EnvidoCallGameEvent -> {
-                if (event.caller != userId ){
+                myTurn = event.caller != userId
+                if (event.caller != userId){
+                    myTurn = true
                     println("El oponente me canto envido")
-                } else {
-                    println("Envido")
+                    showEnvidoAnswerOptions = true
                 }
+            }
+
+            is EnvidoAcceptedGameEvent -> {
+                myTurn = event.acceptedBy != userId
+                showEnvidoAnswerOptions = false
+                myPoints = event.points[userId] ?: 0
+                opponentPoints = event.points.entries.first { it.key != userId }.value
+                println("Quiero envido")
+            }
+
+            is EnvidoDeclinedGameEvent -> {
+                myTurn = event.declinedBy != userId
+                showEnvidoAnswerOptions = false
+                myPoints = event.points[userId] ?: 0
+                opponentPoints = event.points.entries.first { it.key != userId }.value
+                println("No quiero envido")
             }
 
         }
@@ -248,6 +266,7 @@ fun GameScreen(navigateTo: NavigateTo, game: Game, isPreview: Boolean = false) {
                 gameId = game.id,
                 myTurn = myTurn,
                 onMyDialogText = { myDialogText = it },
+                showEnvidoAnswerOptions = showEnvidoAnswerOptions,
             )
 
             opponentDialogText?.let {
