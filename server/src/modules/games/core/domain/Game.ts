@@ -82,12 +82,14 @@ export type GameEventEnvidoCall = {
 export type GameEventEnvidoAccepted = {
     type: GameEventType.ENVIDO_ACCEPTED;
     acceptedBy: SafeUser['id'];
+    nextPlayerId: SafeUser['id'];
     points: Record<SafeUser['id'], number>;
 };
 
 export type GameEventEnvidoDeclined = {
     type: GameEventType.ENVIDO_DECLINED;
     declinedBy: SafeUser['id'];
+    nextPlayerId: SafeUser['id'];
     points: Record<SafeUser['id'], number>;
 };
 
@@ -567,15 +569,21 @@ export class Game {
             [this.players[1].id]: this.state.points[this.players[1].id] + playersPoints[this.players[1].id],
         }
 
+        if(newEnvido.firstCaller === undefined){
+            throw new Error("Envido first caller is undefined")
+        }
+
         const envidoEvent: GameEventEnvidoAccepted | GameEventEnvidoDeclined = accepted
             ? {
                 type: GameEventType.ENVIDO_ACCEPTED,
                 acceptedBy: userId,
+                nextPlayerId: newEnvido.firstCaller,
                 points,
             }
             : {
                 type: GameEventType.ENVIDO_DECLINED,
                 declinedBy: userId,
+                nextPlayerId: newEnvido.firstCaller,
                 points,
             };
 

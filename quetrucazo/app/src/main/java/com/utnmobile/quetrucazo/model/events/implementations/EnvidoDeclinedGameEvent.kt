@@ -7,12 +7,14 @@ import org.json.JSONObject
 
 class EnvidoDeclinedGameEvent (
     val declinedBy: UserId,
+    val nextPlayerId: UserId,
     val points: Map<UserId, Int>): GameEvent() {
     companion object{
         fun from(json: JSONObject): EnvidoDeclinedGameEvent{
             val declinedBy = json.getInt("declinedBy")
+            val nextPlayerId = json.getInt("nextPlayerId")
             val points = json.toPoints()
-            return EnvidoDeclinedGameEvent(declinedBy, points)
+            return EnvidoDeclinedGameEvent(declinedBy, nextPlayerId, points)
         }
     }
 }

@@ -140,7 +140,7 @@ fun GameScreen(navigateTo: NavigateTo, game: Game, isPreview: Boolean = false) {
             }
 
             is EnvidoAcceptedGameEvent -> {
-                myTurn = event.acceptedBy != userId
+                myTurn = event.nextPlayerId == userId
                 showEnvidoAnswerOptions = false
                 myPoints = event.points[userId] ?: 0
                 opponentPoints = event.points.entries.first { it.key != userId }.value
@@ -148,7 +148,7 @@ fun GameScreen(navigateTo: NavigateTo, game: Game, isPreview: Boolean = false) {
             }
 
             is EnvidoDeclinedGameEvent -> {
-                myTurn = event.declinedBy != userId
+                myTurn = event.nextPlayerId == userId
                 showEnvidoAnswerOptions = false
                 myPoints = event.points[userId] ?: 0
                 opponentPoints = event.points.entries.first { it.key != userId }.value
