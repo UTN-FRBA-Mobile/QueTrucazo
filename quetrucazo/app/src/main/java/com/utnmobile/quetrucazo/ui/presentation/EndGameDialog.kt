@@ -25,6 +25,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import com.utnmobile.quetrucazo.services.SocketIOManager
+import com.utnmobile.quetrucazo.ui.presentation.game.PointCounter
 
 @Composable
 fun EndGameDialog(
@@ -73,8 +74,8 @@ fun EndGameDialog(
                         horizontalAlignment = Alignment.CenterHorizontally,
                         verticalArrangement = Arrangement.Center
                     ) {
-                        Text(text = "Mis puntos: $myPoints")
-                        Text(text = "Puntos del oponente: $opponentPoints")
+                        PointCounter(text = "TU", points = myPoints)
+                        PointCounter(text = "ÉL", points = opponentPoints)
                     }
                 }
                 Row(
@@ -126,8 +127,8 @@ fun EndGameDialog(
 fun YouWinDialogPreview() {
     EndGameDialog(
         onDismissRequest = { },
-        myPoints = 10,
-        opponentPoints = 5,
+        myPoints = 12,
+        opponentPoints = 23,
         isWinner = false,
         gameId = 1,
         userId = 2
