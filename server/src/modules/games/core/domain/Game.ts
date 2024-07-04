@@ -77,6 +77,7 @@ export type GameEventEnvidoCall = {
     type: GameEventType.ENVIDO_CALL;
     call: EnvidoCall;
     caller: SafeUser['id'];
+    calls: EnvidoCall[];
 };
 
 export type GameEventEnvidoAccepted = {
@@ -523,6 +524,7 @@ export class Game {
             type: GameEventType.ENVIDO_CALL,
             call,
             caller: userId,
+            calls: newEnvido.calls,
         };
 
         return this.copy({

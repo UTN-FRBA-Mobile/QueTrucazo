@@ -17,6 +17,7 @@ import com.utnmobile.quetrucazo.ui.viewmodel.auth.AuthViewModel
 import com.utnmobile.quetrucazo.ui.viewmodel.music.MusicViewModel
 import kotlinx.coroutines.delay
 import org.json.JSONArray
+import kotlin.math.min
 
 @Composable
 fun GameScreen(navigateTo: NavigateTo, game: Game, isPreview: Boolean = false) {
@@ -58,6 +59,12 @@ fun GameScreen(navigateTo: NavigateTo, game: Game, isPreview: Boolean = false) {
 
     var showEnvidoAnswerOptions by remember { mutableStateOf(false) }
 
+    var wasEnvidoCalled by remember { mutableStateOf(false) }
+    var envidoCalls by remember { mutableStateOf<List<String>>(emptyList()) }
+
+    fun isFirstStep(): Boolean {
+        return min(myThrownCards.size, opponentThrownCards.size) == 0
+    }
 
     suspend fun analyzeEvents() {
         analyzingEvents = true
@@ -78,6 +85,7 @@ fun GameScreen(navigateTo: NavigateTo, game: Game, isPreview: Boolean = false) {
                 opponentCardsSize = event.cards.entries.first { it.key != userId }.value.size
                 myTurn = event.nextPlayerId == userId
                 trucoDatos = TrucoDatos(userId,game.id,"")
+                wasEnvidoCalled = false
             }
 
             is ResultGameEvent -> {
@@ -133,7 +141,9 @@ fun GameScreen(navigateTo: NavigateTo, game: Game, isPreview: Boolean = false) {
             }
 
             is EnvidoCallGameEvent -> {
+                envidoCalls = event.calls
                 myTurn = event.caller != userId
+                wasEnvidoCalled = true
                 if (event.caller != userId){
                     myTurn = true
                     println("El oponente me canto envido")
@@ -240,7 +250,6 @@ fun GameScreen(navigateTo: NavigateTo, game: Game, isPreview: Boolean = false) {
                         isWinner = winner == userId,
                         gameId = game.id,
                         userId = userId
-
                     )
                 } else if (playAgainDialog) {
                     PlayAgainDialog(
@@ -269,7 +278,10 @@ fun GameScreen(navigateTo: NavigateTo, game: Game, isPreview: Boolean = false) {
                 myTurn = myTurn,
                 onMyDialogText = { myDialogText = it },
                 showEnvidoAnswerOptions = showEnvidoAnswerOptions,
-                trucoCall = trucoDatos?.call
+                trucoCall = trucoDatos?.call,
+                isFirstStep = isFirstStep(),
+                wasEnvidoCalled =  wasEnvidoCalled,
+                envidoCalls = envidoCalls,
             )
 
             opponentDialogText?.let {

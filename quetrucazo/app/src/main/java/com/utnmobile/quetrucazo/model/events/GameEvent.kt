@@ -1,5 +1,6 @@
 package com.utnmobile.quetrucazo.model.events
 
+import com.utnmobile.quetrucazo.model.Card
 import com.utnmobile.quetrucazo.model.UserId
 import com.utnmobile.quetrucazo.model.events.implementations.EnvidoAcceptedGameEvent
 import com.utnmobile.quetrucazo.model.events.implementations.NextRoundGameEvent
@@ -74,4 +75,17 @@ fun <T> JSONObject.toUserMapList(key: String, f: (JSONArray) -> List<T>): Map<Us
 
 fun JSONArray.toGameEvents(): List<GameEvent> {
     return (0 until this.length()).map { this.getJSONObject(it) }.map { GameEvent.from(it) }
+}
+
+fun toCalls(json: JSONObject): List<String> {
+    val callsList = mutableListOf<String>()
+    if (json.has("calls")) {
+        val callsArray = json.getJSONArray("calls")
+
+        for (i in 0 until callsArray.length()) {
+            val call = callsArray.getString(i)
+            callsList.add(call)
+        }
+    }
+    return callsList
 }

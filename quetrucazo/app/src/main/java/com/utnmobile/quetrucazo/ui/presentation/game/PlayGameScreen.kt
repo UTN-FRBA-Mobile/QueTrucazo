@@ -26,9 +26,16 @@ fun PlayGameScreen(
     myTurn: Boolean,
     onMyDialogText: (String) -> Unit,
     showEnvidoAnswerOptions: Boolean,
-    trucoCall: String?
+    trucoCall: String?,
+    isFirstStep: Boolean,
+    wasEnvidoCalled: Boolean,
+    envidoCalls: List<String>,
 ) {
     var showEnvidoCallOptions by remember { mutableStateOf(false) }
+
+    val disableFaltaEnvido = envidoCalls.lastOrNull() == "FALTA_ENVIDO"
+    val disableRealEnvido = envidoCalls.lastOrNull() == "REAL_ENVIDO"
+    val disableEnvido = envidoCalls.size > 1 && envidoCalls.takeLast(2).all { it == "ENVIDO" }
 
     if (myTurn) {
         Column(
@@ -50,6 +57,7 @@ fun PlayGameScreen(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     val lightButtonColors = ButtonDefaults.buttonColors(containerColor = lightPurple)
+                    val grayButtonColors = ButtonDefaults.buttonColors(containerColor = Color.Gray)
 
                     Button(
                         onClick = {
@@ -60,7 +68,8 @@ fun PlayGameScreen(
                             .weight(1f)
                             .height(buttonHeight),
                         shape = RectangleShape,
-                        colors = lightButtonColors
+                        colors = if (disableEnvido || disableRealEnvido || disableFaltaEnvido) grayButtonColors else lightButtonColors,
+                        enabled = !(disableEnvido || disableRealEnvido || disableFaltaEnvido)
                     ) {
                         Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize()) {
                             Text("ENVIDO", fontSize = 16.sp, maxLines = 1)
@@ -76,7 +85,8 @@ fun PlayGameScreen(
                             .weight(1f)
                             .height(buttonHeight),
                         shape = RectangleShape,
-                        colors = lightButtonColors
+                        colors = if (disableRealEnvido || disableFaltaEnvido) grayButtonColors else lightButtonColors,
+                        enabled = !(disableRealEnvido || disableFaltaEnvido)
                     ) {
                         Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize()) {
                             Text("REAL ENVIDO", fontSize = 16.sp, maxLines = 2)
@@ -92,7 +102,8 @@ fun PlayGameScreen(
                             .weight(1f)
                             .height(buttonHeight),
                         shape = RectangleShape,
-                        colors = lightButtonColors
+                        colors = if (disableFaltaEnvido) grayButtonColors else lightButtonColors,
+                        enabled = !(disableFaltaEnvido)
                     ) {
                         Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize()) {
                             Text("FALTA ENVIDO", fontSize = 16.sp, maxLines = 2)
@@ -192,13 +203,16 @@ fun PlayGameScreen(
 
                     Button(
                         onClick = {
-                            showEnvidoCallOptions = !showEnvidoCallOptions
+                            if (isFirstStep && !wasEnvidoCalled) {
+                                showEnvidoCallOptions = !showEnvidoCallOptions
+                            }
                         },
                         modifier = Modifier
                             .weight(1f)
                             .height(buttonHeight),
                         shape = RectangleShape,
-                        colors = buttonColors
+                        colors = if (isFirstStep && !wasEnvidoCalled) buttonColors else grayButtonColors,
+                        enabled = isFirstStep && !wasEnvidoCalled
                     ) {
                         Box(
                             contentAlignment = Alignment.Center,
