@@ -86,6 +86,7 @@ fun GameScreen(navigateTo: NavigateTo, game: Game, isPreview: Boolean = false) {
                 myTurn = event.nextPlayerId == userId
                 trucoDatos = TrucoDatos(userId,game.id,"")
                 wasEnvidoCalled = false
+                envidoCalls = emptyList()
             }
 
             is ResultGameEvent -> {

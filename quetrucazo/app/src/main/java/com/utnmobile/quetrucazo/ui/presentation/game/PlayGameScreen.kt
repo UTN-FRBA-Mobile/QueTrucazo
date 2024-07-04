@@ -34,8 +34,8 @@ fun PlayGameScreen(
     var showEnvidoCallOptions by remember { mutableStateOf(false) }
 
     val disableFaltaEnvido = envidoCalls.lastOrNull() == "FALTA_ENVIDO"
-    val disableRealEnvido = envidoCalls.lastOrNull() == "REAL_ENVIDO"
-    val disableEnvido = envidoCalls.size > 1 && envidoCalls.takeLast(2).all { it == "ENVIDO" }
+    val disableRealEnvido = envidoCalls.lastOrNull() == "REAL_ENVIDO" || disableFaltaEnvido
+    val disableEnvido = envidoCalls.size > 1 && envidoCalls.takeLast(2).all { it == "ENVIDO" } || disableRealEnvido
 
     if (myTurn) {
         Column(
@@ -68,8 +68,8 @@ fun PlayGameScreen(
                             .weight(1f)
                             .height(buttonHeight),
                         shape = RectangleShape,
-                        colors = if (disableEnvido || disableRealEnvido || disableFaltaEnvido) grayButtonColors else lightButtonColors,
-                        enabled = !(disableEnvido || disableRealEnvido || disableFaltaEnvido)
+                        colors = if (disableEnvido) grayButtonColors else lightButtonColors,
+                        enabled = !(disableEnvido)
                     ) {
                         Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize()) {
                             Text("ENVIDO", fontSize = 16.sp, maxLines = 1)
@@ -85,8 +85,8 @@ fun PlayGameScreen(
                             .weight(1f)
                             .height(buttonHeight),
                         shape = RectangleShape,
-                        colors = if (disableRealEnvido || disableFaltaEnvido) grayButtonColors else lightButtonColors,
-                        enabled = !(disableRealEnvido || disableFaltaEnvido)
+                        colors = if (disableRealEnvido) grayButtonColors else lightButtonColors,
+                        enabled = !(disableRealEnvido)
                     ) {
                         Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize()) {
                             Text("REAL ENVIDO", fontSize = 16.sp, maxLines = 2)
