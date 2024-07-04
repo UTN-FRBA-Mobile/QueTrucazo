@@ -19,18 +19,18 @@ import androidx.compose.runtime.setValue
 import com.utnmobile.quetrucazo.model.events.implementations.TrucoCallGameEvent
 
 @Composable
-fun PlayGameScreen(modifier: Modifier = Modifier,
-                   userId: Int,
-                   gameId: Int,
-                   myTurn: Boolean,
-                   onMyDialogText: (String) -> Unit,
-                   showEnvidoAnswerOptions: Boolean,
-                   trucoCall: String?) {
+fun PlayGameScreen(
+    modifier: Modifier = Modifier,
+    userId: Int,
+    gameId: Int,
+    myTurn: Boolean,
+    onMyDialogText: (String) -> Unit,
+    showEnvidoAnswerOptions: Boolean,
+    trucoCall: String?
+) {
     var showEnvidoCallOptions by remember { mutableStateOf(false) }
 
-    //faltaria deshabilitar el envido despues de la primera ronda
-
-    if(myTurn){
+    if (myTurn) {
         Column(
             modifier = modifier
                 .fillMaxWidth()
@@ -161,24 +161,26 @@ fun PlayGameScreen(modifier: Modifier = Modifier,
                         }
                     }
                 } else {
-
                     val buttonColors =
                         ButtonDefaults.buttonColors(containerColor = Color(0xFF6200EE))
+                    val grayButtonColors =
+                        ButtonDefaults.buttonColors(containerColor = Color.Gray)
                     val buttonHeight = 48.dp
 
-
-                    val nextCall = if (trucoCall == null || trucoCall == "") "TRUCO" else if (trucoCall == "TRUCO") "RETRUCO" else if (trucoCall == "RETRUCO") "VALE_CUATRO" else "TRUCO"
+                    val nextCall =
+                        if (trucoCall == null || trucoCall == "") "TRUCO" else if (trucoCall == "TRUCO") "RETRUCO" else if (trucoCall == "RETRUCO") "VALE_CUATRO" else "TRUCO"
 
                     Button(
-                        onClick = { SocketIOManager.trucoCall(userId, gameId, nextCall)
-                                    onMyDialogText(nextCall.replace("_", " "))
-                                  },
+                        onClick = {
+                            SocketIOManager.trucoCall(userId, gameId, nextCall)
+                            onMyDialogText(nextCall.replace("_", " "))
+                        },
                         modifier = Modifier
                             .weight(1f)
                             .height(buttonHeight),
                         shape = RectangleShape,
-                        colors = buttonColors,
-                        enabled = (trucoCall != "VALE_CUATRO")
+                        colors = if (showEnvidoCallOptions) grayButtonColors else buttonColors,
+                        enabled = !showEnvidoCallOptions && (trucoCall != "VALE_CUATRO")
                     ) {
                         Box(
                             contentAlignment = Alignment.Center,
@@ -189,7 +191,9 @@ fun PlayGameScreen(modifier: Modifier = Modifier,
                     }
 
                     Button(
-                        onClick = { showEnvidoCallOptions = !showEnvidoCallOptions },
+                        onClick = {
+                            showEnvidoCallOptions = !showEnvidoCallOptions
+                        },
                         modifier = Modifier
                             .weight(1f)
                             .height(buttonHeight),
@@ -229,7 +233,3 @@ fun PlayGameScreen(modifier: Modifier = Modifier,
         showEnvidoCallOptions = false
     }
 }
-
-
-
-
