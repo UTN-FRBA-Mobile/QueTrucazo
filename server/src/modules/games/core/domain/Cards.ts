@@ -117,7 +117,7 @@ export const getRoundWinner = (players: UserId[], cards: Record<UserId, Card[]>)
         return undefined;
     }
 
-    if (step1Winner === step2Winner) {
+    if (step1Winner !== -1 && step1Winner === step2Winner) {
         return players[step1Winner];
     }
 
@@ -125,7 +125,7 @@ export const getRoundWinner = (players: UserId[], cards: Record<UserId, Card[]>)
         return players[step2Winner];
     }
 
-    if (step2Winner === -1 && step1Winner !== -1) {
+    if (step1Winner !== -1 && step2Winner === -1) {
         return players[step1Winner];
     }
 

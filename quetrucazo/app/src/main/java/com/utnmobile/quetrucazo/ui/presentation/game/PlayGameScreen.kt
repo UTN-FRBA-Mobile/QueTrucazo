@@ -20,6 +20,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.utnmobile.quetrucazo.model.UserId
 import com.utnmobile.quetrucazo.services.SocketIOManager
 import com.utnmobile.quetrucazo.ui.presentation.colorBoton
 import com.utnmobile.quetrucazo.ui.presentation.colorBotonDisable
@@ -33,6 +34,7 @@ fun PlayGameScreen(
     onMyDialogText: (String) -> Unit,
     showEnvidoAnswerOptions: Boolean,
     trucoCall: String?,
+    trucoCaller: UserId?,
     isFirstStep: Boolean,
     wasEnvidoCalled: Boolean,
     envidoCalls: List<String>,
@@ -191,14 +193,13 @@ fun PlayGameScreen(
                                 "VALE_CUATRO" -> onMyDialogText("Quiero vale cuatro")
                                 else -> onMyDialogText("Truco")
                             }
-                            onMyDialogText(nextCall.replace("_", " "))
                         },
                         modifier = Modifier
                             .weight(1f)
                             .height(buttonHeight),
                         shape = RectangleShape,
                         colors = if (showEnvidoCallOptions) grayButtonColors else buttonColors,
-                        enabled = !showEnvidoCallOptions && (trucoCall != "VALE_CUATRO")
+                        enabled = !showEnvidoCallOptions && (trucoCall != "VALE_CUATRO") && (trucoCaller != userId)
                     ) {
                         Box(
                             contentAlignment = Alignment.Center,

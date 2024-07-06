@@ -26,6 +26,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.utnmobile.quetrucazo.R
 import com.utnmobile.quetrucazo.model.Game
+import com.utnmobile.quetrucazo.model.UserId
 import com.utnmobile.quetrucazo.model.events.implementations.EnvidoAcceptedGameEvent
 import com.utnmobile.quetrucazo.model.events.implementations.EnvidoCallGameEvent
 import com.utnmobile.quetrucazo.model.events.implementations.EnvidoDeclinedGameEvent
@@ -84,6 +85,7 @@ fun GameScreen(navigateTo: NavigateTo, game: Game, isPreview: Boolean = false) {
 
     var playAgainDialog by remember { mutableStateOf(false) } // setear
 
+    var lastTrucoCaller by remember { mutableStateOf<UserId?>(null)} // setear
     var lastTrucoCall by remember { mutableStateOf<String?>(null)} // setear
     var trucoDialogCall by remember { mutableStateOf<String?>(null) } // setear
 
@@ -119,6 +121,7 @@ fun GameScreen(navigateTo: NavigateTo, game: Game, isPreview: Boolean = false) {
                 opponentCardsSize = event.cards.entries.first { it.key != userId }.value.size
                 myTurn = event.nextPlayerId == userId
                 lastTrucoCall = null
+                lastTrucoCaller = null
                 trucoDialogCall = null
                 wasEnvidoCalled = false
                 envidoCalls = emptyList()
@@ -160,6 +163,7 @@ fun GameScreen(navigateTo: NavigateTo, game: Game, isPreview: Boolean = false) {
             is TrucoCallGameEvent -> {
                 myTurn = event.caller != userId
                 lastTrucoCall = event.call
+                lastTrucoCaller = event.caller
                 if (userId != event.caller) {
                     opponentDialogText = when (event.call) {
                         "TRUCO" -> "Truco"
@@ -411,10 +415,11 @@ fun GameScreen(navigateTo: NavigateTo, game: Game, isPreview: Boolean = false) {
                         .align(Alignment.BottomEnd),
                     userId = userId,
                     gameId = game.id,
-                    myTurn = myTurn,
+                    myTurn = myTurn && !analyzingEvents,
                     onMyDialogText = { myDialogText = it },
                     showEnvidoAnswerOptions = showEnvidoAnswerOptions,
                     trucoCall = lastTrucoCall,
+                    trucoCaller = lastTrucoCaller,
                     isFirstStep = isFirstStep(),
                     wasEnvidoCalled = wasEnvidoCalled,
                     envidoCalls = envidoCalls,
