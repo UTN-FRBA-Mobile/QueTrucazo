@@ -67,7 +67,7 @@ fun MainScreen(navigateTo: NavigateTo) {
                     title = { Text("QuéTrucazo!", color = titleTopBarColor()) },
                     actions = {
                         IconButton(onClick = { showDialog = true }) {
-                            Icon(Icons.Filled.Settings, contentDescription = "Settings", tint = iconDialog())
+                            Icon(Icons.Filled.Settings, contentDescription = "Settings", tint = iconDialogColor())
                         }
                     },
                     colors = TopAppBarDefaults.topAppBarColors(

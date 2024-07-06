@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -16,15 +15,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
-import com.utnmobile.quetrucazo.model.Game
 import com.utnmobile.quetrucazo.services.SocketIOManager
 
 @Composable
@@ -36,11 +32,12 @@ fun TrucoDialog(
     onMyDialogText: (String) -> Unit,
 ) {
 
-    val buttonColors = ButtonDefaults.buttonColors(containerColor = Color(0xFF6200EE))
+    val buttonColors = colorBoton()
     Dialog(onDismissRequest = onDismissRequest) {
         Surface(
             shape = MaterialTheme.shapes.medium,
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
+            color = dialogColor()
         ) {
             Column(modifier = Modifier.padding(16.dp)){
                 Row( modifier = Modifier
@@ -71,7 +68,6 @@ fun TrucoDialog(
                     },
                         modifier = Modifier
                             .fillMaxWidth(),
-                        shape = RectangleShape,
                         colors = buttonColors) {
                         Text(text = "¡QUIERO!")
                     }
@@ -98,7 +94,6 @@ fun TrucoDialog(
                         },
                         modifier = Modifier
                             .fillMaxWidth(),
-                        shape = RectangleShape,
                         colors = buttonColors,
                         enabled = (call != "VALE_CUATRO")
                     ) {
@@ -116,7 +111,6 @@ fun TrucoDialog(
                         SocketIOManager.trucoAccept(userId,gameId,false)             },
                         modifier = Modifier
                             .fillMaxWidth(),
-                        shape = RectangleShape,
                         colors = buttonColors) {
                         Text(text = "Me voy al mazo")
                     }

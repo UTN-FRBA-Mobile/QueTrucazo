@@ -1,18 +1,53 @@
 package com.utnmobile.quetrucazo.ui.presentation.game
 
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.absoluteOffset
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.utnmobile.quetrucazo.R
 import com.utnmobile.quetrucazo.model.Game
-import com.utnmobile.quetrucazo.model.events.implementations.*
+import com.utnmobile.quetrucazo.model.events.implementations.EnvidoAcceptedGameEvent
+import com.utnmobile.quetrucazo.model.events.implementations.EnvidoCallGameEvent
+import com.utnmobile.quetrucazo.model.events.implementations.EnvidoDeclinedGameEvent
+import com.utnmobile.quetrucazo.model.events.implementations.NextRoundGameEvent
+import com.utnmobile.quetrucazo.model.events.implementations.NoPlayAgainEvent
+import com.utnmobile.quetrucazo.model.events.implementations.PlayAgainEvent
+import com.utnmobile.quetrucazo.model.events.implementations.ResultGameEvent
+import com.utnmobile.quetrucazo.model.events.implementations.RoundResultGameEvent
+import com.utnmobile.quetrucazo.model.events.implementations.StartGameEvent
+import com.utnmobile.quetrucazo.model.events.implementations.ThrowCardGameEvent
+import com.utnmobile.quetrucazo.model.events.implementations.ToDeckGameEvent
+import com.utnmobile.quetrucazo.model.events.implementations.TrucoAcceptGameEvent
+import com.utnmobile.quetrucazo.model.events.implementations.TrucoCallGameEvent
+import com.utnmobile.quetrucazo.model.events.implementations.TrucoDeclineGameEvent
 import com.utnmobile.quetrucazo.model.events.toGameEvents
 import com.utnmobile.quetrucazo.services.SocketIOManager
-import com.utnmobile.quetrucazo.ui.presentation.*
+import com.utnmobile.quetrucazo.ui.presentation.BackgroundBox
+import com.utnmobile.quetrucazo.ui.presentation.EndGameDialog
+import com.utnmobile.quetrucazo.ui.presentation.NavigateTo
+import com.utnmobile.quetrucazo.ui.presentation.PlayAgainDialog
+import com.utnmobile.quetrucazo.ui.presentation.Screen
+import com.utnmobile.quetrucazo.ui.presentation.TrucoDialog
 import com.utnmobile.quetrucazo.ui.viewmodel.auth.AuthViewModel
 import com.utnmobile.quetrucazo.ui.viewmodel.music.MusicViewModel
 import kotlinx.coroutines.delay
@@ -50,7 +85,7 @@ fun GameScreen(navigateTo: NavigateTo, game: Game, isPreview: Boolean = false) {
     var playAgainDialog by remember { mutableStateOf(false) } // setear
 
     var lastTrucoCall by remember { mutableStateOf<String?>(null)} // setear
-    var trucoDialogCall by remember { mutableStateOf<String?>(null)} // setear
+    var trucoDialogCall by remember { mutableStateOf<String?>(null) } // setear
 
     var myDialogText by remember { mutableStateOf<String?>(null) } // setear
     var opponentDialogText by remember { mutableStateOf<String?>(null) } // setear
@@ -125,7 +160,7 @@ fun GameScreen(navigateTo: NavigateTo, game: Game, isPreview: Boolean = false) {
             is TrucoCallGameEvent -> {
                 myTurn = event.caller != userId
                 lastTrucoCall = event.call
-                if (userId != event.caller){
+                if (userId != event.caller) {
                     opponentDialogText = when (event.call) {
                         "TRUCO" -> "Truco"
                         "RETRUCO" -> "Quiero retruco"
@@ -180,7 +215,7 @@ fun GameScreen(navigateTo: NavigateTo, game: Game, isPreview: Boolean = false) {
                 envidoCalls = event.calls
                 myTurn = event.caller != userId
                 wasEnvidoCalled = true
-                if (event.caller != userId){
+                if (event.caller != userId) {
                     myTurn = true
                     println("El oponente me canto envido")
                     showEnvidoAnswerOptions = true
@@ -286,31 +321,34 @@ fun GameScreen(navigateTo: NavigateTo, game: Game, isPreview: Boolean = false) {
             SocketIOManager.socket?.off("new-events")
         }
     }
-
-    Scaffold { paddingValues ->
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(
-                    PaddingValues(
-                        start = 0.dp,
-                        top = paddingValues.calculateTopPadding(),
-                        end = 0.dp,
-                        bottom = paddingValues.calculateBottomPadding()
+    BackgroundBox(imageRes = R.drawable.game_background) {
+        Scaffold(
+            containerColor = Color.Transparent,
+            contentColor = Color.Transparent
+        ) { paddingValues ->
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(
+                        PaddingValues(
+                            start = 0.dp,
+                            top = paddingValues.calculateTopPadding(),
+                            end = 0.dp,
+                            bottom = paddingValues.calculateBottomPadding()
+                        )
                     )
-                )
-        ) {
-            Column(
-                modifier = Modifier.fillMaxSize(),
-                verticalArrangement = Arrangement.SpaceBetween
             ) {
-                PointsGameScreen(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 16.dp),
-                    myPoints = myPoints,
-                    opponentPoints = opponentPoints
-                )
+                Column(
+                    modifier = Modifier.fillMaxSize(),
+                    verticalArrangement = Arrangement.SpaceBetween
+                ) {
+                    PointsGameScreen(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 16.dp),
+                        myPoints = myPoints,
+                        opponentPoints = opponentPoints
+                    )
 
                 CardsGameScreen(
                     modifier = Modifier
@@ -333,68 +371,70 @@ fun GameScreen(navigateTo: NavigateTo, game: Game, isPreview: Boolean = false) {
                     disableActions = analyzingEvents
                 )
 
-                Spacer(modifier = Modifier.weight(1.5f))
+                    Spacer(modifier = Modifier.weight(1.5f))
 
-                if (winner != null) {
-                    EndGameDialog(
-                        onDismissRequest = {
-                            winner = null
-                            playAgainDialog = true
-                        },
-                        myPoints = myPoints,
-                        opponentPoints = opponentPoints,
-                        isWinner = winner == userId,
-                        gameId = game.id,
-                        userId = userId
-                    )
-                } else if (playAgainDialog) {
-                    PlayAgainDialog(
-                        onDismissRequest = { playAgainDialog = false },
-                        gameId = game.id,
-                        userId = userId,
-                    )
+                    if (winner != null) {
+                        EndGameDialog(
+                            onDismissRequest = {
+                                winner = null
+                                playAgainDialog = true
+                            },
+                            myPoints = myPoints,
+                            opponentPoints = opponentPoints,
+                            isWinner = winner == userId,
+                            gameId = game.id,
+                            userId = userId
+                        )
+                    } else if (playAgainDialog) {
+                        PlayAgainDialog(
+                            onDismissRequest = { playAgainDialog = false },
+                            gameId = game.id,
+                            userId = userId,
+                        )
+                    }
+
+                    trucoDialogCall?.let {
+                        TrucoDialog(
+                            onDismissRequest = { trucoDialogCall = null },
+                            gameId = game.id,
+                            userId = userId,
+                            call = it,
+                            onMyDialogText = { t -> myDialogText = t }
+                        )
+                    }
                 }
 
-                trucoDialogCall?.let {
-                    TrucoDialog(
-                        onDismissRequest = { trucoDialogCall = null },
-                        gameId = game.id,
-                        userId = userId,
-                        call = it,
-                        onMyDialogText = { t -> myDialogText = t }
+                PlayGameScreen(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .absoluteOffset(x = 0.dp, y = 0.dp)
+                        .align(Alignment.BottomEnd),
+                    userId = userId,
+                    gameId = game.id,
+                    myTurn = myTurn,
+                    onMyDialogText = { myDialogText = it },
+                    showEnvidoAnswerOptions = showEnvidoAnswerOptions,
+                    trucoCall = lastTrucoCall,
+                    isFirstStep = isFirstStep(),
+                    wasEnvidoCalled = wasEnvidoCalled,
+                    envidoCalls = envidoCalls,
+                )
+
+                opponentDialogText?.let {
+                    OpponentBubbleDialog(
+                        text = it,
+                        modifier = Modifier
+                            .absoluteOffset(x = 16.dp, y = 32.dp)
                     )
                 }
-            }
-
-            PlayGameScreen(
-                modifier = Modifier.fillMaxWidth()
-                    .absoluteOffset(x = 0.dp, y = 0.dp)
-                    .align(Alignment.BottomEnd),
-                userId = userId,
-                gameId = game.id,
-                myTurn = myTurn,
-                onMyDialogText = { myDialogText = it },
-                showEnvidoAnswerOptions = showEnvidoAnswerOptions,
-                trucoCall = lastTrucoCall,
-                isFirstStep = isFirstStep(),
-                wasEnvidoCalled =  wasEnvidoCalled,
-                envidoCalls = envidoCalls,
-            )
-
-            opponentDialogText?.let {
-                OpponentBubbleDialog(
-                    text = it,
-                    modifier = Modifier
-                        .absoluteOffset(x = 16.dp, y = 32.dp)
-                )
-            }
-            myDialogText?.let {
-                MyBubbleDialog(
-                    text = it,
-                    modifier = Modifier
-                        .absoluteOffset(x = (-20).dp, y = (-60).dp)
-                        .align(Alignment.BottomEnd)
-                )
+                myDialogText?.let {
+                    MyBubbleDialog(
+                        text = it,
+                        modifier = Modifier
+                            .absoluteOffset(x = (-20).dp, y = (-60).dp)
+                            .align(Alignment.BottomEnd)
+                    )
+                }
             }
         }
     }

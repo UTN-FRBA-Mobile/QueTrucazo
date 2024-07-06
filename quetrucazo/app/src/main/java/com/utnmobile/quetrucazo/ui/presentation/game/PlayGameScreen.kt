@@ -1,22 +1,28 @@
 package com.utnmobile.quetrucazo.ui.presentation.game
 
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.unit.dp
 import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.utnmobile.quetrucazo.services.SocketIOManager
-import androidx.compose.runtime.setValue
-import com.utnmobile.quetrucazo.model.events.implementations.TrucoCallGameEvent
+import com.utnmobile.quetrucazo.ui.presentation.colorBoton
+import com.utnmobile.quetrucazo.ui.presentation.colorBotonDisable
 
 @Composable
 fun PlayGameScreen(
@@ -46,7 +52,6 @@ fun PlayGameScreen(
             verticalArrangement = Arrangement.Bottom
         ) {
             if (showEnvidoCallOptions || showEnvidoAnswerOptions) {
-                val lightPurple = Color(0xFFBB86FC)
                 val buttonHeight = 64.dp
 
                 Row(
@@ -56,8 +61,6 @@ fun PlayGameScreen(
                     horizontalArrangement = Arrangement.SpaceEvenly,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    val lightButtonColors = ButtonDefaults.buttonColors(containerColor = lightPurple)
-                    val grayButtonColors = ButtonDefaults.buttonColors(containerColor = Color.Gray)
 
                     Button(
                         onClick = {
@@ -68,7 +71,7 @@ fun PlayGameScreen(
                             .weight(1f)
                             .height(buttonHeight),
                         shape = RectangleShape,
-                        colors = if (disableEnvido) grayButtonColors else lightButtonColors,
+                        colors = if (disableEnvido) colorBotonDisable() else colorBoton(),
                         enabled = !(disableEnvido)
                     ) {
                         Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize()) {
@@ -85,7 +88,7 @@ fun PlayGameScreen(
                             .weight(1f)
                             .height(buttonHeight),
                         shape = RectangleShape,
-                        colors = if (disableRealEnvido) grayButtonColors else lightButtonColors,
+                        colors = if (disableRealEnvido) colorBotonDisable() else colorBoton(),
                         enabled = !(disableRealEnvido)
                     ) {
                         Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize()) {
@@ -102,7 +105,7 @@ fun PlayGameScreen(
                             .weight(1f)
                             .height(buttonHeight),
                         shape = RectangleShape,
-                        colors = if (disableFaltaEnvido) grayButtonColors else lightButtonColors,
+                        colors = if (disableFaltaEnvido) colorBotonDisable() else colorBoton(),
                         enabled = !(disableFaltaEnvido)
                     ) {
                         Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize()) {
@@ -120,7 +123,6 @@ fun PlayGameScreen(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 if (showEnvidoAnswerOptions) {
-                    val lightPurple = Color(0xFFBB86FC)
                     val buttonHeight = 64.dp
 
                     Row(
@@ -131,7 +133,7 @@ fun PlayGameScreen(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         val lightButtonColors =
-                            ButtonDefaults.buttonColors(containerColor = lightPurple)
+                            colorBotonDisable()
 
                         Button(
                             onClick = {
@@ -173,9 +175,9 @@ fun PlayGameScreen(
                     }
                 } else {
                     val buttonColors =
-                        ButtonDefaults.buttonColors(containerColor = Color(0xFF6200EE))
+                        colorBoton()
                     val grayButtonColors =
-                        ButtonDefaults.buttonColors(containerColor = Color.Gray)
+                        colorBotonDisable()
                     val buttonHeight = 48.dp
 
                     val nextCall =
