@@ -45,7 +45,7 @@ fun VolumeControlDialog(onDismissRequest: () -> Unit) {
                     horizontalArrangement = Arrangement.End
                 ) {
                     IconButton(onClick = onDismissRequest) {
-                        Icon(Icons.Filled.Close, contentDescription = "Close", tint = iconDialog())
+                        Icon(Icons.Filled.Close, contentDescription = "Close", tint = iconDialogColor())
                     }
                 }
                 Text("Música", style = MaterialTheme.typography.titleLarge, color = volumeColor())

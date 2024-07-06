@@ -75,12 +75,12 @@ fun GameListScreen(navigateTo: NavigateTo) {
                     title = { Text("QuéTrucazo!", color = titleTopBarColor()) },
                     actions = {
                         IconButton(onClick = { showDialog = true }) {
-                            Icon(Icons.Filled.Settings, contentDescription = "Settings", tint = iconDialog())
+                            Icon(Icons.Filled.Settings, contentDescription = "Settings", tint = iconDialogColor())
                         }
                     },
                     navigationIcon = {
                         IconButton(onClick = { navigateTo(Screen.Main, emptyMap()) }) {
-                            Icon(Icons.Filled.ArrowBack, contentDescription = "Back", tint = iconDialog())
+                            Icon(Icons.Filled.ArrowBack, contentDescription = "Back", tint = iconDialogColor())
                         }
                     },
                     colors = TopAppBarDefaults.topAppBarColors(

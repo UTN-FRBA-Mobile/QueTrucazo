@@ -9,6 +9,10 @@ import androidx.compose.ui.graphics.Color
 fun colorBoton(): ButtonColors {
     return ButtonDefaults.buttonColors(containerColor = Color(0xFFA65E2E))
 }
+@Composable
+fun colorBotonDisable(): ButtonColors {
+    return ButtonDefaults.buttonColors(containerColor = Color(0xFF8a6642))
+}
 
 @Composable
 fun volumeColor(): Color {
@@ -23,7 +27,7 @@ fun dialogColor2(): Color {
     return Color(0xFFA65E2E)
 }
 
-fun iconDialog(): Color {
+fun iconDialogColor(): Color {
     return Color.White
 }
 
