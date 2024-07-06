@@ -10,6 +10,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -57,14 +58,23 @@ fun WaitingForOpponentScreen(navigateTo: NavigateTo, gameId: Int) {
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center
             ) {
-                Text(
-                    text = "Esperando rival...",
-                    style = MaterialTheme.typography.titleLarge
-                )
+
+                Surface(
+                    color = Color.Black.copy(alpha = 0.6f), // Color de fondo semi-transparente
+                    shape = MaterialTheme.shapes.small, // Forma del fondo
+                    modifier = Modifier.padding(horizontal = 8.dp) // Espaciado alrededor del texto
+                ) {
+                    Text(
+                        "Esperando rival...",
+                        color = Color.White,
+                        style = MaterialTheme.typography.titleLarge
+                    )
+                }
+
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                CircularProgressIndicator()
+                CircularProgressIndicator(color = volumeColor())
 
                 Spacer(modifier = Modifier.height(64.dp))
 

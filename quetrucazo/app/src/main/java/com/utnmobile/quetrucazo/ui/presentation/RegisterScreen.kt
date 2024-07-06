@@ -1,17 +1,18 @@
 package com.utnmobile.quetrucazo.ui.presentation
 
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
@@ -22,9 +23,13 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.utnmobile.quetrucazo.R
 import com.utnmobile.quetrucazo.ui.viewmodel.auth.AuthViewModel
@@ -110,19 +115,32 @@ fun RegisterScreen(navigateTo: NavigateTo) {
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            Text("¿Ya tienes cuenta?")
+            Surface(
+                color = Color.Black.copy(alpha = 0.6f), // Color de fondo semi-transparente
+                shape = MaterialTheme.shapes.small, // Forma del fondo
+                modifier = Modifier.padding(horizontal = 8.dp) // Espaciado alrededor del texto
+            ) {
+                Text(
+                    "¿Ya tienes cuenta?",
+                    color = Color.White,
+                    style = TextStyle(fontSize = 15.sp, fontWeight = FontWeight.Bold)
+                )
+            }
 
             Spacer(modifier = Modifier.height(4.dp))
 
-            Text(
-                "Iniciar sesión",
-                modifier = Modifier.clickable {
+            Button(
+                onClick = {
                     navigateTo(Screen.Login, emptyMap())
                 },
-                style = MaterialTheme.typography.bodyLarge.copy(
-                    color = MaterialTheme.colorScheme.primary,
-                )
-            )
+                modifier = Modifier
+                    .width(180.dp)
+                    .height(30.dp),
+                colors = colorBotonDisable()
+            ) {
+                Text("Iniciar sesión", fontSize = 11.sp)
+            }
+
         }
     }
 }
