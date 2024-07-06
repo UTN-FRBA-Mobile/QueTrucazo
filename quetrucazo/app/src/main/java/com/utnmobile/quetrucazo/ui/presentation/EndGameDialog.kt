@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -16,7 +15,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -38,11 +36,11 @@ fun EndGameDialog(
 
 ) {
 
-    val buttonColors = ButtonDefaults.buttonColors(containerColor = Color(0xFF6200EE))
     Dialog(onDismissRequest = onDismissRequest) {
         Surface(
             shape = MaterialTheme.shapes.medium,
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
+            color = dialogColor()
         ) {
             Column(modifier = Modifier.padding(16.dp)) {
                 Row(
@@ -90,8 +88,7 @@ fun EndGameDialog(
                         },
                         modifier = Modifier
                             .fillMaxWidth(),
-                        shape = RectangleShape,
-                        colors = buttonColors
+                        colors = colorBoton()
                     ) {
                         Text("VOLVER A JUGAR")
                     }
@@ -108,8 +105,7 @@ fun EndGameDialog(
                         },
                         modifier = Modifier
                             .fillMaxWidth(),
-                        shape = RectangleShape,
-                        colors = buttonColors
+                        colors = colorBoton()
                     ) {
                         Text("IR AL MENU")
                     }

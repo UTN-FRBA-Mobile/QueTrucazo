@@ -1,13 +1,24 @@
 package com.utnmobile.quetrucazo.ui.presentation
 
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.foundation.layout.*
-import androidx.compose.material3.*
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.utnmobile.quetrucazo.R
 import com.utnmobile.quetrucazo.model.Game
 import com.utnmobile.quetrucazo.services.SocketIOManager
 import com.utnmobile.quetrucazo.ui.viewmodel.auth.AuthViewModel
@@ -33,34 +44,41 @@ fun WaitingForOpponentScreen(navigateTo: NavigateTo, gameId: Int) {
             SocketIOManager.socket?.off("join-game")
         }
     }
-
-    Scaffold {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(it)
-                .padding(16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
+    BackgroundBox(imageRes = R.drawable.crear_partida_background) {
+        Scaffold(
+            containerColor = Color.Transparent,
+            contentColor = Color.Transparent,
         ) {
-            Text(
-                text = "Esperando rival...",
-                style = MaterialTheme.typography.titleLarge
-            )
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(it)
+                    .padding(16.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
+            ) {
+                Text(
+                    text = "Esperando rival...",
+                    style = MaterialTheme.typography.titleLarge
+                )
 
-            Spacer(modifier = Modifier.height(16.dp))
+                Spacer(modifier = Modifier.height(16.dp))
 
-            CircularProgressIndicator()
+                CircularProgressIndicator()
 
-            Spacer(modifier = Modifier.height(64.dp))
+                Spacer(modifier = Modifier.height(64.dp))
 
-            Button(onClick = {
-                authViewModel.user?.let { user ->
-                    SocketIOManager.cancelGame(user.id, gameId)
-                    navigateTo(Screen.Main, emptyMap())
+                Button(
+                    onClick = {
+                        authViewModel.user?.let { user ->
+                            SocketIOManager.cancelGame(user.id, gameId)
+                            navigateTo(Screen.Main, emptyMap())
+                        }
+                    },
+                    colors = colorBoton()
+                ) {
+                    Text("Cancelar")
                 }
-            }) {
-                Text("Cancelar")
             }
         }
     }

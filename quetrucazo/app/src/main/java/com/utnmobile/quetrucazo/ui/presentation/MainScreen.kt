@@ -1,21 +1,37 @@
 package com.utnmobile.quetrucazo.ui.presentation
 
-import androidx.compose.foundation.layout.*
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material3.Button
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.utnmobile.quetrucazo.model.Game
-import com.utnmobile.quetrucazo.model.toGames
+import com.utnmobile.quetrucazo.R
 import com.utnmobile.quetrucazo.services.SocketIOManager
 import com.utnmobile.quetrucazo.ui.viewmodel.auth.AuthViewModel
-import com.utnmobile.quetrucazo.ui.viewmodel.connection.ConnectionViewModel
 import com.utnmobile.quetrucazo.ui.viewmodel.music.MusicViewModel
-import org.json.JSONArray
 import org.json.JSONObject
 
 
@@ -44,41 +60,53 @@ fun MainScreen(navigateTo: NavigateTo) {
             SocketIOManager.socket?.off("created-game")
         }
     }
-
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { Text("QuéTrucazo!") },
-                actions = {
-                    IconButton(onClick = { showDialog = true }) {
-                        Icon(Icons.Filled.Settings, contentDescription = "Settings")
-                    }
+    BackgroundBox(imageRes = R.drawable.crear_partida_background) {
+        Scaffold(
+            topBar = {
+                TopAppBar(
+                    title = { Text("QuéTrucazo!", color = titleTopBarColor()) },
+                    actions = {
+                        IconButton(onClick = { showDialog = true }) {
+                            Icon(Icons.Filled.Settings, contentDescription = "Settings", tint = iconDialog())
+                        }
+                    },
+                    colors = TopAppBarDefaults.topAppBarColors(
+                        containerColor = Color.Transparent
+                    )
+                )
+            },
+            containerColor = Color.Transparent,
+            contentColor = Color.Transparent
+        ) { paddingValues ->
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(paddingValues)
+                    .padding(16.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
+            ) {
+                Button(
+                    onClick = {
+                        SocketIOManager.createGame(authViewModel.user!!.id)
+                    },
+                    colors = colorBoton()
+                ) {
+                    Text("Crear partida")
                 }
-            )
-        }
-    ) { paddingValues ->
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues)
-                .padding(16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
-        ) {
-            Button(onClick = {
-                SocketIOManager.createGame(authViewModel.user!!.id)
-            }) {
-                Text("Crear partida")
-            }
 
-            Spacer(modifier = Modifier.height(16.dp))
+                Spacer(modifier = Modifier.height(16.dp))
 
-            Button(onClick = { navigateTo(Screen.GameList, emptyMap()) }) {
-                Text("Unirse a una partida")
-            }
+                Button(
+                    onClick = { navigateTo(Screen.GameList, emptyMap()) },
+                    colors = colorBoton()
+                ) {
+                    Text("Unirse a una partida")
+                }
 
-            if (showDialog) {
-                VolumeControlDialog(onDismissRequest = { showDialog = false })
+                if (showDialog) {
+                    VolumeControlDialog(onDismissRequest = { showDialog = false })
+                }
             }
         }
     }
