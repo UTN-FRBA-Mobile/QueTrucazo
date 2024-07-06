@@ -47,20 +47,17 @@ fun GameScreen(navigateTo: NavigateTo, game: Game, isPreview: Boolean = false) {
 
     var myTurn by remember { mutableStateOf(game.state.playerTurn == userId) }
 
-    var playAgainDialog by remember { mutableStateOf(false) }
+    var playAgainDialog by remember { mutableStateOf(false) } // setear
 
-    var trucoDialog by remember { mutableStateOf(false)}
-    data class TrucoDatos(var userId: Int, var gameId: Int, var call: String)
+    var trucoDialogCall by remember { mutableStateOf<String?>(null)} // setear
 
-    var trucoDatos by remember { mutableStateOf<TrucoDatos?>(null) }
+    var myDialogText by remember { mutableStateOf<String?>(null) } // setear
+    var opponentDialogText by remember { mutableStateOf<String?>(null) } // setear
 
-    var myDialogText by remember { mutableStateOf<String?>(null) }
-    var opponentDialogText by remember { mutableStateOf<String?>(null) }
+    var showEnvidoAnswerOptions by remember { mutableStateOf(false) } // setear
 
-    var showEnvidoAnswerOptions by remember { mutableStateOf(false) }
-
-    var wasEnvidoCalled by remember { mutableStateOf(false) }
-    var envidoCalls by remember { mutableStateOf<List<String>>(emptyList()) }
+    var wasEnvidoCalled by remember { mutableStateOf(false) } // setear
+    var envidoCalls by remember { mutableStateOf<List<String>>(emptyList()) } // setear
 
     fun isFirstStep(): Boolean {
         return min(myThrownCards.size, opponentThrownCards.size) == 0
@@ -84,7 +81,7 @@ fun GameScreen(navigateTo: NavigateTo, game: Game, isPreview: Boolean = false) {
                 myCards = event.cards[userId] ?: emptyList()
                 opponentCardsSize = event.cards.entries.first { it.key != userId }.value.size
                 myTurn = event.nextPlayerId == userId
-                trucoDatos = TrucoDatos(userId,game.id,"")
+                trucoDialogCall = null
                 wasEnvidoCalled = false
                 envidoCalls = emptyList()
             }
@@ -124,8 +121,40 @@ fun GameScreen(navigateTo: NavigateTo, game: Game, isPreview: Boolean = false) {
 
             is TrucoCallGameEvent -> {
                 if (userId != event.caller){
-                    trucoDatos = TrucoDatos(userId,game.id,event.call)
-                    trucoDialog = true
+                    opponentDialogText = when (event.call) {
+                        "TRUCO" -> "Truco"
+                        "RETRUCO" -> "Quiero retruco"
+                        "VALE_CUATRO" -> "Quiero vale cuatro"
+                        else -> "Truco"
+                    }
+                    delay(1500)
+                    opponentDialogText = null
+                    trucoDialogCall = event.call
+                } else {
+                    delay(1200)
+                    myDialogText = null
+                }
+            }
+
+            is TrucoAcceptGameEvent -> {
+                if (event.acceptedBy != userId) {
+                    opponentDialogText = "Quiero"
+                    delay(1000)
+                    opponentDialogText = null
+                } else {
+                    delay(700)
+                    myDialogText = null
+                }
+            }
+
+            is TrucoDeclineGameEvent -> {
+                if (event.declinedBy != userId) {
+                    opponentDialogText = "No quiero"
+                    delay(1000)
+                    opponentDialogText = null
+                } else {
+                    delay(700)
+                    myDialogText = null
                 }
             }
 
@@ -149,15 +178,67 @@ fun GameScreen(navigateTo: NavigateTo, game: Game, isPreview: Boolean = false) {
                     myTurn = true
                     println("El oponente me canto envido")
                     showEnvidoAnswerOptions = true
+                    opponentDialogText = when (event.call) {
+                        "ENVIDO" -> "Envido"
+                        "REAL_ENVIDO" -> "Real envido"
+                        "FALTA_ENVIDO" -> "Falta envido"
+                        else -> "Envido"
+                    }
+                    delay(1500)
+                    opponentDialogText = null
+                } else {
+                    delay(1200)
+                    myDialogText = null
                 }
             }
 
             is EnvidoAcceptedGameEvent -> {
                 myTurn = event.nextPlayerId == userId
                 showEnvidoAnswerOptions = false
+
+                // acepto
+                if (event.acceptedBy != userId) {
+                    opponentDialogText = "Quiero"
+                    delay(1000)
+                    opponentDialogText = null
+                } else {
+                    delay(700)
+                    myDialogText = null
+                }
+
+                val myCardPoints = event.cardsPoints[userId] ?: 0
+                val opponentCardPoints = event.cardsPoints.entries.first { it.key != userId }.value
+
+                if (event.handUserId == userId) {
+                    myDialogText = "$myCardPoints"
+                    delay(1500)
+                    myDialogText = null
+                    if (myCardPoints >= opponentCardPoints) {
+                        opponentDialogText = "Son buenas"
+                        delay(1500)
+                        opponentDialogText = null
+                    } else {
+                        opponentDialogText = "$opponentCardPoints son mejores"
+                        delay(1500)
+                        opponentDialogText = null
+                    }
+                } else {
+                    opponentDialogText = "$opponentCardPoints"
+                    delay(1500)
+                    opponentDialogText = null
+                    if (opponentCardPoints >= myCardPoints) {
+                        myDialogText = "Son buenas"
+                        delay(1500)
+                        myDialogText = null
+                    } else {
+                        myDialogText = "$myCardPoints son mejores"
+                        delay(1500)
+                        myDialogText = null
+                    }
+                }
+
                 myPoints = event.points[userId] ?: 0
                 opponentPoints = event.points.entries.first { it.key != userId }.value
-                println("Quiero envido")
             }
 
             is EnvidoDeclinedGameEvent -> {
@@ -165,7 +246,14 @@ fun GameScreen(navigateTo: NavigateTo, game: Game, isPreview: Boolean = false) {
                 showEnvidoAnswerOptions = false
                 myPoints = event.points[userId] ?: 0
                 opponentPoints = event.points.entries.first { it.key != userId }.value
-                println("No quiero envido")
+                if (event.declinedBy != userId) {
+                    opponentDialogText = "No quiero"
+                    delay(1000)
+                    opponentDialogText = null
+                } else {
+                    delay(700)
+                    myDialogText = null
+                }
             }
 
         }
@@ -260,12 +348,13 @@ fun GameScreen(navigateTo: NavigateTo, game: Game, isPreview: Boolean = false) {
                     )
                 }
 
-                if (trucoDialog && trucoDatos != null) {
+                trucoDialogCall?.let {
                     TrucoDialog(
-                        onDismissRequest = { trucoDialog = false },
-                        gameId = trucoDatos!!.gameId,
-                        userId = trucoDatos!!.userId,
-                        call = trucoDatos!!.call
+                        onDismissRequest = { trucoDialogCall = null },
+                        gameId = game.id,
+                        userId = userId,
+                        call = it,
+                        onMyDialogText = { t -> myDialogText = t }
                     )
                 }
             }
@@ -279,7 +368,7 @@ fun GameScreen(navigateTo: NavigateTo, game: Game, isPreview: Boolean = false) {
                 myTurn = myTurn,
                 onMyDialogText = { myDialogText = it },
                 showEnvidoAnswerOptions = showEnvidoAnswerOptions,
-                trucoCall = trucoDatos?.call,
+                trucoCall = trucoDialogCall,
                 isFirstStep = isFirstStep(),
                 wasEnvidoCalled =  wasEnvidoCalled,
                 envidoCalls = envidoCalls,

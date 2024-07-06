@@ -20,6 +20,7 @@ export type Envido = {
     waitingResponse: boolean;
     winner: SafeUser['id'] | undefined;
     playersPoints: Record<SafeUser['id'], number> | undefined;
+    cardsPoints: Record<SafeUser['id'], number> | undefined;
 }
 
 export type Truco = {
@@ -85,6 +86,8 @@ export type GameEventEnvidoAccepted = {
     acceptedBy: SafeUser['id'];
     nextPlayerId: SafeUser['id'];
     points: Record<SafeUser['id'], number>;
+    cardsPoints: Record<SafeUser['id'], number>;
+    handUserId: SafeUser['id'];
 };
 
 export type GameEventEnvidoDeclined = {
@@ -225,6 +228,7 @@ export class Game {
                     accepted: undefined,
                     winner: undefined,
                     playersPoints: undefined,
+                    cardsPoints: undefined,
                     waitingResponse: false,
                 },
                 truco: {
@@ -337,6 +341,7 @@ export class Game {
                     accepted: undefined,
                     winner: undefined,
                     playersPoints: undefined,
+                    cardsPoints: undefined,
                     waitingResponse: false,
                 },
                 firstPlayer: this.state.firstPlayer,
@@ -355,7 +360,8 @@ export class Game {
                 thrownCards: {},
                 winner: undefined,
             },
-            finished: false,            
+            finished: false,
+            playAgainResponse: [],
         });
     }
 
@@ -397,7 +403,7 @@ export class Game {
     }
 
     truco(userId: UserId, call: TrucoCall): Game {
-    
+
         if (this.state.playerTurn !== userId) {
             throw new Error('Not your turn');
         }
@@ -517,6 +523,7 @@ export class Game {
             accepted: undefined,
             winner: undefined,
             playersPoints: undefined,
+            cardsPoints: undefined,
             waitingResponse: true,
         };
 
@@ -553,7 +560,7 @@ export class Game {
             throw new Error('Not waiting response');
         }
 
-        const { winner, playersPoints } = this.analyzeEnvido(userId, accepted);
+        const { winner, playersPoints, cardsPoints } = this.analyzeEnvido(userId, accepted);
 
         const newEnvido: Envido = {
             calls: envido.calls,
@@ -563,6 +570,7 @@ export class Game {
             accepted,
             winner,
             playersPoints,
+            cardsPoints,
             waitingResponse: false,
         };
 
@@ -571,7 +579,7 @@ export class Game {
             [this.players[1].id]: this.state.points[this.players[1].id] + playersPoints[this.players[1].id],
         }
 
-        if(newEnvido.firstCaller === undefined){
+        if (newEnvido.firstCaller === undefined) {
             throw new Error("Envido first caller is undefined")
         }
 
@@ -581,6 +589,11 @@ export class Game {
                 acceptedBy: userId,
                 nextPlayerId: newEnvido.firstCaller,
                 points,
+                cardsPoints: cardsPoints || {
+                    [this.players[0].id]: 0,
+                    [this.players[1].id]: 0,
+                },
+                handUserId: this.state.firstPlayer,
             }
             : {
                 type: GameEventType.ENVIDO_DECLINED,
@@ -604,7 +617,7 @@ export class Game {
         return gameWithWinnerAnalysis || game;
     }
 
-    analyzeEnvido(userId: UserId, accepted: boolean): { winner: SafeUser['id'], playersPoints: Record<SafeUser['id'], number> } {
+    analyzeEnvido(userId: UserId, accepted: boolean): { winner: SafeUser['id'], playersPoints: Record<SafeUser['id'], number>, cardsPoints: Record<SafeUser['id'], number> | undefined } {
         const envido = this.state.envido;
 
         if (!accepted) {
@@ -614,6 +627,7 @@ export class Game {
                     [envido.lastCaller!]: this.getNotWantedEnvidoPoints(),
                     [userId]: 0,
                 },
+                cardsPoints: undefined,
             };
         }
 
@@ -631,6 +645,10 @@ export class Game {
             playersPoints: {
                 [winner]: this.getEnvidoPoints(winner),
                 [this.players.find(player => player.id !== winner)!.id]: 0,
+            },
+            cardsPoints: {
+                [this.players[0].id]: player1EnvidoPoints,
+                [this.players[1].id]: player2EnvidoPoints,
             },
         };
     }
@@ -792,6 +810,7 @@ export class Game {
                     accepted: undefined,
                     winner: undefined,
                     playersPoints: undefined,
+                    cardsPoints: undefined,
                     waitingResponse: false,
                 },
                 truco: {

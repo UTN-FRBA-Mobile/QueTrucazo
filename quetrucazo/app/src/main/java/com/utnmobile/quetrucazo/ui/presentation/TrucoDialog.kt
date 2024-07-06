@@ -32,8 +32,8 @@ fun TrucoDialog(
     onDismissRequest: () -> Unit,
     gameId: Int,
     userId: Int,
-    call: String
-
+    call: String,
+    onMyDialogText: (String) -> Unit,
 ) {
 
     val buttonColors = ButtonDefaults.buttonColors(containerColor = Color(0xFF6200EE))
@@ -66,6 +66,7 @@ fun TrucoDialog(
                 ) {
                     Button(onClick = {
                         onDismissRequest()
+                        onMyDialogText("Quiero")
                         SocketIOManager.trucoAccept(userId,gameId,true)
                     },
                         modifier = Modifier
@@ -86,6 +87,12 @@ fun TrucoDialog(
                     Button(
                         onClick = {
                             onDismissRequest()
+                            val call = when (nextCall) {
+                                "RETRUCO" -> "Quiero retruco"
+                                "VALE_CUATRO" -> "Quiero vale cuatro"
+                                else -> "Truco"
+                            }
+                            onMyDialogText(call)
                             SocketIOManager.trucoCall(userId, gameId,nextCall)
 
                         },
@@ -105,6 +112,7 @@ fun TrucoDialog(
                 ) {
                     Button(onClick = {
                         onDismissRequest()
+                        onMyDialogText("No quiero")
                         SocketIOManager.trucoAccept(userId,gameId,false)             },
                         modifier = Modifier
                             .fillMaxWidth(),
@@ -119,4 +127,3 @@ fun TrucoDialog(
     }
 
 }
-

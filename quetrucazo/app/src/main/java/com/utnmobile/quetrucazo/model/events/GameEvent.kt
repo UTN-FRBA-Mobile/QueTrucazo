@@ -1,6 +1,5 @@
 package com.utnmobile.quetrucazo.model.events
 
-import com.utnmobile.quetrucazo.model.Card
 import com.utnmobile.quetrucazo.model.UserId
 import com.utnmobile.quetrucazo.model.events.implementations.EnvidoAcceptedGameEvent
 import com.utnmobile.quetrucazo.model.events.implementations.NextRoundGameEvent
@@ -57,6 +56,12 @@ fun <T> JSONObject.toUserMap(key: String, f: (JSONObject, String) -> T): Map<Use
 
 fun JSONObject.toPoints(): Map<UserId, Int> {
     return toUserMap("points") { points, key ->
+        points.getInt(key)
+    }
+}
+
+fun JSONObject.toCardsPoints(): Map<UserId, Int> {
+    return toUserMap("cardsPoints") { points, key ->
         points.getInt(key)
     }
 }

@@ -61,7 +61,7 @@ fun PlayGameScreen(
 
                     Button(
                         onClick = {
-                            println("Canto envido")
+                            onMyDialogText("Envido")
                             SocketIOManager.envido(userId, gameId, "ENVIDO")
                         },
                         modifier = Modifier
@@ -78,7 +78,7 @@ fun PlayGameScreen(
 
                     Button(
                         onClick = {
-                            println("Canto real envido")
+                            onMyDialogText("Real envido")
                             SocketIOManager.envido(userId, gameId, "REAL_ENVIDO")
                         },
                         modifier = Modifier
@@ -95,7 +95,7 @@ fun PlayGameScreen(
 
                     Button(
                         onClick = {
-                            println("Canto falta envido")
+                            onMyDialogText("Falta envido")
                             SocketIOManager.envido(userId, gameId, "FALTA_ENVIDO")
                         },
                         modifier = Modifier
@@ -135,7 +135,7 @@ fun PlayGameScreen(
 
                         Button(
                             onClick = {
-                                println("Quiero envido")
+                                onMyDialogText("Quiero")
                                 SocketIOManager.answerEnvido(userId, gameId, true)
                             },
                             modifier = Modifier
@@ -154,7 +154,7 @@ fun PlayGameScreen(
 
                         Button(
                             onClick = {
-                                println("No quiero envido")
+                                onMyDialogText("No quiero")
                                 SocketIOManager.answerEnvido(userId, gameId, false)
                             },
                             modifier = Modifier
@@ -184,6 +184,11 @@ fun PlayGameScreen(
                     Button(
                         onClick = {
                             SocketIOManager.trucoCall(userId, gameId, nextCall)
+                            when (nextCall) {
+                                "RETRUCO" -> onMyDialogText("Quiero retruco")
+                                "VALE_CUATRO" -> onMyDialogText("Quiero vale cuatro")
+                                else -> onMyDialogText("Truco")
+                            }
                             onMyDialogText(nextCall.replace("_", " "))
                         },
                         modifier = Modifier
@@ -197,7 +202,7 @@ fun PlayGameScreen(
                             contentAlignment = Alignment.Center,
                             modifier = Modifier.fillMaxSize()
                         ) {
-                            Text(nextCall.replace("_", " "), fontSize = 16.sp, maxLines = 1)
+                            Text(nextCall.replace("_", " ").replace("VALE CUATRO", "V CUATRO"), fontSize = 16.sp, maxLines = 1)
                         }
                     }
 
