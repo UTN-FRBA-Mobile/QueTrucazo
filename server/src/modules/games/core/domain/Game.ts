@@ -106,6 +106,7 @@ export type GameEventTrucoCall = {
 export type GameEventTrucoAccept = {
     type: GameEventType.TRUCO_ACCEPT;
     acceptedBy: SafeUser['id'];
+    nextPlayerId: SafeUser['id'];
 };
 
 export type GameEventTrucoDecline = {
@@ -478,6 +479,7 @@ export class Game {
             ? {
                 type: GameEventType.TRUCO_ACCEPT,
                 acceptedBy: userId,
+                nextPlayerId: playerTurn,
             }
             : {
                 type: GameEventType.TRUCO_DECLINE,

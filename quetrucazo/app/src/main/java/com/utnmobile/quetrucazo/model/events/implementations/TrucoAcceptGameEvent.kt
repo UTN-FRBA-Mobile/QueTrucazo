@@ -6,11 +6,13 @@ import org.json.JSONObject
 
 class TrucoAcceptGameEvent (
         val acceptedBy: UserId,
+    val nextPlayerId: UserId,
 ): GameEvent(){
     companion object{
         fun from(json: JSONObject): TrucoAcceptGameEvent{
             val acceptedBy = json.getInt("acceptedBy")
-            return TrucoAcceptGameEvent(acceptedBy)
+            val nextPlayerId = json.getInt("nextPlayerId")
+            return TrucoAcceptGameEvent(acceptedBy, nextPlayerId)
         }
     }
 

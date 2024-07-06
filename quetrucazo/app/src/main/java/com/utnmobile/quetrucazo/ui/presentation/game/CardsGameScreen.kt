@@ -52,6 +52,7 @@ fun CardsGameScreen(
     myTurn: Boolean,
     gameId: Int,
     userId: Int,
+    disableActions: Boolean
 ) {
 
     var inGameCardsRowBounds by remember { mutableStateOf<Rect?>(null) }
@@ -100,7 +101,8 @@ fun CardsGameScreen(
                 myTurn,
                 gameId,
                 userId,
-                inGameCardsRowBounds
+                inGameCardsRowBounds,
+                disableActions
             )
         }
 
@@ -244,14 +246,15 @@ fun DisplayMyCards(
     myTurn: Boolean,
     gameId: Int,
     userId: Int,
-    inGameCardsRowBounds: Rect?
+    inGameCardsRowBounds: Rect?,
+    disabledActions: Boolean
 ) {
     myCards.forEach { card ->
         val offset = remember { mutableStateOf(Offset.Zero) }
         val cardCoordinates = remember { mutableStateOf<LayoutCoordinates?>(null) }
         val imageModifier = Modifier
             .offset { IntOffset(offset.value.x.roundToInt(), offset.value.y.roundToInt()) }
-            .pointerInput(myTurn, offset, cardCoordinates, userId, gameId, card) {
+            .pointerInput(myTurn, offset, cardCoordinates, userId, gameId, card, disabledActions) {
                 detectDragGestures(
                     onDragStart = {
 
@@ -270,6 +273,7 @@ fun DisplayMyCards(
                     onDragCancel = {
                     },
                     onDrag = { change, dragAmount ->
+                        if (disabledActions) return@detectDragGestures
                         if (change.pressed) {
                             offset.value += dragAmount
                         }
@@ -320,5 +324,6 @@ fun CardsPreview() {
         myTurn = true,
         gameId = 1,
         userId = 1,
+        disableActions = false
     )
 }

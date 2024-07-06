@@ -24,7 +24,7 @@ fun GameScreen(navigateTo: NavigateTo, game: Game, isPreview: Boolean = false) {
 
     var userId = 1
 
-    var analyzingEvents = false
+    var analyzingEvents by remember { mutableStateOf(false) }
 
     if (!isPreview) {
         viewModel<MusicViewModel>().playMusic()
@@ -49,6 +49,7 @@ fun GameScreen(navigateTo: NavigateTo, game: Game, isPreview: Boolean = false) {
 
     var playAgainDialog by remember { mutableStateOf(false) } // setear
 
+    var lastTrucoCall by remember { mutableStateOf<String?>(null)} // setear
     var trucoDialogCall by remember { mutableStateOf<String?>(null)} // setear
 
     var myDialogText by remember { mutableStateOf<String?>(null) } // setear
@@ -68,6 +69,7 @@ fun GameScreen(navigateTo: NavigateTo, game: Game, isPreview: Boolean = false) {
         println("Analyzing events: $eventIndex - ${events.size}")
         if (eventIndex >= events.size) {
             analyzingEvents = false
+            println("Fin analizando")
             return
         }
 
@@ -81,6 +83,7 @@ fun GameScreen(navigateTo: NavigateTo, game: Game, isPreview: Boolean = false) {
                 myCards = event.cards[userId] ?: emptyList()
                 opponentCardsSize = event.cards.entries.first { it.key != userId }.value.size
                 myTurn = event.nextPlayerId == userId
+                lastTrucoCall = null
                 trucoDialogCall = null
                 wasEnvidoCalled = false
                 envidoCalls = emptyList()
@@ -120,6 +123,8 @@ fun GameScreen(navigateTo: NavigateTo, game: Game, isPreview: Boolean = false) {
             }
 
             is TrucoCallGameEvent -> {
+                myTurn = event.caller != userId
+                lastTrucoCall = event.call
                 if (userId != event.caller){
                     opponentDialogText = when (event.call) {
                         "TRUCO" -> "Truco"
@@ -137,6 +142,7 @@ fun GameScreen(navigateTo: NavigateTo, game: Game, isPreview: Boolean = false) {
             }
 
             is TrucoAcceptGameEvent -> {
+                myTurn = event.nextPlayerId == userId
                 if (event.acceptedBy != userId) {
                     opponentDialogText = "Quiero"
                     delay(1000)
@@ -324,6 +330,7 @@ fun GameScreen(navigateTo: NavigateTo, game: Game, isPreview: Boolean = false) {
                     myTurn = myTurn,
                     gameId = game.id,
                     userId = userId,
+                    disableActions = analyzingEvents
                 )
 
                 Spacer(modifier = Modifier.weight(1.5f))
@@ -368,7 +375,7 @@ fun GameScreen(navigateTo: NavigateTo, game: Game, isPreview: Boolean = false) {
                 myTurn = myTurn,
                 onMyDialogText = { myDialogText = it },
                 showEnvidoAnswerOptions = showEnvidoAnswerOptions,
-                trucoCall = trucoDialogCall,
+                trucoCall = lastTrucoCall,
                 isFirstStep = isFirstStep(),
                 wasEnvidoCalled =  wasEnvidoCalled,
                 envidoCalls = envidoCalls,
