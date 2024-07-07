@@ -18,47 +18,30 @@
 
 ## Capturas de Pantalla
 
-### 1. Inicio de sesión
-![Login](./screenshots/1_login.png)
-
-### 2. Registro
-![Register](./screenshots/2_register.png)
-
-### 3. Menú Principal
-![Main Menu](./screenshots/3_main.png)
-
-### 4. Esperando Juego
-![Waiting Game](./screenshots/4_waiting_game.png)
-
-### 5. Lista de Juegos
-![List of Games](./screenshots/5_list_games.png)
-
-### 6. Juego
-![Game](./screenshots/6_game.png)
-
-### 7. Carta Jugada
-![Thrown Card](./screenshots/7_thrown_card.png)
-
-### 8. Cantar Envido
-![Envido](./screenshots/8_envido.png)
-
-### 9. Envido Seleccionado
-![Envido Selected](./screenshots/9_envido_selected.png)
-
-### 10. Respuesta del Oponente
-![Opponent Response](./screenshots/10_opponent_response.png)
-
-### 11. Cantar Truco
-![Truco](./screenshots/11_truco.png)
-
-### 12. Vale Cuatro
-![Vale Cuatro](./screenshots/12_vale_cuatro.png)
-
-### 13. Resultado del Juego
-![Game Result](./screenshots/13_game_result.png)
-
-### 14. Esperando al Oponente
-![Waiting Opponent](./screenshots/14_waiting_opponent.png)
+<p float="left">
+  <img style="margin-left:10px;margin-right:10px" src="./screenshots/1_login.png" width="30%" />
+  <img style="margin-left:10px;margin-right:10px" src="./screenshots/2_register.png" width="30%" />
+  <img style="margin-left:10px;margin-right:10px" src="./screenshots/3_main.png" width="30%" />
+</p>
+<p float="left">
+  <img style="margin-left:10px;margin-right:10px" src="./screenshots/4_waiting_game.png" width="30%" />
+  <img style="margin-left:10px;margin-right:10px" src="./screenshots/5_list_games.png" width="30%" />
+  <img style="margin-left:10px;margin-right:10px" src="./screenshots/6_game.png" width="30%" />
+</p>
+<p float="left">
+  <img style="margin-left:10px;margin-right:10px" src="./screenshots/7_thrown_card.png" width="30%" />
+  <img style="margin-left:10px;margin-right:10px" src="./screenshots/8_envido.png" width="30%" />
+  <img style="margin-left:10px;margin-right:10px" src="./screenshots/9_envido_selected.png" width="30%" />
+</p>
+<p float="left">
+  <img style="margin-left:10px;margin-right:10px" src="./screenshots/10_opponent_response.png" width="30%" />
+  <img style="margin-left:10px;margin-right:10px" src="./screenshots/11_truco.png" width="30%" />
+  <img style="margin-left:10px;margin-right:10px" src="./screenshots/12_vale_cuatro.png" width="30%" />
+</p>
+<p float="left">
+  <img style="margin-left:10px;margin-right:10px" src="./screenshots/13_game_result.png" width="30%" />
+  <img style="margin-left:10px;margin-right:10px" src="./screenshots/14_waiting_opponent.png" width="30%" />
+</p>
 
 ## Cómo Jugar
 
