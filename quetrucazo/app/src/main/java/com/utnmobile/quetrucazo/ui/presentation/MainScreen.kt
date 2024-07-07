@@ -6,9 +6,9 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -87,23 +87,28 @@ fun MainScreen(navigateTo: NavigateTo) {
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center
             ) {
-                Button(
+                BotonImagen2(
                     onClick = {
                         SocketIOManager.createGame(authViewModel.user!!.id)
                     },
-                    colors = colorBoton()
-                ) {
-                    Text("CREAR PARTIDA")
-                }
+                    modifier = Modifier
+                        .width(120.dp)
+                        .height(40.dp),
+                    text = "CREAR PARTIDA"
+                )
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                Button(
-                    onClick = { navigateTo(Screen.GameList, emptyMap()) },
-                    colors = colorBoton()
-                ) {
-                    Text("UNIRSE A UNA PARTIDA")
-                }
+
+                BotonImagen2(
+                    onClick = {
+                        navigateTo(Screen.GameList, emptyMap())
+                    },
+                    modifier = Modifier
+                        .width(180.dp)
+                        .height(40.dp),
+                    text = "UNIRSE A UNA PARTIDA"
+                )
 
                 if (showDialog) {
                     VolumeControlDialog(onDismissRequest = { showDialog = false })

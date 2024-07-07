@@ -6,7 +6,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Button
+import androidx.compose.foundation.layout.width
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -78,17 +78,19 @@ fun WaitingForOpponentScreen(navigateTo: NavigateTo, gameId: Int) {
 
                 Spacer(modifier = Modifier.height(64.dp))
 
-                Button(
+                BotonImagen2(
                     onClick = {
                         authViewModel.user?.let { user ->
                             SocketIOManager.cancelGame(user.id, gameId)
                             navigateTo(Screen.Main, emptyMap())
                         }
                     },
-                    colors = colorBoton()
-                ) {
-                    Text("Cancelar")
-                }
+                    modifier = Modifier
+                        .width(120.dp)
+                        .height(40.dp),
+                    text = "Cancelar"
+                )
+
             }
         }
     }

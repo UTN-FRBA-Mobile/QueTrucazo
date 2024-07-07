@@ -1,17 +1,14 @@
 package com.utnmobile.quetrucazo.ui.presentation
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -54,12 +51,15 @@ fun LoginScreen(navigateTo: NavigateTo) {
             title = { Text("Error de Login") },
             text = { Text(it) },
             confirmButton = {
-                Button(
-                    onClick = { errorMessage = null },
-                    colors = colorBoton()
-                ) {
-                    Text("OK")
-                }
+                BotonImagen2(
+                    onClick = {
+                        errorMessage = null
+                    },
+                    modifier = Modifier
+                        .width(60.dp)
+                        .height(40.dp),
+                    text = "OK"
+                )
             },
             containerColor = dialogColor()
         )
@@ -121,7 +121,8 @@ fun LoginScreen(navigateTo: NavigateTo) {
             if (isLoading) {
                 CircularProgressIndicator(color = Color.White)
             } else {
-                Button(
+
+                BotonImagen2(
                     onClick = {
                         isLoading = true
                         authViewModel.login(username, password, {
@@ -132,10 +133,12 @@ fun LoginScreen(navigateTo: NavigateTo) {
                             errorMessage = it
                         })
                     },
-                    colors = colorBoton()
-                ) {
-                    Text("INICIAR SESIÓN")
-                }
+                    modifier = Modifier
+                        .width(140.dp)
+                        .height(40.dp),
+                    text = "INICIAR SESIÓN"
+                )
+
             }
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -154,21 +157,17 @@ fun LoginScreen(navigateTo: NavigateTo) {
 
             Spacer(modifier = Modifier.height(4.dp))
 
-            Button(
+            BotonImagen1(
                 onClick = {
                     navigateTo(Screen.Register, emptyMap())
                 },
                 modifier = Modifier
                     .width(180.dp)
-                    .height(30.dp),
-                colors = colorBotonDisable()
-            ) {
-                Text("REGISTRARSE", fontSize = 11.sp)
-            }
-
+                    .height(15.dp),
+                text = "REGISTRARSE",
+                fontSize = 11.sp
+            )
         }
     }
 
 }
-
-

@@ -4,10 +4,11 @@ import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -21,6 +22,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
@@ -36,20 +38,22 @@ fun TrucoDialog(
     canCallEnvido: Boolean,
 ) {
     var showEnvidoOptions by remember { mutableStateOf(false) }
-    val buttonColors = colorBoton()
     Dialog(onDismissRequest = onDismissRequest) {
         Surface(
             shape = MaterialTheme.shapes.medium,
             modifier = Modifier.fillMaxWidth(),
             color = dialogColor()
         ) {
-            Column(modifier = Modifier.padding(16.dp)){
-                Row( modifier = Modifier
-                    .fillMaxWidth()
-                    .fillMaxHeight(0.25f),
+            Column(modifier = Modifier.padding(16.dp)) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .fillMaxHeight(0.25f),
                     horizontalArrangement = Arrangement.Center,
-                    verticalAlignment = Alignment.CenterVertically){
-                    Text(text = "¡${call.replace("_", " ")}!",
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = "¡${call.replace("_", " ")}!",
                         style = TextStyle(
                             fontSize = 30.sp,
                             color = dialogTextColor(),
@@ -62,107 +66,134 @@ fun TrucoDialog(
 
                 }
                 if (showEnvidoOptions) {
-                    Row (modifier = Modifier
-                        .fillMaxWidth()
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
 
                     ) {
-                        Button(onClick = {
-                            onMyDialogText("Envido")
-                            SocketIOManager.envidoGoFirst(userId, gameId, "ENVIDO")
-                        },
+
+                        Spacer(modifier = Modifier.height(60.dp))
+                        BotonImagen1(
+                            onClick = {
+                                onMyDialogText("Envido")
+                                SocketIOManager.envidoGoFirst(userId, gameId, "ENVIDO")
+                            },
                             modifier = Modifier
-                                .fillMaxWidth(),
-                            colors = buttonColors) {
-                            Text(text = "ENVIDO")
-                        }
+                                .fillMaxWidth()
+                                .height(40.dp),
+                            text = "ENVIDO"
+                        )
+
 
                     }
-                    Row (modifier = Modifier
-                        .fillMaxWidth()
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
 
                     ) {
-                        Button(onClick = {
-                            onMyDialogText("Real envido")
-                            SocketIOManager.envidoGoFirst(userId, gameId, "REAL_ENVIDO")
-                        },
+
+                        Spacer(modifier = Modifier.height(60.dp))
+                        BotonImagen1(
+                            onClick = {
+                                onMyDialogText("Real envido")
+                                SocketIOManager.envidoGoFirst(userId, gameId, "REAL_ENVIDO")
+                            },
                             modifier = Modifier
-                                .fillMaxWidth(),
-                            colors = buttonColors) {
-                            Text(text = "REAL ENVIDO")
-                        }
+                                .fillMaxWidth()
+                                .height(40.dp),
+                            text = "REAL ENVIDO"
+                        )
 
                     }
-                    Row (modifier = Modifier
-                        .fillMaxWidth()
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
 
                     ) {
-                        Button(onClick = {
-                            onMyDialogText("Falta envido")
-                            SocketIOManager.envidoGoFirst(userId, gameId, "FALTA_ENVIDO")
-                        },
+
+                        Spacer(modifier = Modifier.height(60.dp))
+                        BotonImagen1(
+                            onClick = {
+                                onMyDialogText("Falta envido")
+                                SocketIOManager.envidoGoFirst(userId, gameId, "FALTA_ENVIDO")
+                            },
                             modifier = Modifier
-                                .fillMaxWidth(),
-                            colors = buttonColors) {
-                            Text(text = "FALTA ENVIDO")
-                        }
+                                .fillMaxWidth()
+                                .height(40.dp),
+                            text = "FALTA ENVIDO"
+                        )
 
                     }
-                    Row (modifier = Modifier
-                        .fillMaxWidth()
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
 
                     ) {
-                        Button(onClick = {
-                            showEnvidoOptions = false
-                        },
+
+                        Spacer(modifier = Modifier.height(60.dp))
+                        BotonImagen1(
+                            onClick = {
+                                showEnvidoOptions = false
+                            },
                             modifier = Modifier
-                                .fillMaxWidth(),
-                            colors = buttonColors) {
-                            Text(text = "ATRÁS")
-                        }
+                                .fillMaxWidth()
+                                .height(40.dp),
+                            text = "ATRÁS"
+                        )
 
                     }
                 } else {
                     if (canCallEnvido) {
-                        Row (modifier = Modifier
-                            .fillMaxWidth()
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
 
                         ) {
-                            Button(onClick = {
-                                showEnvidoOptions = true
-                            },
+
+                            Spacer(modifier = Modifier.height(60.dp))
+                            BotonImagen1(
+                                onClick = {
+                                    showEnvidoOptions = true
+                                },
                                 modifier = Modifier
-                                    .fillMaxWidth(),
-                                colors = buttonColors) {
-                                Text(text = "ENVIDO")
-                            }
+                                    .fillMaxWidth()
+                                    .height(40.dp),
+                                text = "ENVIDO"
+                            )
 
                         }
                     }
 
-                    Row (modifier = Modifier
-                        .fillMaxWidth()
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
 
                     ) {
-                        Button(onClick = {
-                            onDismissRequest()
-                            onMyDialogText("Quiero")
-                            SocketIOManager.trucoAccept(userId,gameId,true)
-                        },
+
+                        Spacer(modifier = Modifier.height(60.dp))
+                        BotonImagen1(
+                            onClick = {
+                                onDismissRequest()
+                                onMyDialogText("Quiero")
+                                SocketIOManager.trucoAccept(userId, gameId, true)
+                            },
                             modifier = Modifier
-                                .fillMaxWidth(),
-                            colors = buttonColors) {
-                            Text(text = "¡QUIERO!")
-                        }
-
+                                .fillMaxWidth()
+                                .height(40.dp),
+                            text = "¡QUIERO!"
+                        )
                     }
-                    Row(modifier = Modifier
-                        .fillMaxWidth()
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
 
                     ) {
-                        val nextCall: String = if (call == "TRUCO"){
+                        val nextCall: String = if (call == "TRUCO") {
                             "RETRUCO"
                         } else "VALE_CUATRO"
-                        Button(
+
+                        Spacer(modifier = Modifier.height(60.dp))
+                        BotonImagen1(
                             onClick = {
                                 onDismissRequest()
                                 val serverCall = when (nextCall) {
@@ -171,31 +202,34 @@ fun TrucoDialog(
                                     else -> "Truco"
                                 }
                                 onMyDialogText(serverCall)
-                                SocketIOManager.trucoCall(userId, gameId,nextCall)
-
+                                SocketIOManager.trucoCall(userId, gameId, nextCall)
                             },
                             modifier = Modifier
-                                .fillMaxWidth(),
-                            colors = buttonColors,
+                                .fillMaxWidth()
+                                .height(40.dp),
+                            text = "¡${nextCall.replace("_", " ")}!",
                             enabled = (call != "VALE_CUATRO")
-                        ) {
-                            Text("¡${nextCall.replace("_", " ")}!")
-                        }
+                        )
 
                     }
-                    Row (modifier = Modifier
-                        .fillMaxWidth()
-                        .fillMaxHeight(0.25f),
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .fillMaxHeight(0.25f),
                     ) {
-                        Button(onClick = {
-                            onDismissRequest()
-                            onMyDialogText("No quiero")
-                            SocketIOManager.trucoAccept(userId,gameId,false)             },
+
+                        Spacer(modifier = Modifier.height(60.dp))
+                        BotonImagen1(
+                            onClick = {
+                                onDismissRequest()
+                                onMyDialogText("No quiero")
+                                SocketIOManager.trucoAccept(userId, gameId, false)
+                            },
                             modifier = Modifier
-                                .fillMaxWidth(),
-                            colors = buttonColors) {
-                            Text(text = "MAZO")
-                        }
+                                .fillMaxWidth()
+                                .height(40.dp),
+                            text = "MAZO"
+                        )
 
                     }
                 }
@@ -203,4 +237,17 @@ fun TrucoDialog(
         }
     }
 
+}
+
+@Preview
+@Composable
+fun TrucoDialogPreview() {
+    TrucoDialog(
+        onDismissRequest = {},
+        gameId = 1,
+        userId = 1,
+        call = "TRUCO",
+        onMyDialogText = {},
+        canCallEnvido = true
+    )
 }

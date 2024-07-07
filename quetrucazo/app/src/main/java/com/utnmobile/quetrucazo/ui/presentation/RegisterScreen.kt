@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -52,12 +51,16 @@ fun RegisterScreen(navigateTo: NavigateTo) {
             title = { Text("Error de Login") },
             text = { Text(it) },
             confirmButton = {
-                Button(
-                    onClick = { errorMessage = null },
-                    colors = colorBoton()
-                ) {
-                    Text("OK")
-                }
+                BotonImagen2(
+                    onClick = {
+                        errorMessage = null
+                    },
+                    modifier = Modifier
+                        .width(60.dp)
+                        .height(40.dp),
+                    text = "OK"
+                )
+
             },
             containerColor = dialogColor()
         )
@@ -121,7 +124,11 @@ fun RegisterScreen(navigateTo: NavigateTo) {
             if (isLoading) {
                 CircularProgressIndicator(color = Color.White)
             } else {
-                Button(
+                BotonImagen2(
+                    modifier = Modifier
+                        .width(140.dp)
+                        .height(40.dp),
+                    text = "REGISTRARME",
                     onClick = {
                         isLoading = true
                         authViewModel.register(username, password, {
@@ -131,11 +138,9 @@ fun RegisterScreen(navigateTo: NavigateTo) {
                             isLoading = false
                             errorMessage = it
                         })
-                    },
-                    colors = colorBoton()
-                ) {
-                    Text("REGISTRARME")
-                }
+                    }
+                )
+
             }
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -153,18 +158,16 @@ fun RegisterScreen(navigateTo: NavigateTo) {
             }
 
             Spacer(modifier = Modifier.height(4.dp))
-
-            Button(
+            BotonImagen1(
                 onClick = {
                     navigateTo(Screen.Login, emptyMap())
                 },
                 modifier = Modifier
                     .width(180.dp)
-                    .height(30.dp),
-                colors = colorBotonDisable()
-            ) {
-                Text("INICIAR SESIÓN", fontSize = 11.sp)
-            }
+                    .height(15.dp),
+                text = "INICIAR SESIÓN",
+                fontSize = 11.sp
+            )
 
         }
     }
