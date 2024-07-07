@@ -53,7 +53,7 @@
 
 ## Ejecutar el Proyecto
 
-Para ejecutar el proyecto, seguir los pasos dentro del [README](./server/README.md) del servidor.
+El servidor se encuentra online por lo que no es necesario ejecutarlo, es suficiente con ejecutar el proyecto de Android Studio. De todos modos, si se quiere ejecutar localmente seguir los pasos dentro del [README](./server/README.md) del servidor.
 
 ## Licencia
 
