@@ -4,6 +4,7 @@ import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.VectorConverter
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -13,6 +14,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -21,9 +23,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.layout.boundsInWindow
@@ -39,6 +43,7 @@ import com.utnmobile.quetrucazo.model.Card
 import com.utnmobile.quetrucazo.model.CartaPalo
 import com.utnmobile.quetrucazo.services.SocketIOManager
 import kotlin.math.roundToInt
+
 
 @Composable
 fun CardsGameScreen(
@@ -57,6 +62,7 @@ fun CardsGameScreen(
 
     var inGameCardsRowBounds by remember { mutableStateOf<Rect?>(null) }
     var opponentCardsRowBounds by remember { mutableStateOf<Rect?>(null) }
+    var shouldGlow by remember { mutableStateOf(false) }
 
     Column(
         modifier = modifier.fillMaxSize(),
@@ -76,10 +82,14 @@ fun CardsGameScreen(
             DisplayOpponentCards(opponentCardsSize)
         }
 
+
         Box(
+
             modifier = Modifier
                 .fillMaxWidth()
                 .weight(2f)
+                .clip(RoundedCornerShape(10.dp))
+                .background(color = if (shouldGlow) Color(255/255f, 255/255f, 255/255f, 0.3f) else Color.Transparent)
                 .onGloballyPositioned { coordinates ->
                     inGameCardsRowBounds = coordinates.boundsInWindow()
                 },
@@ -102,7 +112,8 @@ fun CardsGameScreen(
                 gameId,
                 userId,
                 inGameCardsRowBounds,
-                disableActions
+                disableActions,
+                setShouldGlow = { value -> shouldGlow = value }
             )
         }
 
@@ -141,7 +152,7 @@ fun DisplayOpponentCards(opponentCardsSize: Int) {
                 painter = painterResource(id = R.drawable.reverso),
                 contentDescription = "Card Image",
                 modifier = Modifier
-                    .offset(x = currentOffsetX.dp, y = currentOffsetY.toInt().dp)
+                    .offset(x = currentOffsetX.dp, y = currentOffsetY.dp)
                     .rotate(currentAngle)
             )
         }
@@ -161,7 +172,12 @@ fun DisplayInGameCards(
         repeat(oponenteCartasJugadas.size) { index ->
             val opponentCard = oponenteCartasJugadas.get(index)
             Box(modifier = Modifier.padding(15.dp)) {
-                AnimatedOpponentCard(opponentCard, index == oponenteCartasJugadas.size - 1, true, opponentCardsRowBounds)
+                AnimatedOpponentCard(
+                    opponentCard,
+                    index == oponenteCartasJugadas.size - 1,
+                    true,
+                    opponentCardsRowBounds
+                )
             }
         }
     }
@@ -247,7 +263,8 @@ fun DisplayMyCards(
     gameId: Int,
     userId: Int,
     inGameCardsRowBounds: Rect?,
-    disabledActions: Boolean
+    disabledActions: Boolean,
+    setShouldGlow: (Boolean) -> Unit
 ) {
     myCards.forEach { card ->
         val offset = remember { mutableStateOf(Offset.Zero) }
@@ -257,9 +274,10 @@ fun DisplayMyCards(
             .pointerInput(myTurn, offset, cardCoordinates, userId, gameId, card, disabledActions) {
                 detectDragGestures(
                     onDragStart = {
-
+                        setShouldGlow(true)
                     },
                     onDragEnd = {
+                        setShouldGlow(false)
                         val cardPosition = cardCoordinates.value?.boundsInWindow()?.center
                         if (myTurn && isCardInCenter(cardPosition, inGameCardsRowBounds)) {
                             SocketIOManager.throwCard(userId, gameId, card)
@@ -271,6 +289,7 @@ fun DisplayMyCards(
                         }
                     },
                     onDragCancel = {
+                        setShouldGlow(false)
                     },
                     onDrag = { change, dragAmount ->
                         if (disabledActions) return@detectDragGestures
