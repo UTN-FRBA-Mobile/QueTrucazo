@@ -30,6 +30,7 @@ fun PlayAgainDialog(
         Surface(
             shape = MaterialTheme.shapes.medium,
             modifier = Modifier.fillMaxWidth(),
+            color = dialogColor()
         ) {
             Column(
                 modifier = Modifier.padding(16.dp),
@@ -37,12 +38,13 @@ fun PlayAgainDialog(
             ) {
                 Text(
                     text = "Esperando rival...",
-                    style = MaterialTheme.typography.titleLarge
+                    style = MaterialTheme.typography.titleLarge,
+                    color = dialogTextColor()
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                CircularProgressIndicator()
+                CircularProgressIndicator(color = dialogTextColor())
 
                 Spacer(modifier = Modifier.height(64.dp))
 
@@ -54,7 +56,7 @@ fun PlayAgainDialog(
                     modifier = Modifier
                         .fillMaxWidth(),
                     shape = RectangleShape,
-                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF6200EE))
+                    colors = colorBoton()
                 ) {
                     Text("Cancelar")
                 }

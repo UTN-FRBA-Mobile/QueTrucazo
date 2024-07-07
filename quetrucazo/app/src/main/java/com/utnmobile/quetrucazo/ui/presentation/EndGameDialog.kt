@@ -54,7 +54,7 @@ fun EndGameDialog(
                         if (isWinner) "¡Felicitaciones, has ganado el juego!" else "¡Has perdido el juego!",
                         style = TextStyle(
                             fontSize = 30.sp,
-                            color = Color.Black,
+                            color = dialogTextColor(),
                             fontWeight = FontWeight.Bold
                         ),
                         textAlign = TextAlign.Center,
@@ -96,7 +96,6 @@ fun EndGameDialog(
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .fillMaxHeight(0.25f)
                 ) {
                     Button(
                         onClick = {

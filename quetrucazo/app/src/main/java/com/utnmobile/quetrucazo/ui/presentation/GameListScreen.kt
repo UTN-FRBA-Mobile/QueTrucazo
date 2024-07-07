@@ -28,6 +28,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.utnmobile.quetrucazo.R
@@ -72,7 +73,7 @@ fun GameListScreen(navigateTo: NavigateTo) {
         Scaffold(
             topBar = {
                 TopAppBar(
-                    title = { Text("QuéTrucazo!", color = titleTopBarColor()) },
+                    title = { Text("QuéTrucazo!", fontWeight = FontWeight.Bold, color = titleTopBarColor()) },
                     actions = {
                         IconButton(onClick = { showDialog = true }) {
                             Icon(Icons.Filled.Settings, contentDescription = "Settings", tint = iconDialogColor())
@@ -114,7 +115,10 @@ fun ListItem(game: Game, onClick: (gameId: Int) -> Unit) {
             .fillMaxWidth()
             .padding(8.dp)
             .clickable(onClick = { onClick(game.id) }),
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = Color.Black.copy(alpha = 0.6f),
+        ),
     ) {
         Row(
             modifier = Modifier
@@ -124,7 +128,14 @@ fun ListItem(game: Game, onClick: (gameId: Int) -> Unit) {
         ) {
             Text(
                 text = game.name,
-                style = MaterialTheme.typography.titleMedium
+                style = MaterialTheme.typography.titleMedium,
+                color = Color.White,
+            )
+            // Trailing
+            Text(
+                text = ">",
+                style = MaterialTheme.typography.titleMedium,
+                color = Color.White,
             )
         }
     }

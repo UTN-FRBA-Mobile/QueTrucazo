@@ -16,6 +16,7 @@ gson = "2.8.6"
 coroutines = "1.3.9"
 socketio = "2.0.1"
 roomKtx = "2.6.1"
+accompanist = "0.30.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -41,6 +42,7 @@ gson-core = { module = "com.google.code.gson:gson", version.ref = "gson" }
 coroutines-android = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android", version.ref = "coroutines" }
 socketio-core = { module = "io.socket:socket.io-client", version.ref = "socketio" }
 androidx-room-ktx = { group = "androidx.room", name = "room-ktx", version.ref = "roomKtx" }
+accompanist-systemuicontroller = { group = "com.google.accompanist", name = "accompanist-systemuicontroller", version.ref = "accompanist" }
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }

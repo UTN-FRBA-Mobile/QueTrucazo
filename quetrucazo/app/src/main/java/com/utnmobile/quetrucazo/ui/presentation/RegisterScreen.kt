@@ -15,6 +15,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -75,9 +76,21 @@ fun RegisterScreen(navigateTo: NavigateTo) {
             TextField(
                 value = username,
                 onValueChange = { username = it },
-                label = { Text("Username") },
+                label = { Text("Usuario") },
                 singleLine = true,
-                keyboardActions = KeyboardActions { keyboardController?.hide() }
+                keyboardActions = KeyboardActions { keyboardController?.hide() },
+                colors = TextFieldDefaults.colors(
+                    cursorColor = Color.White,
+                    focusedIndicatorColor = Color.Transparent,
+                    unfocusedIndicatorColor = Color.Transparent,
+                    disabledTextColor = Color.White.copy(alpha = 0.6f),
+                    focusedLabelColor = Color.White,
+                    unfocusedLabelColor = Color.White.copy(alpha = 0.6f),
+                    focusedContainerColor = Color.Black.copy(alpha = 0.6f),
+                    unfocusedContainerColor = Color.Black.copy(alpha = 0.6f),
+                    focusedTextColor = Color.White,
+                    unfocusedTextColor = Color.White,
+                ),
             )
 
             Spacer(modifier = Modifier.height(8.dp))
@@ -85,16 +98,28 @@ fun RegisterScreen(navigateTo: NavigateTo) {
             TextField(
                 value = password,
                 onValueChange = { password = it },
-                label = { Text("Password") },
+                label = { Text("Contraseña") },
                 singleLine = true,
                 keyboardActions = KeyboardActions { keyboardController?.hide() },
-                visualTransformation = PasswordVisualTransformation()
+                visualTransformation = PasswordVisualTransformation(),
+                colors = TextFieldDefaults.colors(
+                    cursorColor = Color.White,
+                    focusedIndicatorColor = Color.Transparent,
+                    unfocusedIndicatorColor = Color.Transparent,
+                    disabledTextColor = Color.White.copy(alpha = 0.6f),
+                    focusedLabelColor = Color.White,
+                    unfocusedLabelColor = Color.White.copy(alpha = 0.6f),
+                    focusedContainerColor = Color.Black.copy(alpha = 0.6f),
+                    unfocusedContainerColor = Color.Black.copy(alpha = 0.6f),
+                    focusedTextColor = Color.White,
+                    unfocusedTextColor = Color.White,
+                ),
             )
 
             Spacer(modifier = Modifier.height(16.dp))
 
             if (isLoading) {
-                CircularProgressIndicator()
+                CircularProgressIndicator(color = Color.White)
             } else {
                 Button(
                     onClick = {
@@ -109,7 +134,7 @@ fun RegisterScreen(navigateTo: NavigateTo) {
                     },
                     colors = colorBoton()
                 ) {
-                    Text("Registrarme")
+                    Text("REGISTRARME")
                 }
             }
 
@@ -138,7 +163,7 @@ fun RegisterScreen(navigateTo: NavigateTo) {
                     .height(30.dp),
                 colors = colorBotonDisable()
             ) {
-                Text("Iniciar sesión", fontSize = 11.sp)
+                Text("INICIAR SESIÓN", fontSize = 11.sp)
             }
 
         }

@@ -37,6 +37,7 @@ fun PlayGameScreen(
     trucoCaller: UserId?,
     isFirstStep: Boolean,
     wasEnvidoCalled: Boolean,
+    canCallEnvido: Boolean,
     envidoCalls: List<String>,
 ) {
     var showEnvidoCallOptions by remember { mutableStateOf(false) }
@@ -220,7 +221,7 @@ fun PlayGameScreen(
                             .height(buttonHeight),
                         shape = RectangleShape,
                         colors = if (isFirstStep && !wasEnvidoCalled) buttonColors else grayButtonColors,
-                        enabled = isFirstStep && !wasEnvidoCalled
+                        enabled = isFirstStep && !wasEnvidoCalled && canCallEnvido
                     ) {
                         Box(
                             contentAlignment = Alignment.Center,

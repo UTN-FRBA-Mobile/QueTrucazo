@@ -127,6 +127,13 @@ object SocketIOManager {
         data.put("call", call)
         _socket?.emit("envido", data)
     }
+    fun envidoGoFirst(userId: Int, gameId: Int, call: String){
+        val data = JSONObject()
+        data.put("userId",userId)
+        data.put("gameId", gameId)
+        data.put("call", call)
+        _socket?.emit("envido-go-first", data)
+    }
 
     fun answerEnvido(userId: Int, gameId: Int, accepted: Boolean){
         val data = JSONObject()

@@ -1,9 +1,11 @@
 package com.utnmobile.quetrucazo.ui.presentation
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
@@ -15,6 +17,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -73,9 +76,21 @@ fun LoginScreen(navigateTo: NavigateTo) {
             TextField(
                 value = username,
                 onValueChange = { username = it },
-                label = { Text("Username") },
+                label = { Text("Usuario") },
                 singleLine = true,
-                keyboardActions = KeyboardActions { keyboardController?.hide() }
+                keyboardActions = KeyboardActions { keyboardController?.hide() },
+                colors = TextFieldDefaults.colors(
+                    cursorColor = Color.White,
+                    focusedIndicatorColor = Color.Transparent,
+                    unfocusedIndicatorColor = Color.Transparent,
+                    disabledTextColor = Color.White.copy(alpha = 0.6f),
+                    focusedLabelColor = Color.White,
+                    unfocusedLabelColor = Color.White.copy(alpha = 0.6f),
+                    focusedContainerColor = Color.Black.copy(alpha = 0.6f),
+                    unfocusedContainerColor = Color.Black.copy(alpha = 0.6f),
+                    focusedTextColor = Color.White,
+                    unfocusedTextColor = Color.White,
+                ),
             )
 
             Spacer(modifier = Modifier.height(8.dp))
@@ -83,16 +98,28 @@ fun LoginScreen(navigateTo: NavigateTo) {
             TextField(
                 value = password,
                 onValueChange = { password = it },
-                label = { Text("Password") },
+                label = { Text("Contraseña") },
                 singleLine = true,
                 keyboardActions = KeyboardActions { keyboardController?.hide() },
-                visualTransformation = PasswordVisualTransformation()
+                visualTransformation = PasswordVisualTransformation(),
+                colors = TextFieldDefaults.colors(
+                    cursorColor = Color.White,
+                    focusedIndicatorColor = Color.Transparent,
+                    unfocusedIndicatorColor = Color.Transparent,
+                    disabledTextColor = Color.White.copy(alpha = 0.6f),
+                    focusedLabelColor = Color.White,
+                    unfocusedLabelColor = Color.White.copy(alpha = 0.6f),
+                    focusedContainerColor = Color.Black.copy(alpha = 0.6f),
+                    unfocusedContainerColor = Color.Black.copy(alpha = 0.6f),
+                    focusedTextColor = Color.White,
+                    unfocusedTextColor = Color.White,
+                ),
             )
 
             Spacer(modifier = Modifier.height(16.dp))
 
             if (isLoading) {
-                CircularProgressIndicator()
+                CircularProgressIndicator(color = Color.White)
             } else {
                 Button(
                     onClick = {
@@ -107,7 +134,7 @@ fun LoginScreen(navigateTo: NavigateTo) {
                     },
                     colors = colorBoton()
                 ) {
-                    Text("Iniciar sesión")
+                    Text("INICIAR SESIÓN")
                 }
             }
 
@@ -136,7 +163,7 @@ fun LoginScreen(navigateTo: NavigateTo) {
                     .height(30.dp),
                 colors = colorBotonDisable()
             ) {
-                Text("Registrarse", fontSize = 11.sp)
+                Text("REGISTRARSE", fontSize = 11.sp)
             }
 
         }

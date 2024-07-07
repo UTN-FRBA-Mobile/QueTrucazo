@@ -15,6 +15,7 @@ import com.utnmobile.quetrucazo.model.events.implementations.TrucoCallGameEvent
 import com.utnmobile.quetrucazo.model.events.implementations.TrucoDeclineGameEvent
 import com.utnmobile.quetrucazo.model.events.implementations.EnvidoCallGameEvent
 import com.utnmobile.quetrucazo.model.events.implementations.EnvidoDeclinedGameEvent
+import com.utnmobile.quetrucazo.model.events.implementations.EnvidoGoFirstGameEvent
 import org.json.JSONArray
 import org.json.JSONObject
 
@@ -36,6 +37,7 @@ open class GameEvent {
                 "ENVIDO_DECLINED" -> EnvidoDeclinedGameEvent.from(json)
                 "PLAY_AGAIN" -> PlayAgainEvent.from(json)
                 "NO_PLAY_AGAIN" -> NoPlayAgainEvent.from(json)
+                "ENVIDO_GO_FIRST" -> EnvidoGoFirstGameEvent.from(json)
                 else -> throw IllegalArgumentException("Invalid event type ${json.getString("type")}")
             }
         }

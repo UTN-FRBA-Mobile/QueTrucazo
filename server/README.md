@@ -1,7 +1,7 @@
 # Levantar el ambiente local
 1. Instalar NodeJS 18
 2. Instalar Docker
-3. Crear la base de datos en docker con docker run --name postgres-quetrucazo -d -p 5432:5432 -e POSTGRES_PASSWORD=password postgres
+3. Crear la base de datos en docker con `docker run --name postgres-quetrucazo -d -p 5432:5432 -e POSTGRES_PASSWORD=password postgres`
 5. Ejecutar npm i
 6. Ejecutar npm run dev
 7. Ejecutar ./ngrok http 8080
@@ -9,10 +9,10 @@
 
 ## Buildear y subir docker image
 1. doctl registry login
-2. docker build -t quetrucazo-api:0.0.11 .
-3. docker tag quetrucazo-api:0.0.11 registry.digitalocean.com/miutn/quetrucazo-api:0.0.11
-4. docker push registry.digitalocean.com/miutn/quetrucazo-api:0.0.11
+2. docker build -t quetrucazo-api:1.0.0 .
+3. docker tag quetrucazo-api:1.0.0 registry.digitalocean.com/miutn/quetrucazo-api:1.0.0
+4. docker push registry.digitalocean.com/miutn/quetrucazo-api:1.0.0
 
 ## Pullear y deployar en droplet
-1. docker --config /home/deve/.docker pull registry.digitalocean.com/miutn/quetrucazo-api:0.0.11
-2. docker run --name quetrucazo-api -d --restart=on-failure:3 -p 32025:8080 --env-file=/home/deve/quetrucazo/api/env.list registry.digitalocean.com/miutn/quetrucazo-api:0.0.11
+1. docker --config /home/deve/.docker pull registry.digitalocean.com/miutn/quetrucazo-api:1.0.0
+2. docker run --name quetrucazo-api -d --restart=on-failure:3 -p 32025:8080 --env-file=/home/deve/quetrucazo/api/env.list registry.digitalocean.com/miutn/quetrucazo-api:1.0.0

@@ -13,6 +13,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -22,21 +24,28 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.utnmobile.quetrucazo.ui.presentation.iconDialogColor
+import kotlin.math.min
 
 @Composable
 fun PointsGameScreen(modifier: Modifier = Modifier, myPoints: Int, opponentPoints: Int) {
-    Column(
-        modifier = modifier.wrapContentHeight().fillMaxWidth(),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Top
+    Surface(
+        color = Color.Black.copy(alpha = 0.6f),
+        shape = MaterialTheme.shapes.small,
+        modifier = Modifier.padding(horizontal = 32.dp, vertical = 16.dp)
     ) {
-        PointCounter(text = "TU", points = myPoints, color = iconDialogColor())
-        PointCounter(text = "ÉL", points = opponentPoints, color = iconDialogColor())
+        Column(
+            modifier = modifier.wrapContentHeight().fillMaxWidth(),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Top,
+        ) {
+            PointCounter(text = "TU", points = myPoints, color = iconDialogColor())
+            PointCounter(text = "ÉL", points = opponentPoints, color = iconDialogColor())
+        }
     }
 }
 
 @Composable
-fun PointCounter(text: String, points: Int, color: Color = Color.Black) {
+fun PointCounter(text: String, points: Int, color: Color = Color.White) {
     val fullSets = points / 5
     val remaining = points % 5
     val emptySets = 6 - fullSets - if (remaining > 0) 1 else 0
@@ -48,7 +57,7 @@ fun PointCounter(text: String, points: Int, color: Color = Color.Black) {
             DrawStrokes(5, color)
             Spacer(modifier = Modifier.height(8.dp))
         }
-        if (remaining > 0) {
+        if (remaining > 0 && fullSets < 6) {
             DrawStrokes(remaining, color)
             Spacer(modifier = Modifier.height(8.dp))
         }

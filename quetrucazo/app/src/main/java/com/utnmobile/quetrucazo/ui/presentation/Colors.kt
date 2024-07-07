@@ -34,3 +34,7 @@ fun iconDialogColor(): Color {
 fun titleTopBarColor(): Color {
     return Color.White
 }
+
+fun dialogTextColor(): Color {
+    return Color.White
+}

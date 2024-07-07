@@ -19,6 +19,7 @@ import { answerTruco } from '../../modules/games/core/actions/AnswerTruco';
 import { checkUserGame } from '../../modules/games/core/actions/CheckUserGame';
 import { checkNoPlayAgain } from '../../modules/games/core/actions/CheckNoPlayAgain';
 import { deleteWaitingUserGame } from '../../modules/games/core/actions/DeleteWaitingUserGame';
+import { envidoGoFirst } from '../../modules/games/core/actions/EnvidoGoFirst';
 
 export class SocketManager {
     private io: Server;
@@ -139,6 +140,18 @@ export class SocketManager {
                     await envido.invoke(gameId, userId, call);
                 } catch (error) {
                     console.error('Error envido', error);
+                }
+            });
+
+            socket.on('envido-go-first', async ({ userId, gameId, call }: { userId: UserId, gameId: GameId, call: EnvidoCall }) => {
+                try {
+                    console.log('envido-go-first', call)
+                    if (call !== EnvidoCall.ENVIDO && call !== EnvidoCall.REAL_ENVIDO && call !== EnvidoCall.FALTA_ENVIDO) {
+                        throw new Error('Invalid envido call');
+                    }
+                    await envidoGoFirst.invoke(gameId, userId, call);
+                } catch (error) {
+                    console.error('Error envido go first', error);
                 }
             });
 

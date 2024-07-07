@@ -30,6 +30,7 @@ import com.utnmobile.quetrucazo.model.UserId
 import com.utnmobile.quetrucazo.model.events.implementations.EnvidoAcceptedGameEvent
 import com.utnmobile.quetrucazo.model.events.implementations.EnvidoCallGameEvent
 import com.utnmobile.quetrucazo.model.events.implementations.EnvidoDeclinedGameEvent
+import com.utnmobile.quetrucazo.model.events.implementations.EnvidoGoFirstGameEvent
 import com.utnmobile.quetrucazo.model.events.implementations.NextRoundGameEvent
 import com.utnmobile.quetrucazo.model.events.implementations.NoPlayAgainEvent
 import com.utnmobile.quetrucazo.model.events.implementations.PlayAgainEvent
@@ -96,6 +97,7 @@ fun GameScreen(navigateTo: NavigateTo, game: Game, isPreview: Boolean = false) {
 
     var wasEnvidoCalled by remember { mutableStateOf(false) } // setear
     var envidoCalls by remember { mutableStateOf<List<String>>(emptyList()) } // setear
+    var canCallEnvido by remember { mutableStateOf(true) } // setear
 
     fun isFirstStep(): Boolean {
         return min(myThrownCards.size, opponentThrownCards.size) == 0
@@ -125,6 +127,7 @@ fun GameScreen(navigateTo: NavigateTo, game: Game, isPreview: Boolean = false) {
                 trucoDialogCall = null
                 wasEnvidoCalled = false
                 envidoCalls = emptyList()
+                canCallEnvido = true
             }
 
             is ResultGameEvent -> {
@@ -164,6 +167,9 @@ fun GameScreen(navigateTo: NavigateTo, game: Game, isPreview: Boolean = false) {
                 myTurn = event.caller != userId
                 lastTrucoCall = event.call
                 lastTrucoCaller = event.caller
+                if (lastTrucoCall == "RETRUCO") {
+                    canCallEnvido = false
+                }
                 if (userId != event.caller) {
                     opponentDialogText = when (event.call) {
                         "TRUCO" -> "Truco"
@@ -181,6 +187,7 @@ fun GameScreen(navigateTo: NavigateTo, game: Game, isPreview: Boolean = false) {
             }
 
             is TrucoAcceptGameEvent -> {
+                canCallEnvido = false
                 myTurn = event.nextPlayerId == userId
                 if (event.acceptedBy != userId) {
                     opponentDialogText = "Quiero"
@@ -237,7 +244,14 @@ fun GameScreen(navigateTo: NavigateTo, game: Game, isPreview: Boolean = false) {
                 }
             }
 
+            is EnvidoGoFirstGameEvent -> {
+                lastTrucoCall = null
+                trucoDialogCall = null
+                lastTrucoCaller = null
+            }
+
             is EnvidoAcceptedGameEvent -> {
+                canCallEnvido = false
                 myTurn = event.nextPlayerId == userId
                 showEnvidoAnswerOptions = false
 
@@ -287,6 +301,7 @@ fun GameScreen(navigateTo: NavigateTo, game: Game, isPreview: Boolean = false) {
             }
 
             is EnvidoDeclinedGameEvent -> {
+                canCallEnvido = false
                 myTurn = event.nextPlayerId == userId
                 showEnvidoAnswerOptions = false
                 myPoints = event.points[userId] ?: 0
@@ -328,7 +343,7 @@ fun GameScreen(navigateTo: NavigateTo, game: Game, isPreview: Boolean = false) {
     BackgroundBox(imageRes = R.drawable.game_background) {
         Scaffold(
             containerColor = Color.Transparent,
-            contentColor = Color.Transparent
+            contentColor = Color.Transparent,
         ) { paddingValues ->
             Box(
                 modifier = Modifier
@@ -403,7 +418,8 @@ fun GameScreen(navigateTo: NavigateTo, game: Game, isPreview: Boolean = false) {
                             gameId = game.id,
                             userId = userId,
                             call = it,
-                            onMyDialogText = { t -> myDialogText = t }
+                            onMyDialogText = { t -> myDialogText = t },
+                            canCallEnvido = canCallEnvido && isFirstStep()
                         )
                     }
                 }
@@ -423,6 +439,7 @@ fun GameScreen(navigateTo: NavigateTo, game: Game, isPreview: Boolean = false) {
                     isFirstStep = isFirstStep(),
                     wasEnvidoCalled = wasEnvidoCalled,
                     envidoCalls = envidoCalls,
+                    canCallEnvido = canCallEnvido
                 )
 
                 opponentDialogText?.let {

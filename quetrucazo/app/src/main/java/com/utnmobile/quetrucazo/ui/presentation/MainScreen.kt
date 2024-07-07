@@ -26,6 +26,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.utnmobile.quetrucazo.R
@@ -64,7 +65,7 @@ fun MainScreen(navigateTo: NavigateTo) {
         Scaffold(
             topBar = {
                 TopAppBar(
-                    title = { Text("QuéTrucazo!", color = titleTopBarColor()) },
+                    title = { Text("QuéTrucazo!", fontWeight = FontWeight.Bold, color = titleTopBarColor()) },
                     actions = {
                         IconButton(onClick = { showDialog = true }) {
                             Icon(Icons.Filled.Settings, contentDescription = "Settings", tint = iconDialogColor())
@@ -92,7 +93,7 @@ fun MainScreen(navigateTo: NavigateTo) {
                     },
                     colors = colorBoton()
                 ) {
-                    Text("Crear partida")
+                    Text("CREAR PARTIDA")
                 }
 
                 Spacer(modifier = Modifier.height(16.dp))
@@ -101,7 +102,7 @@ fun MainScreen(navigateTo: NavigateTo) {
                     onClick = { navigateTo(Screen.GameList, emptyMap()) },
                     colors = colorBoton()
                 ) {
-                    Text("Unirse a una partida")
+                    Text("UNIRSE A UNA PARTIDA")
                 }
 
                 if (showDialog) {

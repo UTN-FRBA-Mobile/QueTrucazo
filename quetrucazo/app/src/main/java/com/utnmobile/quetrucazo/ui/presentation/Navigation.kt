@@ -2,14 +2,35 @@ package com.utnmobile.quetrucazo.ui.presentation
 
 import android.content.Context
 import android.content.Intent
+import androidx.compose.animation.animateContentSize
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.utnmobile.quetrucazo.model.Game
 import com.utnmobile.quetrucazo.services.SocketIOManager
 import com.utnmobile.quetrucazo.ui.presentation.game.GameScreen
+import com.utnmobile.quetrucazo.ui.presentation.game.PointCounter
 import com.utnmobile.quetrucazo.ui.viewmodel.auth.AuthViewModel
 import com.utnmobile.quetrucazo.ui.viewmodel.connection.ConnectionViewModel
 import org.json.JSONObject
@@ -69,16 +90,52 @@ enum class Screen {
     Login, Register, Main, GameList, WaitingForOpponent, Game
 }@Composable
 fun ConnectionLostDialog(onRestartApp: () -> Unit) {
-    AlertDialog(
-        onDismissRequest = onRestartApp,
-        title = { Text("Conexión perdida") },
-        text = { Text("Se perdió la conexión. Por favor, reinicie la aplicación.") },
-        confirmButton = {
-            TextButton(onClick = onRestartApp) {
-                Text("Reiniciar")
+    Dialog(
+        onDismissRequest = onRestartApp
+    ) {
+        Surface(
+            shape = MaterialTheme.shapes.medium,
+            modifier = Modifier.fillMaxWidth(),
+            color = dialogColor()
+        ) {
+            Column(modifier = Modifier.padding(16.dp)) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth(),
+                    horizontalArrangement = Arrangement.Center,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        "Conexión perdida",
+                        style = TextStyle(
+                            fontSize = 30.sp,
+                            color = dialogTextColor(),
+                            fontWeight = FontWeight.Bold
+                        ),
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.animateContentSize()
+                    )
+                }
+                Spacer(modifier = Modifier.height(16.dp))
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth(),
+                ) {
+                    Button(
+                        onClick = {
+                            onRestartApp()
+                        },
+                        modifier = Modifier
+                            .fillMaxWidth(),
+                        colors = colorBoton()
+                    ) {
+                        Text("RECONECTAR")
+                    }
+                }
+
             }
         }
-    )
+    }
 }
 
 fun restartApp(context: Context) {

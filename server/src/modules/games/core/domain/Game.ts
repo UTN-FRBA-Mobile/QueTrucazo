@@ -58,6 +58,7 @@ export enum GameEventType {
     ENVIDO_CALL = 'ENVIDO_CALL',
     ENVIDO_ACCEPTED = 'ENVIDO_ACCEPTED',
     ENVIDO_DECLINED = 'ENVIDO_DECLINED',
+    ENVIDO_GO_FIRST = 'ENVIDO_GO_FIRST',
     TRUCO_CALL = 'TRUCO_CALL',
     TRUCO_ACCEPT = 'TRUCO_ACCEPT',
     TRUCO_DECLINE = 'TRUCO_DECLINE',
@@ -157,10 +158,16 @@ export type GameEventNoPlayAgain = {
     userId: SafeUser['id'];
 };
 
+export type GameEventEnvidoGoFirst = {
+    type: GameEventType.ENVIDO_GO_FIRST;
+    caller: SafeUser['id'];
+}
+
 export type GameEvent = GameEventStart
     | GameEventEnvidoCall
     | GameEventEnvidoAccepted
     | GameEventEnvidoDeclined
+    | GameEventEnvidoGoFirst
     | GameEventTrucoCall
     | GameEventTrucoAccept
     | GameEventTrucoDecline
@@ -502,6 +509,53 @@ export class Game {
         return game;
     }
 
+    envidoGoFirst(userId: UserId, call: EnvidoCall): Game {
+        if (this.step() !== 1) {
+            throw new Error('Invalid step');
+        }
+        if (this.state.playerTurn !== userId) {
+            throw new Error('Not your turn');
+        }
+        if (this.state.envido.calls.length !== 0) {
+            throw new Error('Envido already called');
+        }
+        if (this.state.truco.lastCall === undefined) {
+            throw new Error('Truco not called');
+        }
+        if (this.state.truco.lastCall !== TrucoCall.TRUCO) {
+            throw new Error('Truco call must be TRUCO');
+        }
+        if (!this.state.truco.waitingResponse) {
+            throw new Error('Truco not waiting response');
+        }
+        return this.removeTrucoForEnvido(userId).envido(userId, call);
+    }
+
+    removeTrucoForEnvido(caller: UserId): Game {
+        const event: GameEventEnvidoGoFirst = {
+            type: GameEventType.ENVIDO_GO_FIRST,
+            caller,
+        };
+
+        return this.copy({
+            ...this,
+            events: [...this.events, event],
+            state: {
+                ...this.state,
+                truco: {
+                    lastCall: undefined,
+                    firstCaller: undefined,
+                    lastCaller: undefined,
+                    acceptedBy: undefined,
+                    accepted: undefined,
+                    waitingResponse: false,
+                    playerTurnAfterResponse: undefined,
+                    points: 1,
+                },
+            },
+        });
+    }
+
     envido(userId: UserId, call: EnvidoCall): Game {
         if (this.state.playerTurn !== userId) {
             throw new Error('Not your turn');
@@ -665,6 +719,9 @@ export class Game {
                 case EnvidoCall.REAL_ENVIDO:
                     points += 3;
                     break;
+                case EnvidoCall.FALTA_ENVIDO:
+                    points += 1;
+                    break;
             }
         }
         return points;
@@ -758,7 +815,7 @@ export class Game {
     }
 
     setRoundWinner(winner: SafeUser['id']): Game {
-        const extraPoints = this.state.truco.points;
+        const extraPoints = this.state.truco.points + this.envidoNotCalledPoints();
 
         const points = {
             ...this.state.points,
@@ -776,6 +833,11 @@ export class Game {
         });
 
         return game.withNextRoundOrWin();
+    }
+
+    private envidoNotCalledPoints(): number {
+        if (this.state.envido.calls.length === 0 && this.state.truco.lastCall === undefined && this.step() === 1) return 1;
+        return 0;
     }
 
     withNextRoundOrWin(): Game {
