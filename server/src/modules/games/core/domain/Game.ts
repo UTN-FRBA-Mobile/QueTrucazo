@@ -710,7 +710,10 @@ export class Game {
     }
 
     getNotWantedEnvidoPoints(): number {
+        if (this.state.envido.calls.length === 1) return 1;
+        
         let points = 0;
+
         for (let i = 0; i < this.state.envido.calls.length - 1; i++) {
             switch (this.state.envido.calls[i]) {
                 case EnvidoCall.ENVIDO:
