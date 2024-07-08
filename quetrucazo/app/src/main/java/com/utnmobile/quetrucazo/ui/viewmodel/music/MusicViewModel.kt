@@ -9,7 +9,7 @@ class MusicViewModel(context: Context) : ViewModel() {
     private var mediaPlayer: MediaPlayer? = null
 
     init {
-        mediaPlayer = MediaPlayer.create(context.applicationContext, R.raw.fluffingaduck)
+        mediaPlayer = MediaPlayer.create(context.applicationContext, R.raw.elcondorpasa)
         mediaPlayer?.isLooping = true
     }
 

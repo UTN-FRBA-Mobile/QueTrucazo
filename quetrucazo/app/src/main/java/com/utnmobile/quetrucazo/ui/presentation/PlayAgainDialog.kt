@@ -14,6 +14,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
 import com.utnmobile.quetrucazo.services.SocketIOManager
 
 @Composable
@@ -22,7 +23,7 @@ fun PlayAgainDialog(
     gameId: Int,
     userId: Int
 ) {
-    Dialog(onDismissRequest = onDismissRequest) {
+    Dialog(onDismissRequest = onDismissRequest, properties = DialogProperties(dismissOnBackPress = false, dismissOnClickOutside = false)) {
         Surface(
             shape = MaterialTheme.shapes.medium,
             modifier = Modifier.fillMaxWidth(),

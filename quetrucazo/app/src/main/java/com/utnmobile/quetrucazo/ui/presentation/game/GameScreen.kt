@@ -421,6 +421,7 @@ fun GameScreen(navigateTo: NavigateTo, game: Game, isPreview: Boolean = false) {
                             onMyDialogText = { t -> myDialogText = t },
                             canCallEnvido = canCallEnvido && isFirstStep()
                         )
+
                     }
                 }
 

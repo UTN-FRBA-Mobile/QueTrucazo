@@ -26,6 +26,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
 import com.utnmobile.quetrucazo.services.SocketIOManager
 
 @Composable
@@ -38,7 +39,8 @@ fun TrucoDialog(
     canCallEnvido: Boolean,
 ) {
     var showEnvidoOptions by remember { mutableStateOf(false) }
-    Dialog(onDismissRequest = onDismissRequest) {
+    Dialog(onDismissRequest = onDismissRequest, properties = DialogProperties(dismissOnClickOutside = false, dismissOnBackPress = false)) {
+
         Surface(
             shape = MaterialTheme.shapes.medium,
             modifier = Modifier.fillMaxWidth(),
