@@ -13,6 +13,8 @@ data class GameState(
     val cards: Map<UserId, List<Card>>,
     val thrownCards: Map<UserId, List<Card>>,
     val points: Map<UserId, Int>,
+    val envido: Envido,
+    val truco: Truco,
 ) {
     companion object {
         val default: GameState = GameState(
@@ -23,7 +25,9 @@ data class GameState(
             round = 0,
             cards = emptyMap(),
             thrownCards = emptyMap(),
-            points = emptyMap()
+            points = emptyMap(),
+            envido = Envido.default,
+            truco = Truco.default,
         )
 
         fun from(json: JSONObject): GameState {
@@ -40,6 +44,8 @@ data class GameState(
                     it.toCards()
                 },
                 points = json.toPoints(),
+                envido = Envido.from(json.getJSONObject("envido")),
+                truco = Truco.from(json.getJSONObject("truco")),
             )
         }
     }

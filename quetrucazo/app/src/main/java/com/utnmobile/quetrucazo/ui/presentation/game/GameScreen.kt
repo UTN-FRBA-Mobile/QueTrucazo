@@ -84,20 +84,26 @@ fun GameScreen(navigateTo: NavigateTo, game: Game, isPreview: Boolean = false) {
 
     var myTurn by remember { mutableStateOf(game.state.playerTurn == userId) }
 
-    var playAgainDialog by remember { mutableStateOf(false) } // setear
+    var playAgainDialog by remember { mutableStateOf(false) }
 
-    var lastTrucoCaller by remember { mutableStateOf<UserId?>(null)} // setear
-    var lastTrucoCall by remember { mutableStateOf<String?>(null)} // setear
-    var trucoDialogCall by remember { mutableStateOf<String?>(null) } // setear
+    var lastTrucoCaller by remember { mutableStateOf(game.state.truco.lastCaller)}
+    var lastTrucoCall by remember { mutableStateOf(game.state.truco.lastCall)}
+    var trucoDialogCall by remember { mutableStateOf(
+        if (game.state.truco.waitingResponse && game.state.playerTurn == userId)
+            game.state.truco.lastCall
+        else null
+    ) }
 
-    var myDialogText by remember { mutableStateOf<String?>(null) } // setear
-    var opponentDialogText by remember { mutableStateOf<String?>(null) } // setear
+    var myDialogText by remember { mutableStateOf<String?>(null) }
+    var opponentDialogText by remember { mutableStateOf<String?>(null) }
 
-    var showEnvidoAnswerOptions by remember { mutableStateOf(false) } // setear
+    var showEnvidoAnswerOptions by remember { mutableStateOf(game.state.envido.waitingResponse && game.state.playerTurn == userId) }
 
-    var wasEnvidoCalled by remember { mutableStateOf(false) } // setear
-    var envidoCalls by remember { mutableStateOf<List<String>>(emptyList()) } // setear
-    var canCallEnvido by remember { mutableStateOf(true) } // setear
+    var wasEnvidoCalled by remember { mutableStateOf(game.state.envido.calls.isNotEmpty()) }
+    var envidoCalls by remember { mutableStateOf(game.state.envido.calls) }
+    var canCallEnvido by remember { mutableStateOf(
+        game.state.envido.acceptedBy == null && game.state.truco.points == 1
+    ) }
 
     fun isFirstStep(): Boolean {
         return min(myThrownCards.size, opponentThrownCards.size) == 0

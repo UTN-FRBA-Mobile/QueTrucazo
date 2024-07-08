@@ -62,18 +62,6 @@ fun VolumeControlDialog(onDismissRequest: () -> Unit) {
                         inactiveTrackColor = volumeColor()
                     )
                 )
-                Text("Efectos", style = MaterialTheme.typography.titleLarge, color = volumeColor())
-                Slider(
-                    value = effectsVolume,
-                    onValueChange = { effectsVolume = it },
-                    valueRange = 0f..1f,
-                    modifier = Modifier.fillMaxWidth(),
-                    colors = SliderDefaults.colors(
-                        thumbColor = volumeColor(),
-                        activeTrackColor = volumeColor(),
-                        inactiveTrackColor = volumeColor()
-                    )
-                )
                 Spacer(Modifier.height(20.dp))
             }
         }

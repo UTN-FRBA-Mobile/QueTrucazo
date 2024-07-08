@@ -162,8 +162,8 @@ fun LoginScreen(navigateTo: NavigateTo) {
                     navigateTo(Screen.Register, emptyMap())
                 },
                 modifier = Modifier
-                    .width(180.dp)
-                    .height(15.dp),
+                    .width(120.dp)
+                    .height(20.dp),
                 text = "REGISTRARSE",
                 fontSize = 11.sp
             )

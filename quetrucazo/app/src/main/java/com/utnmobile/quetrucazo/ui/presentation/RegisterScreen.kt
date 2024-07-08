@@ -163,8 +163,8 @@ fun RegisterScreen(navigateTo: NavigateTo) {
                     navigateTo(Screen.Login, emptyMap())
                 },
                 modifier = Modifier
-                    .width(180.dp)
-                    .height(15.dp),
+                    .width(120.dp)
+                    .height(20.dp),
                 text = "INICIAR SESIÓN",
                 fontSize = 11.sp
             )
